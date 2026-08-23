@@ -1,0 +1,1300 @@
+2026-08-23T06:08:56.7698072Z Current runner version: '2.336.0'
+2026-08-23T06:08:56.7718875Z ##[group]Runner Image Provisioner
+2026-08-23T06:08:56.7719563Z Hosted Compute Agent
+2026-08-23T06:08:56.7720036Z Version: 20260729.566
+2026-08-23T06:08:56.7720660Z Commit: cf7153fe6e25b664e8693c24944bf2b00355d109
+2026-08-23T06:08:56.7721284Z Build Date: 2026-07-29T19:17:02Z
+2026-08-23T06:08:56.7721901Z Worker ID: {b30fb96d-9099-43b3-b454-2517586799d6}
+2026-08-23T06:08:56.7722493Z Azure Region: northcentralus
+2026-08-23T06:08:56.7722992Z ##[endgroup]
+2026-08-23T06:08:56.7724457Z ##[group]Operating System
+2026-08-23T06:08:56.7725018Z Ubuntu
+2026-08-23T06:08:56.7725512Z 24.04.4
+2026-08-23T06:08:56.7725957Z LTS
+2026-08-23T06:08:56.7726628Z ##[endgroup]
+2026-08-23T06:08:56.7727246Z ##[group]Runner Image
+2026-08-23T06:08:56.7727771Z Image: ubuntu-24.04
+2026-08-23T06:08:56.7728267Z Version: 20260816.277.1
+2026-08-23T06:08:56.7729326Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20260816.277/images/ubuntu/Ubuntu2404-Readme.md
+2026-08-23T06:08:56.7730738Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20260816.277
+2026-08-23T06:08:56.7731566Z ##[endgroup]
+2026-08-23T06:08:56.7732782Z ##[group]GITHUB_TOKEN Permissions
+2026-08-23T06:08:56.7734643Z Contents: write
+2026-08-23T06:08:56.7735202Z Metadata: read
+2026-08-23T06:08:56.7735719Z ##[endgroup]
+2026-08-23T06:08:56.7737623Z Secret source: Actions
+2026-08-23T06:08:56.7738856Z Prepare workflow directory
+2026-08-23T06:08:56.8033146Z Prepare all required actions
+2026-08-23T06:08:56.8086597Z Getting action download info
+2026-08-23T06:08:57.0183201Z Download action repository 'actions/checkout@v4' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+2026-08-23T06:08:57.1714330Z Download action repository 'docker/setup-qemu-action@v3' (SHA:c7c53464625b32c7a7e944ae62b3e17d2b600130)
+2026-08-23T06:08:57.5623984Z Download action repository 'actions/upload-artifact@v4' (SHA:ea165f8d65b6e75b540449e92b4886f43607fa02)
+2026-08-23T06:08:57.7497075Z Download action repository 'softprops/action-gh-release@v2' (SHA:3bb12739c298aeb8a4eeaf626c5b8d85266b0e65)
+2026-08-23T06:08:58.0908170Z Complete job name: Build RPM for aarch64
+2026-08-23T06:08:58.1585656Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+2026-08-23T06:08:58.1594192Z ##[group]Run actions/checkout@v4
+2026-08-23T06:08:58.1595121Z with:
+2026-08-23T06:08:58.1595816Z   repository: jiangchuanso/smartctl-ps3stor
+2026-08-23T06:08:58.1602688Z   token: ***
+2026-08-23T06:08:58.1603336Z   ssh-strict: true
+2026-08-23T06:08:58.1603997Z   ssh-user: git
+2026-08-23T06:08:58.1604663Z   persist-credentials: true
+2026-08-23T06:08:58.1605402Z   clean: true
+2026-08-23T06:08:58.1606080Z   sparse-checkout-cone-mode: true
+2026-08-23T06:08:58.1606997Z   fetch-depth: 1
+2026-08-23T06:08:58.1607685Z   fetch-tags: false
+2026-08-23T06:08:58.1608367Z   show-progress: true
+2026-08-23T06:08:58.1609081Z   lfs: false
+2026-08-23T06:08:58.1609752Z   submodules: false
+2026-08-23T06:08:58.1610440Z   set-safe-directory: true
+2026-08-23T06:08:58.1611221Z   allow-unsafe-pr-checkout: false
+2026-08-23T06:08:58.1612199Z ##[endgroup]
+2026-08-23T06:08:58.2425499Z Syncing repository: jiangchuanso/smartctl-ps3stor
+2026-08-23T06:08:58.2428529Z ##[group]Getting Git version info
+2026-08-23T06:08:58.2429844Z Working directory is '/home/runner/work/smartctl-ps3stor/smartctl-ps3stor'
+2026-08-23T06:08:58.2431812Z [command]/usr/bin/git version
+2026-08-23T06:08:58.2480363Z git version 2.55.0
+2026-08-23T06:08:58.2504308Z ##[endgroup]
+2026-08-23T06:08:58.2522101Z Temporarily overriding HOME='/home/runner/work/_temp/b2ae6193-7d8e-4691-a748-1c6c451acc0a' before making global git config changes
+2026-08-23T06:08:58.2524329Z Adding repository directory to the temporary git global config as a safe directory
+2026-08-23T06:08:58.2526786Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/smartctl-ps3stor/smartctl-ps3stor
+2026-08-23T06:08:58.2575941Z Deleting the contents of '/home/runner/work/smartctl-ps3stor/smartctl-ps3stor'
+2026-08-23T06:08:58.2579180Z ##[group]Initializing the repository
+2026-08-23T06:08:58.2582572Z [command]/usr/bin/git init /home/runner/work/smartctl-ps3stor/smartctl-ps3stor
+2026-08-23T06:08:58.2678473Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-08-23T06:08:58.2681002Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-08-23T06:08:58.2683574Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-08-23T06:08:58.2685570Z hint: call:
+2026-08-23T06:08:58.2686860Z hint:
+2026-08-23T06:08:58.2688155Z hint: 	git config --global init.defaultBranch <name>
+2026-08-23T06:08:58.2689706Z hint:
+2026-08-23T06:08:58.2691265Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-08-23T06:08:58.2693748Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-08-23T06:08:58.2695931Z hint:
+2026-08-23T06:08:58.2697165Z hint: 	git branch -m <name>
+2026-08-23T06:08:58.2698414Z hint:
+2026-08-23T06:08:58.2700045Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-08-23T06:08:58.2702745Z Initialized empty Git repository in /home/runner/work/smartctl-ps3stor/smartctl-ps3stor/.git/
+2026-08-23T06:08:58.2707343Z [command]/usr/bin/git remote add origin https://github.com/jiangchuanso/smartctl-ps3stor
+2026-08-23T06:08:58.2769591Z ##[endgroup]
+2026-08-23T06:08:58.2771462Z ##[group]Disabling automatic garbage collection
+2026-08-23T06:08:58.2773339Z [command]/usr/bin/git config --local gc.auto 0
+2026-08-23T06:08:58.2798837Z ##[endgroup]
+2026-08-23T06:08:58.2800015Z ##[group]Setting up auth
+2026-08-23T06:08:58.2805323Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-08-23T06:08:58.2835062Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-08-23T06:08:58.3145028Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-08-23T06:08:58.3178738Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-08-23T06:08:58.3363617Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-08-23T06:08:58.3395069Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-08-23T06:08:58.3583421Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-08-23T06:08:58.3614808Z ##[endgroup]
+2026-08-23T06:08:58.3616461Z ##[group]Fetching the repository
+2026-08-23T06:08:58.3622710Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +63d6c71ca888f95e5b5221f391f6584aac384bad:refs/tags/v1.0.0.1
+2026-08-23T06:08:59.1171717Z From https://github.com/jiangchuanso/smartctl-ps3stor
+2026-08-23T06:08:59.1172744Z  * [new ref]         63d6c71ca888f95e5b5221f391f6584aac384bad -> v1.0.0.1
+2026-08-23T06:08:59.1175631Z ##[endgroup]
+2026-08-23T06:08:59.1176303Z ##[group]Determining the checkout info
+2026-08-23T06:08:59.1178114Z ##[endgroup]
+2026-08-23T06:08:59.1183154Z [command]/usr/bin/git sparse-checkout disable
+2026-08-23T06:08:59.1227025Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+2026-08-23T06:08:59.1254124Z ##[group]Checking out the ref
+2026-08-23T06:08:59.1257942Z [command]/usr/bin/git checkout --progress --force refs/tags/v1.0.0.1
+2026-08-23T06:08:59.2760013Z Note: switching to 'refs/tags/v1.0.0.1'.
+2026-08-23T06:08:59.2761234Z 
+2026-08-23T06:08:59.2761971Z You are in 'detached HEAD' state. You can look around, make experimental
+2026-08-23T06:08:59.2762888Z changes and commit them, and you can discard any commits you make in this
+2026-08-23T06:08:59.2763881Z state without impacting any branches by switching back to a branch.
+2026-08-23T06:08:59.2764457Z 
+2026-08-23T06:08:59.2764852Z If you want to create a new branch to retain commits you create, you may
+2026-08-23T06:08:59.2765767Z do so (now or later) by using -c with the switch command. Example:
+2026-08-23T06:08:59.2766468Z 
+2026-08-23T06:08:59.2766789Z   git switch -c <new-branch-name>
+2026-08-23T06:08:59.2767247Z 
+2026-08-23T06:08:59.2767564Z Or undo this operation with:
+2026-08-23T06:08:59.2767907Z 
+2026-08-23T06:08:59.2768258Z   git switch -
+2026-08-23T06:08:59.2768609Z 
+2026-08-23T06:08:59.2769088Z Turn off this advice by setting config variable advice.detachedHead to false
+2026-08-23T06:08:59.2769729Z 
+2026-08-23T06:08:59.2770461Z HEAD is now at 63d6c71 fix(ci): 修复 RPM 构建 ./configure Permission denied
+2026-08-23T06:08:59.2774749Z ##[endgroup]
+2026-08-23T06:08:59.2814019Z [command]/usr/bin/git log -1 --format=%H
+2026-08-23T06:08:59.2836637Z 63d6c71ca888f95e5b5221f391f6584aac384bad
+2026-08-23T06:08:59.3105738Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+2026-08-23T06:08:59.3107468Z ##[group]Run docker/setup-qemu-action@v3
+2026-08-23T06:08:59.3107813Z with:
+2026-08-23T06:08:59.3108090Z   platforms: arm64
+2026-08-23T06:08:59.3108403Z   image: docker.io/tonistiigi/binfmt:latest
+2026-08-23T06:08:59.3108744Z   cache-image: true
+2026-08-23T06:08:59.3109042Z ##[endgroup]
+2026-08-23T06:08:59.4940896Z ##[group]Docker info
+2026-08-23T06:08:59.4955161Z (node:2122) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-08-23T06:08:59.4956286Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-08-23T06:08:59.4987555Z [command]/usr/bin/docker version
+2026-08-23T06:09:00.6791838Z Client: Docker Engine - Community
+2026-08-23T06:09:00.6792311Z  Version:           28.0.4
+2026-08-23T06:09:00.6792635Z  API version:       1.48
+2026-08-23T06:09:00.6792949Z  Go version:        go1.23.7
+2026-08-23T06:09:00.6793292Z  Git commit:        b8034c0
+2026-08-23T06:09:00.6793625Z  Built:             Tue Mar 25 15:07:16 2025
+2026-08-23T06:09:00.6793986Z  OS/Arch:           linux/amd64
+2026-08-23T06:09:00.6794304Z  Context:           default
+2026-08-23T06:09:00.6794495Z 
+2026-08-23T06:09:00.6794666Z Server: Docker Engine - Community
+2026-08-23T06:09:00.6794988Z  Engine:
+2026-08-23T06:09:00.6795228Z   Version:          28.0.4
+2026-08-23T06:09:00.6795550Z   API version:      1.48 (minimum version 1.24)
+2026-08-23T06:09:00.6795912Z   Go version:       go1.23.7
+2026-08-23T06:09:00.6796252Z   Git commit:       6430e49
+2026-08-23T06:09:00.6796775Z   Built:            Tue Mar 25 15:07:16 2025
+2026-08-23T06:09:00.6797116Z   OS/Arch:          linux/amd64
+2026-08-23T06:09:00.6797349Z   Experimental:     false
+2026-08-23T06:09:00.6797539Z  containerd:
+2026-08-23T06:09:00.6797820Z   Version:          v2.3.3
+2026-08-23T06:09:00.6798118Z   GitCommit:        aad11006b869517fcd3009450b6f82da282e1a9b
+2026-08-23T06:09:00.6798483Z  runc:
+2026-08-23T06:09:00.6798698Z   Version:          1.4.3
+2026-08-23T06:09:00.6798975Z   GitCommit:        v1.4.3-0-gbb14dab
+2026-08-23T06:09:00.6799336Z  docker-init:
+2026-08-23T06:09:00.6799588Z   Version:          0.19.0
+2026-08-23T06:09:00.6799897Z   GitCommit:        de40ad0
+2026-08-23T06:09:00.6864343Z [command]/usr/bin/docker info
+2026-08-23T06:09:03.1327654Z Client: Docker Engine - Community
+2026-08-23T06:09:03.1328147Z  Version:    28.0.4
+2026-08-23T06:09:03.1328428Z  Context:    default
+2026-08-23T06:09:03.1328716Z  Debug Mode: false
+2026-08-23T06:09:03.1329338Z  Plugins:
+2026-08-23T06:09:03.1329591Z   buildx: Docker Buildx (Docker Inc.)
+2026-08-23T06:09:03.1329920Z     Version:  v0.36.1
+2026-08-23T06:09:03.1330293Z     Path:     /usr/libexec/docker/cli-plugins/docker-buildx
+2026-08-23T06:09:03.1330712Z   compose: Docker Compose (Docker Inc.)
+2026-08-23T06:09:03.1331036Z     Version:  v2.38.2
+2026-08-23T06:09:03.1331376Z     Path:     /usr/libexec/docker/cli-plugins/docker-compose
+2026-08-23T06:09:03.1331659Z 
+2026-08-23T06:09:03.1331763Z Server:
+2026-08-23T06:09:03.1331985Z  Containers: 0
+2026-08-23T06:09:03.1332237Z   Running: 0
+2026-08-23T06:09:03.1332477Z   Paused: 0
+2026-08-23T06:09:03.1332641Z   Stopped: 0
+2026-08-23T06:09:03.1332800Z  Images: 6
+2026-08-23T06:09:03.1332963Z  Server Version: 28.0.4
+2026-08-23T06:09:03.1333154Z  Storage Driver: overlay2
+2026-08-23T06:09:03.1333347Z   Backing Filesystem: extfs
+2026-08-23T06:09:03.1333546Z   Supports d_type: true
+2026-08-23T06:09:03.1333735Z   Using metacopy: false
+2026-08-23T06:09:03.1333913Z   Native Overlay Diff: false
+2026-08-23T06:09:03.1334114Z   userxattr: false
+2026-08-23T06:09:03.1334286Z  Logging Driver: json-file
+2026-08-23T06:09:03.1334476Z  Cgroup Driver: systemd
+2026-08-23T06:09:03.1334833Z  Cgroup Version: 2
+2026-08-23T06:09:03.1335004Z  Plugins:
+2026-08-23T06:09:03.1335161Z   Volume: local
+2026-08-23T06:09:03.1335390Z   Network: bridge host ipvlan macvlan null overlay
+2026-08-23T06:09:03.1335719Z   Log: awslogs fluentd gcplogs gelf journald json-file local splunk syslog
+2026-08-23T06:09:03.1336010Z  Swarm: inactive
+2026-08-23T06:09:03.1336197Z  Runtimes: io.containerd.runc.v2 runc
+2026-08-23T06:09:03.1336729Z  Default Runtime: runc
+2026-08-23T06:09:03.1336919Z  Init Binary: docker-init
+2026-08-23T06:09:03.1337178Z  containerd version: aad11006b869517fcd3009450b6f82da282e1a9b
+2026-08-23T06:09:03.1337476Z  runc version: v1.4.3-0-gbb14dab
+2026-08-23T06:09:03.1337689Z  init version: de40ad0
+2026-08-23T06:09:03.1337868Z  Security Options:
+2026-08-23T06:09:03.1338035Z   apparmor
+2026-08-23T06:09:03.1338254Z   seccomp
+2026-08-23T06:09:03.1338486Z    Profile: builtin
+2026-08-23T06:09:03.1338717Z   cgroupns
+2026-08-23T06:09:03.1338883Z  Kernel Version: 6.17.0-1022-azure
+2026-08-23T06:09:03.1339113Z  Operating System: Ubuntu 24.04.4 LTS
+2026-08-23T06:09:03.1339383Z  OSType: linux
+2026-08-23T06:09:03.1339583Z  Architecture: x86_64
+2026-08-23T06:09:03.1339766Z  CPUs: 4
+2026-08-23T06:09:03.1339924Z  Total Memory: 15.61GiB
+2026-08-23T06:09:03.1340100Z  Name: runnervm76f27
+2026-08-23T06:09:03.1340290Z  ID: 49fbd9fe-ba53-4f4b-b058-8c240f21fa06
+2026-08-23T06:09:03.1340530Z  Docker Root Dir: /var/lib/docker
+2026-08-23T06:09:03.1340796Z  Debug Mode: false
+2026-08-23T06:09:03.1341046Z  Username: githubactions
+2026-08-23T06:09:03.1341333Z  Experimental: false
+2026-08-23T06:09:03.1341602Z  Insecure Registries:
+2026-08-23T06:09:03.1345272Z   ::1/128
+2026-08-23T06:09:03.1345539Z   127.0.0.0/8
+2026-08-23T06:09:03.1345778Z  Live Restore Enabled: false
+2026-08-23T06:09:03.1345992Z 
+2026-08-23T06:09:03.1346786Z ##[endgroup]
+2026-08-23T06:09:03.1347282Z ##[group]Pulling binfmt Docker image
+2026-08-23T06:09:03.2418726Z [command]/usr/bin/docker pull docker.io/tonistiigi/binfmt:latest
+2026-08-23T06:09:03.6744246Z latest: Pulling from tonistiigi/binfmt
+2026-08-23T06:09:03.7961658Z 56685a25fbf3: Pulling fs layer
+2026-08-23T06:09:03.7961943Z 0c46aa6e9c41: Pulling fs layer
+2026-08-23T06:09:03.8969613Z 0c46aa6e9c41: Verifying Checksum
+2026-08-23T06:09:03.8969895Z 0c46aa6e9c41: Download complete
+2026-08-23T06:09:03.9887364Z 56685a25fbf3: Download complete
+2026-08-23T06:09:04.3024219Z 56685a25fbf3: Pull complete
+2026-08-23T06:09:05.0458424Z 0c46aa6e9c41: Pull complete
+2026-08-23T06:09:05.0498163Z Digest: sha256:400a4873b838d1b89194d982c45e5fb3cda4593fbfd7e08a02e76b03b21166f0
+2026-08-23T06:09:05.0509082Z Status: Downloaded newer image for tonistiigi/binfmt:latest
+2026-08-23T06:09:05.0518303Z docker.io/tonistiigi/binfmt:latest
+2026-08-23T06:09:05.0559317Z [command]/usr/bin/docker save -o /home/runner/work/_temp/docker-actions-toolkit-rTiCxp/749e64100d3fa0c09bdbc8a02e4fb9cb3ee64266f7f661c98371040689abacb3.tar docker.io/tonistiigi/binfmt:latest
+2026-08-23T06:09:05.7690992Z Copying /home/runner/work/_temp/docker-actions-toolkit-rTiCxp/749e64100d3fa0c09bdbc8a02e4fb9cb3ee64266f7f661c98371040689abacb3.tar to /home/runner/.docker/.cache/images/docker.io--tonistiigi--binfmt/latest/linux-x64/image.tar
+2026-08-23T06:09:06.5191443Z Image cached to /home/runner/.docker/.cache/images/docker.io--tonistiigi--binfmt/latest/linux-x64/image.tar
+2026-08-23T06:09:06.5192380Z ##[endgroup]
+2026-08-23T06:09:06.5192924Z ##[group]Image info
+2026-08-23T06:09:06.5206611Z [command]/usr/bin/docker image inspect docker.io/tonistiigi/binfmt:latest
+2026-08-23T06:09:06.5316855Z [
+2026-08-23T06:09:06.5317105Z     {
+2026-08-23T06:09:06.5317515Z         "Id": "sha256:15935d0512bf0a8e5afa1df990d971cf97a619ede08fa60f2d5966a62de6d6b7",
+2026-08-23T06:09:06.5318040Z         "RepoTags": [
+2026-08-23T06:09:06.5318327Z             "tonistiigi/binfmt:latest"
+2026-08-23T06:09:06.5318634Z         ],
+2026-08-23T06:09:06.5318901Z         "RepoDigests": [
+2026-08-23T06:09:06.5319436Z             "tonistiigi/binfmt@sha256:400a4873b838d1b89194d982c45e5fb3cda4593fbfd7e08a02e76b03b21166f0"
+2026-08-23T06:09:06.5320358Z         ],
+2026-08-23T06:09:06.5320590Z         "Parent": "",
+2026-08-23T06:09:06.5320816Z         "Comment": "buildkit.dockerfile.v0",
+2026-08-23T06:09:06.5321072Z         "Created": "2026-06-05T19:12:02.167333037Z",
+2026-08-23T06:09:06.5321331Z         "DockerVersion": "",
+2026-08-23T06:09:06.5321527Z         "Author": "",
+2026-08-23T06:09:06.5321690Z         "Config": {
+2026-08-23T06:09:06.5322113Z             "Hostname": "",
+2026-08-23T06:09:06.5322346Z             "Domainname": "",
+2026-08-23T06:09:06.5322535Z             "User": "",
+2026-08-23T06:09:06.5322711Z             "AttachStdin": false,
+2026-08-23T06:09:06.5322911Z             "AttachStdout": false,
+2026-08-23T06:09:06.5323107Z             "AttachStderr": false,
+2026-08-23T06:09:06.5323299Z             "Tty": false,
+2026-08-23T06:09:06.5323592Z             "OpenStdin": false,
+2026-08-23T06:09:06.5323893Z             "StdinOnce": false,
+2026-08-23T06:09:06.5324167Z             "Env": [
+2026-08-23T06:09:06.5324550Z                 "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+2026-08-23T06:09:06.5325021Z                 "QEMU_PRESERVE_ARGV0=1"
+2026-08-23T06:09:06.5325321Z             ],
+2026-08-23T06:09:06.5325550Z             "Cmd": null,
+2026-08-23T06:09:06.5325797Z             "Image": "",
+2026-08-23T06:09:06.5326034Z             "Volumes": {
+2026-08-23T06:09:06.5326296Z                 "/tmp": {}
+2026-08-23T06:09:06.5326727Z             },
+2026-08-23T06:09:06.5326971Z             "WorkingDir": "/",
+2026-08-23T06:09:06.5327255Z             "Entrypoint": [
+2026-08-23T06:09:06.5327535Z                 "/usr/bin/binfmt"
+2026-08-23T06:09:06.5327817Z             ],
+2026-08-23T06:09:06.5328054Z             "OnBuild": null,
+2026-08-23T06:09:06.5328339Z             "Labels": null
+2026-08-23T06:09:06.5328604Z         },
+2026-08-23T06:09:06.5328853Z         "Architecture": "amd64",
+2026-08-23T06:09:06.5329151Z         "Os": "linux",
+2026-08-23T06:09:06.5329408Z         "Size": 85304497,
+2026-08-23T06:09:06.5329697Z         "GraphDriver": {
+2026-08-23T06:09:06.5329961Z             "Data": {
+2026-08-23T06:09:06.5330553Z                 "LowerDir": "/var/lib/docker/overlay2/850973dd27e3c302c141ed10fe060a3b96ad8a9ebc79ec549647135a0d27ff83/diff",
+2026-08-23T06:09:06.5331549Z                 "MergedDir": "/var/lib/docker/overlay2/893e08aa132259284b4c204bd915e1f0e78e0472494b32f31924708df2c13dca/merged",
+2026-08-23T06:09:06.5332500Z                 "UpperDir": "/var/lib/docker/overlay2/893e08aa132259284b4c204bd915e1f0e78e0472494b32f31924708df2c13dca/diff",
+2026-08-23T06:09:06.5333508Z                 "WorkDir": "/var/lib/docker/overlay2/893e08aa132259284b4c204bd915e1f0e78e0472494b32f31924708df2c13dca/work"
+2026-08-23T06:09:06.5334156Z             },
+2026-08-23T06:09:06.5334412Z             "Name": "overlay2"
+2026-08-23T06:09:06.5335035Z         },
+2026-08-23T06:09:06.5335279Z         "RootFS": {
+2026-08-23T06:09:06.5335549Z             "Type": "layers",
+2026-08-23T06:09:06.5335838Z             "Layers": [
+2026-08-23T06:09:06.5336302Z                 "sha256:c747b796d990a647df062f87e24f1ef5e4a90a312cd9c4ae8b7d09667d57befb",
+2026-08-23T06:09:06.5337141Z                 "sha256:6d831b0f477d9df7afe18e5a65c97e8084fef8fe10c2930b65f728ab68d0bb5b"
+2026-08-23T06:09:06.5337637Z             ]
+2026-08-23T06:09:06.5337867Z         },
+2026-08-23T06:09:06.5338108Z         "Metadata": {
+2026-08-23T06:09:06.5338403Z             "LastTagTime": "0001-01-01T00:00:00Z"
+2026-08-23T06:09:06.5338769Z         }
+2026-08-23T06:09:06.5339089Z     }
+2026-08-23T06:09:06.5339315Z ]
+2026-08-23T06:09:06.5339899Z ##[endgroup]
+2026-08-23T06:09:06.5340316Z ##[group]Binfmt version
+2026-08-23T06:09:06.5340992Z [command]/usr/bin/docker run --rm --privileged docker.io/tonistiigi/binfmt:latest --version
+2026-08-23T06:09:07.6570693Z binfmt/e29e7d7 qemu/v10.2.3 go/1.26.4
+2026-08-23T06:09:07.7236128Z ##[endgroup]
+2026-08-23T06:09:07.7237010Z ##[group]Installing QEMU static binaries
+2026-08-23T06:09:07.7249539Z [command]/usr/bin/docker run --rm --privileged docker.io/tonistiigi/binfmt:latest --install arm64
+2026-08-23T06:09:07.8242502Z installing: arm64 OK
+2026-08-23T06:09:07.8308948Z {
+2026-08-23T06:09:07.8309404Z   "supported": [
+2026-08-23T06:09:07.8309828Z     "linux/amd64",
+2026-08-23T06:09:07.8310096Z     "linux/amd64/v2",
+2026-08-23T06:09:07.8310361Z     "linux/amd64/v3",
+2026-08-23T06:09:07.8310613Z     "linux/amd64/v4",
+2026-08-23T06:09:07.8310858Z     "linux/arm64",
+2026-08-23T06:09:07.8311113Z     "linux/386"
+2026-08-23T06:09:07.8311347Z   ],
+2026-08-23T06:09:07.8311570Z   "emulators": [
+2026-08-23T06:09:07.8311836Z     "llvm-16-runtime.binfmt",
+2026-08-23T06:09:07.8312140Z     "llvm-17-runtime.binfmt",
+2026-08-23T06:09:07.8312432Z     "llvm-18-runtime.binfmt",
+2026-08-23T06:09:07.8312731Z     "python3.12",
+2026-08-23T06:09:07.8312983Z     "qemu-aarch64"
+2026-08-23T06:09:07.8313223Z   ]
+2026-08-23T06:09:07.8314039Z }
+2026-08-23T06:09:07.8822915Z ##[endgroup]
+2026-08-23T06:09:07.8823350Z ##[group]Extracting available platforms
+2026-08-23T06:09:08.0471572Z linux/amd64,linux/amd64/v2,linux/amd64/v3,linux/amd64/v4,linux/arm64,linux/386
+2026-08-23T06:09:08.0473772Z ##[endgroup]
+2026-08-23T06:09:08.0601760Z ##[group]Run set -eux
+2026-08-23T06:09:08.0602041Z [36;1mset -eux[0m
+2026-08-23T06:09:08.0602264Z [36;1mdocker run --rm --platform "$PLATFORM" \[0m
+2026-08-23T06:09:08.0602557Z [36;1m  -v "$PWD":/src -w /src centos:8 \[0m
+2026-08-23T06:09:08.0602798Z [36;1m  bash -c '[0m
+2026-08-23T06:09:08.0602980Z [36;1m    set -e[0m
+2026-08-23T06:09:08.0603228Z [36;1m    # CentOS 8 is end-of-life: the default mirrorlist is dead, so[0m
+2026-08-23T06:09:08.0603590Z [36;1m    # repoint the repos to vault.centos.org before installing anything.[0m
+2026-08-23T06:09:08.0604202Z [36;1m    sed -i "s/mirrorlist/#mirrorlist/g; s|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g" /etc/yum.repos.d/CentOS-Linux-*.repo || true[0m
+2026-08-23T06:09:08.0604745Z [36;1m[0m
+2026-08-23T06:09:08.0604949Z [36;1m    dnf -y install gcc-c++ make rpm-build gzip tar[0m
+2026-08-23T06:09:08.0605188Z [36;1m[0m
+2026-08-23T06:09:08.0605449Z [36;1m    mkdir -p /root/rpmbuild/{BUILD,RPMS,SRPMS,SOURCES,SPECS}[0m
+2026-08-23T06:09:08.0605722Z [36;1m    cd /src[0m
+2026-08-23T06:09:08.0605888Z [36;1m[0m
+2026-08-23T06:09:08.0606112Z [36;1m    # The autotools scripts (configure, config.sub, config.guess,[0m
+2026-08-23T06:09:08.0606888Z [36;1m    # install-sh, missing, depcomp, compile) may have been committed[0m
+2026-08-23T06:09:08.0607256Z [36;1m    # WITHOUT the executable bit -- common when the repo was created[0m
+2026-08-23T06:09:08.0607615Z [36;1m    # on Windows with core.fileMode=false. rpmbuild extracts the[0m
+2026-08-23T06:09:08.0607962Z [36;1m    # tarball and then runs ./configure, which would otherwise fail[0m
+2026-08-23T06:09:08.0608314Z [36;1m    # with "Permission denied". Force +x so the generated tarball[0m
+2026-08-23T06:09:08.0608852Z [36;1m    # carries the bit regardless of how the source was checked out.[0m
+2026-08-23T06:09:08.0609210Z [36;1m    chmod +x configure config.sub config.guess install-sh missing \[0m
+2026-08-23T06:09:08.0609546Z [36;1m            depcomp compile autogen.sh 2>/dev/null || true[0m
+2026-08-23T06:09:08.0609793Z [36;1m[0m
+2026-08-23T06:09:08.0610017Z [36;1m    # Start from a clean source tree so ./configure runs fresh.[0m
+2026-08-23T06:09:08.0610315Z [36;1m    make distclean >/dev/null 2>&1 || true[0m
+2026-08-23T06:09:08.0610555Z [36;1m[0m
+2026-08-23T06:09:08.0610795Z [36;1m    # Package the checked-out source into the tarball rpmbuild expects.[0m
+2026-08-23T06:09:08.0611190Z [36;1m    # The --transform prefix makes the top-level dir match %{name}-%{version}.[0m
+2026-08-23T06:09:08.0611581Z [36;1m    # Exclude .git so the build does not pick up a git-based version string.[0m
+2026-08-23T06:09:08.0611953Z [36;1m    tar czf /root/rpmbuild/SOURCES/smartctl-ps3stor-1.0.0.tar.gz \[0m
+2026-08-23T06:09:08.0612247Z [36;1m      --exclude=.git \[0m
+2026-08-23T06:09:08.0612503Z [36;1m      --transform "s,^,smartctl-ps3stor-1.0.0/," -C /src .[0m
+2026-08-23T06:09:08.0612751Z [36;1m[0m
+2026-08-23T06:09:08.0612911Z [36;1m    rpmbuild -bb \[0m
+2026-08-23T06:09:08.0613134Z [36;1m      --define "_topdir /root/rpmbuild" \[0m
+2026-08-23T06:09:08.0613373Z [36;1m      --define "dist .el8" \[0m
+2026-08-23T06:09:08.0613598Z [36;1m      /src/smartctl-ps3stor.spec[0m
+2026-08-23T06:09:08.0613806Z [36;1m[0m
+2026-08-23T06:09:08.0613980Z [36;1m    cp /root/rpmbuild/RPMS/*/*.rpm /src/[0m
+2026-08-23T06:09:08.0614199Z [36;1m  '[0m
+2026-08-23T06:09:08.0650711Z shell: /usr/bin/bash -e {0}
+2026-08-23T06:09:08.0650971Z env:
+2026-08-23T06:09:08.0651149Z   PLATFORM: linux/arm64
+2026-08-23T06:09:08.0651336Z ##[endgroup]
+2026-08-23T06:09:08.0716255Z + docker run --rm --platform linux/arm64 -v /home/runner/work/smartctl-ps3stor/smartctl-ps3stor:/src -w /src centos:8 bash -c '
+2026-08-23T06:09:08.0717137Z     set -e
+2026-08-23T06:09:08.0717466Z     # CentOS 8 is end-of-life: the default mirrorlist is dead, so
+2026-08-23T06:09:08.0717986Z     # repoint the repos to vault.centos.org before installing anything.
+2026-08-23T06:09:08.0719123Z     sed -i "s/mirrorlist/#mirrorlist/g; s|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g" /etc/yum.repos.d/CentOS-Linux-*.repo || true
+2026-08-23T06:09:08.0719695Z 
+2026-08-23T06:09:08.0719799Z     dnf -y install gcc-c++ make rpm-build gzip tar
+2026-08-23T06:09:08.0719971Z 
+2026-08-23T06:09:08.0720105Z     mkdir -p /root/rpmbuild/{BUILD,RPMS,SRPMS,SOURCES,SPECS}
+2026-08-23T06:09:08.0720369Z     cd /src
+2026-08-23T06:09:08.0720462Z 
+2026-08-23T06:09:08.0720594Z     # The autotools scripts (configure, config.sub, config.guess,
+2026-08-23T06:09:08.0720928Z     # install-sh, missing, depcomp, compile) may have been committed
+2026-08-23T06:09:08.0721250Z     # WITHOUT the executable bit -- common when the repo was created
+2026-08-23T06:09:08.0721570Z     # on Windows with core.fileMode=false. rpmbuild extracts the
+2026-08-23T06:09:08.0721890Z     # tarball and then runs ./configure, which would otherwise fail
+2026-08-23T06:09:08.0722200Z     # with "Permission denied". Force +x so the generated tarball
+2026-08-23T06:09:08.0722504Z     # carries the bit regardless of how the source was checked out.
+2026-08-23T06:09:08.0722819Z     chmod +x configure config.sub config.guess install-sh missing \
+2026-08-23T06:09:08.0723121Z             depcomp compile autogen.sh 2>/dev/null || true
+2026-08-23T06:09:08.0723292Z 
+2026-08-23T06:09:08.0723419Z     # Start from a clean source tree so ./configure runs fresh.
+2026-08-23T06:09:08.0723709Z     make distclean >/dev/null 2>&1 || true
+2026-08-23T06:09:08.0723853Z 
+2026-08-23T06:09:08.0724001Z     # Package the checked-out source into the tarball rpmbuild expects.
+2026-08-23T06:09:08.0724367Z     # The --transform prefix makes the top-level dir match %{name}-%{version}.
+2026-08-23T06:09:08.0724855Z     # Exclude .git so the build does not pick up a git-based version string.
+2026-08-23T06:09:08.0725202Z     tar czf /root/rpmbuild/SOURCES/smartctl-ps3stor-1.0.0.tar.gz \
+2026-08-23T06:09:08.0725469Z       --exclude=.git \
+2026-08-23T06:09:08.0725705Z       --transform "s,^,smartctl-ps3stor-1.0.0/," -C /src .
+2026-08-23T06:09:08.0725889Z 
+2026-08-23T06:09:08.0725966Z     rpmbuild -bb \
+2026-08-23T06:09:08.0726152Z       --define "_topdir /root/rpmbuild" \
+2026-08-23T06:09:08.0726545Z       --define "dist .el8" \
+2026-08-23T06:09:08.0726754Z       /src/smartctl-ps3stor.spec
+2026-08-23T06:09:08.0726882Z 
+2026-08-23T06:09:08.0726974Z     cp /root/rpmbuild/RPMS/*/*.rpm /src/
+2026-08-23T06:09:08.0727180Z   '
+2026-08-23T06:09:08.0810864Z Unable to find image 'centos:8' locally
+2026-08-23T06:09:08.4361688Z 8: Pulling from library/centos
+2026-08-23T06:09:08.5516813Z 52f9ef134af7: Pulling fs layer
+2026-08-23T06:09:08.9978698Z 52f9ef134af7: Verifying Checksum
+2026-08-23T06:09:08.9979124Z 52f9ef134af7: Download complete
+2026-08-23T06:09:11.3061487Z 52f9ef134af7: Pull complete
+2026-08-23T06:09:11.3149821Z Digest: sha256:a27fd8080b517143cbbbab9dfb7c8571c40d67d534bbdee55bd6c473f432b177
+2026-08-23T06:09:11.3162056Z Status: Downloaded newer image for centos:8
+2026-08-23T06:09:15.6571315Z CentOS Linux 8 - AppStream                      6.2 MB/s | 7.2 MB     00:01    
+2026-08-23T06:09:25.0165015Z CentOS Linux 8 - BaseOS                         5.9 MB/s | 3.7 MB     00:00    
+2026-08-23T06:09:29.3258281Z CentOS Linux 8 - Extras                          29 kB/s |  10 kB     00:00    
+2026-08-23T06:09:33.0416642Z Package gzip-1.9-12.el8.aarch64 is already installed.
+2026-08-23T06:09:33.0434030Z Package tar-2:1.30-5.el8.aarch64 is already installed.
+2026-08-23T06:09:33.9851806Z Dependencies resolved.
+2026-08-23T06:09:34.0574239Z ================================================================================
+2026-08-23T06:09:34.0574868Z  Package                     Arch     Version                  Repository  Size
+2026-08-23T06:09:34.0575674Z ================================================================================
+2026-08-23T06:09:34.0576079Z Installing:
+2026-08-23T06:09:34.0576607Z  gcc-c++                     aarch64  8.5.0-4.el8_5            appstream   11 M
+2026-08-23T06:09:34.0577426Z  make                        aarch64  1:4.2.1-10.el8           baseos     490 k
+2026-08-23T06:09:34.0577929Z  rpm-build                   aarch64  4.14.3-19.el8            appstream  172 k
+2026-08-23T06:09:34.0578319Z Upgrading:
+2026-08-23T06:09:34.0578661Z  elfutils-libelf             aarch64  0.185-1.el8              baseos     220 k
+2026-08-23T06:09:34.0579235Z  elfutils-libs               aarch64  0.185-1.el8              baseos     284 k
+2026-08-23T06:09:34.0579782Z  file-libs                   aarch64  5.33-20.el8              baseos     541 k
+2026-08-23T06:09:34.0580300Z  glibc                       aarch64  2.28-164.el8             baseos     3.5 M
+2026-08-23T06:09:34.0580829Z  glibc-common                aarch64  2.28-164.el8             baseos     1.2 M
+2026-08-23T06:09:34.0581444Z  glibc-minimal-langpack      aarch64  2.28-164.el8             baseos      58 k
+2026-08-23T06:09:34.0582032Z  libgcc                      aarch64  8.5.0-4.el8_5            baseos      73 k
+2026-08-23T06:09:34.0582583Z  libstdc++                   aarch64  8.5.0-4.el8_5            baseos     423 k
+2026-08-23T06:09:34.0583131Z  libxcrypt                   aarch64  4.1.1-6.el8              baseos      73 k
+2026-08-23T06:09:34.0583682Z  python3-rpm                 aarch64  4.14.3-19.el8            baseos     155 k
+2026-08-23T06:09:34.0584200Z  rpm                         aarch64  4.14.3-19.el8            baseos     542 k
+2026-08-23T06:09:34.0584733Z  rpm-build-libs              aarch64  4.14.3-19.el8            baseos     150 k
+2026-08-23T06:09:34.0585277Z  rpm-libs                    aarch64  4.14.3-19.el8            baseos     327 k
+2026-08-23T06:09:34.0585727Z Installing dependencies:
+2026-08-23T06:09:34.0586137Z  annobin                     aarch64  9.72-1.el8_5.2           appstream  109 k
+2026-08-23T06:09:34.0587012Z  bzip2                       aarch64  1.0.6-26.el8             baseos      60 k
+2026-08-23T06:09:34.0587519Z  cpp                         aarch64  8.5.0-4.el8_5            appstream  8.9 M
+2026-08-23T06:09:34.0588055Z  diffutils                   aarch64  3.6-6.el8                baseos     352 k
+2026-08-23T06:09:34.0588553Z  dwz                         aarch64  0.12-10.el8              appstream  103 k
+2026-08-23T06:09:34.0589052Z  efi-srpm-macros             noarch   3-3.el8                  appstream   22 k
+2026-08-23T06:09:34.0589595Z  elfutils                    aarch64  0.185-1.el8              baseos     525 k
+2026-08-23T06:09:34.0590100Z  file                        aarch64  5.33-20.el8              baseos      77 k
+2026-08-23T06:09:34.0590607Z  gc                          aarch64  7.6.4-3.el8              appstream   99 k
+2026-08-23T06:09:34.0591095Z  gcc                         aarch64  8.5.0-4.el8_5            appstream   19 M
+2026-08-23T06:09:34.0591621Z  gdb-headless                aarch64  8.2-16.el8               appstream  3.1 M
+2026-08-23T06:09:34.0592200Z  ghc-srpm-macros             noarch   1.4.2-7.el8              appstream  9.3 k
+2026-08-23T06:09:34.0592775Z  glibc-devel                 aarch64  2.28-164.el8             baseos     1.0 M
+2026-08-23T06:09:34.0593320Z  glibc-headers               aarch64  2.28-164.el8             baseos     471 k
+2026-08-23T06:09:34.0593886Z  go-srpm-macros              noarch   2-17.el8                 appstream   13 k
+2026-08-23T06:09:34.0594424Z  guile                       aarch64  5:2.0.14-7.el8           appstream  3.5 M
+2026-08-23T06:09:34.0594932Z  isl                         aarch64  0.16.1-6.el8             appstream  778 k
+2026-08-23T06:09:34.0595456Z  kernel-headers              aarch64  4.18.0-348.7.1.el8_5     baseos     8.2 M
+2026-08-23T06:09:34.0596000Z  libasan                     aarch64  8.5.0-4.el8_5            baseos     385 k
+2026-08-23T06:09:34.0596643Z  libatomic                   aarch64  8.5.0-4.el8_5            baseos      24 k
+2026-08-23T06:09:34.0597172Z  libatomic_ops               aarch64  7.6.2-3.el8              appstream   38 k
+2026-08-23T06:09:34.0597729Z  libbabeltrace               aarch64  1.5.4-3.el8              baseos     189 k
+2026-08-23T06:09:34.0598424Z  libgomp                     aarch64  8.5.0-4.el8_5            baseos     198 k
+2026-08-23T06:09:34.0598941Z  libmpc                      aarch64  1.1.0-9.1.el8            appstream   60 k
+2026-08-23T06:09:34.0599490Z  libpkgconf                  aarch64  1.4.2-1.el8              baseos      34 k
+2026-08-23T06:09:34.0600049Z  libstdc++-devel             aarch64  8.5.0-4.el8_5            appstream  2.0 M
+2026-08-23T06:09:34.0600607Z  libtool-ltdl                aarch64  2.4.6-25.el8             baseos      57 k
+2026-08-23T06:09:34.0601145Z  libubsan                    aarch64  8.5.0-4.el8_5            baseos     143 k
+2026-08-23T06:09:34.0601695Z  libxcrypt-devel             aarch64  4.1.1-6.el8              baseos      25 k
+2026-08-23T06:09:34.0602283Z  ocaml-srpm-macros           noarch   5-4.el8                  appstream  9.4 k
+2026-08-23T06:09:34.0602893Z  openblas-srpm-macros        noarch   2-2.el8                  appstream  7.9 k
+2026-08-23T06:09:34.0603472Z  patch                       aarch64  2.7.6-11.el8             baseos     134 k
+2026-08-23T06:09:34.0604012Z  perl-srpm-macros            noarch   1-25.el8                 appstream   11 k
+2026-08-23T06:09:34.0604680Z  pkgconf                     aarch64  1.4.2-1.el8              baseos      37 k
+2026-08-23T06:09:34.0605312Z  pkgconf-m4                  noarch   1.4.2-1.el8              baseos      17 k
+2026-08-23T06:09:34.0605874Z  pkgconf-pkg-config          aarch64  1.4.2-1.el8              baseos      15 k
+2026-08-23T06:09:34.0606574Z  python-rpm-macros           noarch   3-41.el8                 appstream   15 k
+2026-08-23T06:09:34.0607168Z  python-srpm-macros          noarch   3-41.el8                 appstream   15 k
+2026-08-23T06:09:34.0607924Z  python3-rpm-macros          noarch   3-41.el8                 appstream   14 k
+2026-08-23T06:09:34.0608526Z  qt5-srpm-macros             noarch   5.15.2-1.el8             appstream   11 k
+2026-08-23T06:09:34.0609110Z  redhat-rpm-config           noarch   125-1.el8                appstream   86 k
+2026-08-23T06:09:34.0609696Z  rust-srpm-macros            noarch   5-2.el8                  appstream  9.2 k
+2026-08-23T06:09:34.0610238Z  unzip                       aarch64  6.0-45.el8_4             baseos     189 k
+2026-08-23T06:09:34.0610736Z  zip                         aarch64  3.0-23.el8               baseos     265 k
+2026-08-23T06:09:34.0611237Z  zstd                        aarch64  1.4.4-1.el8              appstream  303 k
+2026-08-23T06:09:34.0611709Z Installing weak dependencies:
+2026-08-23T06:09:34.0612199Z  elfutils-debuginfod-client  aarch64  0.185-1.el8              baseos      66 k
+2026-08-23T06:09:34.0612865Z  glibc-langpack-en           aarch64  2.28-164.el8             baseos     828 k
+2026-08-23T06:09:34.0613232Z 
+2026-08-23T06:09:34.0613348Z Transaction Summary
+2026-08-23T06:09:34.0613666Z ================================================================================
+2026-08-23T06:09:34.0614072Z Install  50 Packages
+2026-08-23T06:09:34.0614355Z Upgrade  13 Packages
+2026-08-23T06:09:34.0614532Z 
+2026-08-23T06:09:34.0830170Z Total download size: 71 M
+2026-08-23T06:09:34.0893072Z Downloading Packages:
+2026-08-23T06:09:34.3069340Z (1/63): annobin-9.72-1.el8_5.2.aarch64.rpm      630 kB/s | 109 kB     00:00    
+2026-08-23T06:09:34.3153488Z (2/63): dwz-0.12-10.el8.aarch64.rpm             579 kB/s | 103 kB     00:00    
+2026-08-23T06:09:34.3297826Z (3/63): efi-srpm-macros-3-3.el8.noarch.rpm      1.0 MB/s |  22 kB     00:00    
+2026-08-23T06:09:34.3436826Z (4/63): gc-7.6.4-3.el8.aarch64.rpm              3.6 MB/s |  99 kB     00:00    
+2026-08-23T06:09:34.9652606Z (5/63): cpp-8.5.0-4.el8_5.aarch64.rpm            11 MB/s | 8.9 MB     00:00    
+2026-08-23T06:09:35.2615937Z (6/63): gcc-c++-8.5.0-4.el8_5.aarch64.rpm        12 MB/s |  11 MB     00:00    
+2026-08-23T06:09:35.2852445Z (7/63): ghc-srpm-macros-1.4.2-7.el8.noarch.rpm  435 kB/s | 9.3 kB     00:00    
+2026-08-23T06:09:35.3341726Z (8/63): gdb-headless-8.2-16.el8.aarch64.rpm     8.5 MB/s | 3.1 MB     00:00    
+2026-08-23T06:09:35.3373617Z (9/63): go-srpm-macros-2-17.el8.noarch.rpm      251 kB/s |  13 kB     00:00    
+2026-08-23T06:09:35.4209151Z (10/63): isl-0.16.1-6.el8.aarch64.rpm           9.4 MB/s | 778 kB     00:00    
+2026-08-23T06:09:35.4463384Z (11/63): libatomic_ops-7.6.2-3.el8.aarch64.rpm  1.6 MB/s |  38 kB     00:00    
+2026-08-23T06:09:35.4772524Z (12/63): libmpc-1.1.0-9.1.el8.aarch64.rpm       2.0 MB/s |  60 kB     00:00    
+2026-08-23T06:09:35.6210217Z (13/63): guile-2.0.14-7.el8.aarch64.rpm          12 MB/s | 3.5 MB     00:00    
+2026-08-23T06:09:35.6450206Z (14/63): ocaml-srpm-macros-5-4.el8.noarch.rpm   425 kB/s | 9.4 kB     00:00    
+2026-08-23T06:09:35.6682693Z (15/63): openblas-srpm-macros-2-2.el8.noarch.rp 373 kB/s | 7.9 kB     00:00    
+2026-08-23T06:09:35.6913847Z (16/63): libstdc++-devel-8.5.0-4.el8_5.aarch64. 9.6 MB/s | 2.0 MB     00:00    
+2026-08-23T06:09:35.7338491Z (17/63): perl-srpm-macros-1-25.el8.noarch.rpm   170 kB/s |  11 kB     00:00    
+2026-08-23T06:09:35.7580119Z (18/63): python-srpm-macros-3-41.el8.noarch.rpm 646 kB/s |  15 kB     00:00    
+2026-08-23T06:09:35.7657005Z (19/63): python-rpm-macros-3-41.el8.noarch.rpm  208 kB/s |  15 kB     00:00    
+2026-08-23T06:09:35.7802788Z (20/63): python3-rpm-macros-3-41.el8.noarch.rpm 693 kB/s |  14 kB     00:00    
+2026-08-23T06:09:35.7894097Z (21/63): qt5-srpm-macros-5.15.2-1.el8.noarch.rp 473 kB/s |  11 kB     00:00    
+2026-08-23T06:09:35.9822490Z (22/63): gcc-8.5.0-4.el8_5.aarch64.rpm           12 MB/s |  19 MB     00:01    
+2026-08-23T06:09:35.9901043Z (23/63): redhat-rpm-config-125-1.el8.noarch.rpm 415 kB/s |  86 kB     00:00    
+2026-08-23T06:09:35.9972834Z (24/63): rpm-build-4.14.3-19.el8.aarch64.rpm    833 kB/s | 172 kB     00:00    
+2026-08-23T06:09:36.0040864Z (25/63): rust-srpm-macros-5-2.el8.noarch.rpm    468 kB/s | 9.2 kB     00:00    
+2026-08-23T06:09:36.0240918Z (26/63): bzip2-1.0.6-26.el8.aarch64.rpm         2.3 MB/s |  60 kB     00:00    
+2026-08-23T06:09:36.0363888Z (27/63): zstd-1.4.4-1.el8.aarch64.rpm           6.6 MB/s | 303 kB     00:00    
+2026-08-23T06:09:36.0407458Z (28/63): diffutils-3.6-6.el8.aarch64.rpm        9.7 MB/s | 352 kB     00:00    
+2026-08-23T06:09:36.0557761Z (29/63): elfutils-debuginfod-client-0.185-1.el8 4.8 MB/s |  66 kB     00:00    
+2026-08-23T06:09:36.0569867Z (30/63): file-5.33-20.el8.aarch64.rpm           5.2 MB/s |  77 kB     00:00    
+2026-08-23T06:09:36.0768603Z (31/63): elfutils-0.185-1.el8.aarch64.rpm        10 MB/s | 525 kB     00:00    
+2026-08-23T06:09:36.1092529Z (32/63): glibc-headers-2.28-164.el8.aarch64.rpm 9.2 MB/s | 471 kB     00:00    
+2026-08-23T06:09:36.1331524Z (33/63): glibc-langpack-en-2.28-164.el8.aarch64  15 MB/s | 828 kB     00:00    
+2026-08-23T06:09:36.1874248Z (34/63): libasan-8.5.0-4.el8_5.aarch64.rpm      7.2 MB/s | 385 kB     00:00    
+2026-08-23T06:09:36.2131296Z (35/63): glibc-devel-2.28-164.el8.aarch64.rpm   6.6 MB/s | 1.0 MB     00:00    
+2026-08-23T06:09:36.2172506Z (36/63): libatomic-8.5.0-4.el8_5.aarch64.rpm    861 kB/s |  24 kB     00:00    
+2026-08-23T06:09:36.2410159Z (37/63): libgomp-8.5.0-4.el8_5.aarch64.rpm      8.9 MB/s | 198 kB     00:00    
+2026-08-23T06:09:36.2525934Z (38/63): libbabeltrace-1.5.4-3.el8.aarch64.rpm  4.9 MB/s | 189 kB     00:00    
+2026-08-23T06:09:36.2765673Z (39/63): libtool-ltdl-2.4.6-25.el8.aarch64.rpm  2.5 MB/s |  57 kB     00:00    
+2026-08-23T06:09:36.2857877Z (40/63): libpkgconf-1.4.2-1.el8.aarch64.rpm     785 kB/s |  34 kB     00:00    
+2026-08-23T06:09:36.3066614Z (41/63): libubsan-8.5.0-4.el8_5.aarch64.rpm     4.9 MB/s | 143 kB     00:00    
+2026-08-23T06:09:36.3104212Z (42/63): libxcrypt-devel-4.1.1-6.el8.aarch64.rp 1.1 MB/s |  25 kB     00:00    
+2026-08-23T06:09:36.3595231Z (43/63): make-4.2.1-10.el8.aarch64.rpm          9.4 MB/s | 490 kB     00:00    
+2026-08-23T06:09:36.3697034Z (44/63): patch-2.7.6-11.el8.aarch64.rpm         2.3 MB/s | 134 kB     00:00    
+2026-08-23T06:09:36.3924803Z (45/63): pkgconf-m4-1.4.2-1.el8.noarch.rpm      800 kB/s |  17 kB     00:00    
+2026-08-23T06:09:36.4150028Z (46/63): pkgconf-pkg-config-1.4.2-1.el8.aarch64 725 kB/s |  15 kB     00:00    
+2026-08-23T06:09:36.4501930Z (47/63): unzip-6.0-45.el8_4.aarch64.rpm         5.5 MB/s | 189 kB     00:00    
+2026-08-23T06:09:36.4797373Z (48/63): pkgconf-1.4.2-1.el8.aarch64.rpm        316 kB/s |  37 kB     00:00    
+2026-08-23T06:09:36.4907979Z (49/63): zip-3.0-23.el8.aarch64.rpm             6.6 MB/s | 265 kB     00:00    
+2026-08-23T06:09:36.5067535Z (50/63): elfutils-libelf-0.185-1.el8.aarch64.rp 8.5 MB/s | 220 kB     00:00    
+2026-08-23T06:09:36.5252650Z (51/63): elfutils-libs-0.185-1.el8.aarch64.rpm  8.5 MB/s | 284 kB     00:00    
+2026-08-23T06:09:36.6274173Z (52/63): kernel-headers-4.18.0-348.7.1.el8_5.aa  16 MB/s | 8.2 MB     00:00    
+2026-08-23T06:09:36.6670459Z (53/63): file-libs-5.33-20.el8.aarch64.rpm      3.3 MB/s | 541 kB     00:00    
+2026-08-23T06:09:36.6815034Z (54/63): glibc-minimal-langpack-2.28-164.el8.aa 4.5 MB/s |  58 kB     00:00    
+2026-08-23T06:09:36.6964703Z (55/63): libgcc-8.5.0-4.el8_5.aarch64.rpm       5.4 MB/s |  73 kB     00:00    
+2026-08-23T06:09:36.7372392Z (56/63): libstdc++-8.5.0-4.el8_5.aarch64.rpm     11 MB/s | 423 kB     00:00    
+2026-08-23T06:09:36.7509998Z (57/63): libxcrypt-4.1.1-6.el8.aarch64.rpm      5.2 MB/s |  73 kB     00:00    
+2026-08-23T06:09:36.7709640Z (58/63): glibc-common-2.28-164.el8.aarch64.rpm  8.8 MB/s | 1.2 MB     00:00    
+2026-08-23T06:09:36.7830669Z (59/63): python3-rpm-4.14.3-19.el8.aarch64.rpm  5.0 MB/s | 155 kB     00:00    
+2026-08-23T06:09:36.8049262Z (60/63): rpm-build-libs-4.14.3-19.el8.aarch64.r 7.3 MB/s | 150 kB     00:00    
+2026-08-23T06:09:36.8208018Z (61/63): rpm-4.14.3-19.el8.aarch64.rpm           11 MB/s | 542 kB     00:00    
+2026-08-23T06:09:36.8392284Z (62/63): rpm-libs-4.14.3-19.el8.aarch64.rpm     9.8 MB/s | 327 kB     00:00    
+2026-08-23T06:09:36.8781709Z (63/63): glibc-2.28-164.el8.aarch64.rpm         9.9 MB/s | 3.5 MB     00:00    
+2026-08-23T06:09:36.8947934Z --------------------------------------------------------------------------------
+2026-08-23T06:09:36.8965278Z Total                                            25 MB/s |  71 MB     00:02     
+2026-08-23T06:09:36.9045660Z warning: /var/cache/dnf/appstream-95374e27e5b9d1c5/packages/annobin-9.72-1.el8_5.2.aarch64.rpm: Header V3 RSA/SHA256 Signature, key ID 8483c65d: NOKEY
+2026-08-23T06:09:36.9131768Z CentOS Linux 8 - AppStream                      1.6 MB/s | 1.6 kB     00:00    
+2026-08-23T06:09:37.4520260Z Importing GPG key 0x8483C65D:
+2026-08-23T06:09:37.4520644Z  Userid     : "CentOS (CentOS Official Signing Key) <security@centos.org>"
+2026-08-23T06:09:37.4521006Z  Fingerprint: 99DB 70FA E1D7 CE22 7FB6 4882 05B5 55B3 8483 C65D
+2026-08-23T06:09:37.4521375Z  From       : /etc/pki/rpm-gpg/RPM-GPG-KEY-centosofficial
+2026-08-23T06:09:37.5330913Z Key imported successfully
+2026-08-23T06:09:37.9589048Z Running transaction check
+2026-08-23T06:09:39.0138154Z Transaction check succeeded.
+2026-08-23T06:09:39.0143714Z Running transaction test
+2026-08-23T06:09:41.2181546Z Transaction test succeeded.
+2026-08-23T06:09:41.2218356Z Running transaction
+2026-08-23T06:09:43.2889279Z   Preparing        :                                                        1/1 
+2026-08-23T06:09:43.2985822Z   Upgrading        : libgcc-8.5.0-4.el8_5.aarch64                          1/76 
+2026-08-23T06:09:43.3608372Z   Running scriptlet: libgcc-8.5.0-4.el8_5.aarch64                          1/76 
+2026-08-23T06:09:43.3690503Z   Installing       : python-srpm-macros-3-41.el8.noarch                    2/76 
+2026-08-23T06:09:43.3768711Z   Installing       : python-rpm-macros-3-41.el8.noarch                     3/76 
+2026-08-23T06:09:44.2787009Z   Installing       : python3-rpm-macros-3-41.el8.noarch                    4/76 
+2026-08-23T06:09:44.2990579Z   Upgrading        : glibc-common-2.28-164.el8.aarch64                     5/76 
+2026-08-23T06:09:46.0288437Z   Running scriptlet: glibc-2.28-164.el8.aarch64                            6/76 
+2026-08-23T06:09:46.0700275Z   Upgrading        : glibc-2.28-164.el8.aarch64                            6/76 
+2026-08-23T06:09:46.7378308Z   Running scriptlet: glibc-2.28-164.el8.aarch64                            6/76 
+2026-08-23T06:09:46.8912837Z   Installing       : glibc-langpack-en-2.28-164.el8.aarch64                7/76 
+2026-08-23T06:09:47.0605525Z   Upgrading        : elfutils-libelf-0.185-1.el8.aarch64                   8/76 
+2026-08-23T06:09:47.0699441Z   Upgrading        : libstdc++-8.5.0-4.el8_5.aarch64                       9/76 
+2026-08-23T06:09:47.3404411Z   Running scriptlet: libstdc++-8.5.0-4.el8_5.aarch64                       9/76 
+2026-08-23T06:09:47.4476736Z   Upgrading        : rpm-4.14.3-19.el8.aarch64                            10/76 
+2026-08-23T06:09:47.4550884Z   Upgrading        : rpm-libs-4.14.3-19.el8.aarch64                       11/76 
+2026-08-23T06:09:47.7684467Z   Running scriptlet: rpm-libs-4.14.3-19.el8.aarch64                       11/76 
+2026-08-23T06:09:47.7970260Z   Upgrading        : file-libs-5.33-20.el8.aarch64                        12/76 
+2026-08-23T06:09:47.8213040Z   Installing       : libmpc-1.1.0-9.1.el8.aarch64                         13/76 
+2026-08-23T06:09:47.9094283Z   Installing       : file-5.33-20.el8.aarch64                             14/76 
+2026-08-23T06:09:47.9308269Z   Upgrading        : elfutils-libs-0.185-1.el8.aarch64                    15/76 
+2026-08-23T06:09:47.9705050Z   Installing       : elfutils-debuginfod-client-0.185-1.el8.aarch64       16/76 
+2026-08-23T06:09:47.9771132Z   Upgrading        : rpm-build-libs-4.14.3-19.el8.aarch64                 17/76 
+2026-08-23T06:09:48.0802629Z   Running scriptlet: rpm-build-libs-4.14.3-19.el8.aarch64                 17/76 
+2026-08-23T06:09:48.1134551Z   Installing       : unzip-6.0-45.el8_4.aarch64                           18/76 
+2026-08-23T06:09:48.2106107Z   Upgrading        : libxcrypt-4.1.1-6.el8.aarch64                        19/76 
+2026-08-23T06:09:48.4335025Z   Installing       : zip-3.0-23.el8.aarch64                               20/76 
+2026-08-23T06:09:48.5155904Z   Installing       : elfutils-0.185-1.el8.aarch64                         21/76 
+2026-08-23T06:09:48.5242841Z   Installing       : libbabeltrace-1.5.4-3.el8.aarch64                    22/76 
+2026-08-23T06:09:51.2887953Z   Running scriptlet: libbabeltrace-1.5.4-3.el8.aarch64                    22/76 
+2026-08-23T06:09:51.2971904Z   Installing       : cpp-8.5.0-4.el8_5.aarch64                            23/76 
+2026-08-23T06:09:51.4227346Z   Running scriptlet: cpp-8.5.0-4.el8_5.aarch64                            23/76 
+2026-08-23T06:09:52.2481845Z   Installing       : efi-srpm-macros-3-3.el8.noarch                       24/76 
+2026-08-23T06:09:52.4158108Z   Installing       : libstdc++-devel-8.5.0-4.el8_5.aarch64                25/76 
+2026-08-23T06:09:52.4217388Z   Installing       : libasan-8.5.0-4.el8_5.aarch64                        26/76 
+2026-08-23T06:09:52.5093455Z   Running scriptlet: libasan-8.5.0-4.el8_5.aarch64                        26/76 
+2026-08-23T06:09:52.5152305Z   Installing       : libubsan-8.5.0-4.el8_5.aarch64                       27/76 
+2026-08-23T06:09:52.5917972Z   Running scriptlet: libubsan-8.5.0-4.el8_5.aarch64                       27/76 
+2026-08-23T06:09:52.8783918Z   Installing       : dwz-0.12-10.el8.aarch64                              28/76 
+2026-08-23T06:09:52.8849149Z   Installing       : isl-0.16.1-6.el8.aarch64                             29/76 
+2026-08-23T06:09:52.9465238Z   Running scriptlet: isl-0.16.1-6.el8.aarch64                             29/76 
+2026-08-23T06:09:52.9868437Z   Installing       : libatomic_ops-7.6.2-3.el8.aarch64                    30/76 
+2026-08-23T06:09:53.0919425Z   Installing       : gc-7.6.4-3.el8.aarch64                               31/76 
+2026-08-23T06:09:53.1234346Z   Installing       : zstd-1.4.4-1.el8.aarch64                             32/76 
+2026-08-23T06:09:53.2423169Z   Installing       : bzip2-1.0.6-26.el8.aarch64                           33/76 
+2026-08-23T06:09:53.2511071Z   Installing       : diffutils-3.6-6.el8.aarch64                          34/76 
+2026-08-23T06:09:53.3707140Z   Running scriptlet: diffutils-3.6-6.el8.aarch64                          34/76 
+2026-08-23T06:09:53.3766262Z   Installing       : libatomic-8.5.0-4.el8_5.aarch64                      35/76 
+2026-08-23T06:09:53.4628110Z   Running scriptlet: libatomic-8.5.0-4.el8_5.aarch64                      35/76 
+2026-08-23T06:09:53.4697092Z   Installing       : libgomp-8.5.0-4.el8_5.aarch64                        36/76 
+2026-08-23T06:09:53.6325561Z   Running scriptlet: libgomp-8.5.0-4.el8_5.aarch64                        36/76 
+2026-08-23T06:09:53.6526295Z   Installing       : libpkgconf-1.4.2-1.el8.aarch64                       37/76 
+2026-08-23T06:09:53.6720788Z   Installing       : pkgconf-1.4.2-1.el8.aarch64                          38/76 
+2026-08-23T06:09:53.6774708Z   Installing       : libtool-ltdl-2.4.6-25.el8.aarch64                    39/76 
+2026-08-23T06:09:54.8518094Z   Running scriptlet: libtool-ltdl-2.4.6-25.el8.aarch64                    39/76 
+2026-08-23T06:09:54.8855991Z   Installing       : guile-5:2.0.14-7.el8.aarch64                         40/76 
+2026-08-23T06:09:56.0242501Z   Running scriptlet: guile-5:2.0.14-7.el8.aarch64                         40/76 
+2026-08-23T06:09:56.0797677Z   Installing       : gdb-headless-8.2-16.el8.aarch64                      41/76 
+2026-08-23T06:09:56.0921193Z   Installing       : patch-2.7.6-11.el8.aarch64                           42/76 
+2026-08-23T06:09:56.1012699Z   Installing       : pkgconf-m4-1.4.2-1.el8.noarch                        43/76 
+2026-08-23T06:09:56.9553036Z   Installing       : pkgconf-pkg-config-1.4.2-1.el8.aarch64               44/76 
+2026-08-23T06:09:57.0771386Z   Installing       : kernel-headers-4.18.0-348.7.1.el8_5.aarch64          45/76 
+2026-08-23T06:09:57.4139391Z   Running scriptlet: glibc-headers-2.28-164.el8.aarch64                   46/76 
+2026-08-23T06:09:57.4463997Z   Installing       : glibc-headers-2.28-164.el8.aarch64                   46/76 
+2026-08-23T06:09:57.6630565Z   Installing       : libxcrypt-devel-4.1.1-6.el8.aarch64                  47/76 
+2026-08-23T06:09:57.6700941Z   Installing       : glibc-devel-2.28-164.el8.aarch64                     48/76 
+2026-08-23T06:10:01.8206453Z   Running scriptlet: glibc-devel-2.28-164.el8.aarch64                     48/76 
+2026-08-23T06:10:01.8363057Z   Installing       : gcc-8.5.0-4.el8_5.aarch64                            49/76 
+2026-08-23T06:10:02.0133941Z   Running scriptlet: gcc-8.5.0-4.el8_5.aarch64                            49/76 
+2026-08-23T06:10:02.0287794Z   Installing       : annobin-9.72-1.el8_5.2.aarch64                       50/76 
+2026-08-23T06:10:02.0351708Z   Installing       : rust-srpm-macros-5-2.el8.noarch                      51/76 
+2026-08-23T06:10:02.0415686Z   Installing       : qt5-srpm-macros-5.15.2-1.el8.noarch                  52/76 
+2026-08-23T06:10:02.0486988Z   Installing       : perl-srpm-macros-1-25.el8.noarch                     53/76 
+2026-08-23T06:10:02.0554519Z   Installing       : openblas-srpm-macros-2-2.el8.noarch                  54/76 
+2026-08-23T06:10:02.0629257Z   Installing       : ocaml-srpm-macros-5-4.el8.noarch                     55/76 
+2026-08-23T06:10:02.0694994Z   Installing       : go-srpm-macros-2-17.el8.noarch                       56/76 
+2026-08-23T06:10:02.0997032Z   Installing       : ghc-srpm-macros-1.4.2-7.el8.noarch                   57/76 
+2026-08-23T06:10:02.1675417Z   Installing       : redhat-rpm-config-125-1.el8.noarch                   58/76 
+2026-08-23T06:10:05.1333733Z   Installing       : rpm-build-4.14.3-19.el8.aarch64                      59/76 
+2026-08-23T06:10:05.1940543Z   Installing       : gcc-c++-8.5.0-4.el8_5.aarch64                        60/76 
+2026-08-23T06:10:05.3282829Z   Upgrading        : python3-rpm-4.14.3-19.el8.aarch64                    61/76 
+2026-08-23T06:10:05.3375139Z   Installing       : make-1:4.2.1-10.el8.aarch64                          62/76 
+2026-08-23T06:10:05.4511088Z   Running scriptlet: make-1:4.2.1-10.el8.aarch64                          62/76 
+2026-08-23T06:10:05.4698074Z   Upgrading        : glibc-minimal-langpack-2.28-164.el8.aarch64          63/76 
+2026-08-23T06:10:05.4920844Z   Cleanup          : python3-rpm-4.14.3-13.el8.aarch64                    64/76 
+2026-08-23T06:10:05.4931030Z   Cleanup          : rpm-build-libs-4.14.3-13.el8.aarch64                 65/76 
+2026-08-23T06:10:05.5547415Z   Running scriptlet: rpm-build-libs-4.14.3-13.el8.aarch64                 65/76 
+2026-08-23T06:10:05.6195332Z   Cleanup          : elfutils-libs-0.182-3.el8.aarch64                    66/76 
+2026-08-23T06:10:05.6623644Z   Cleanup          : rpm-4.14.3-13.el8.aarch64                            67/76 
+2026-08-23T06:10:05.6633582Z   Cleanup          : rpm-libs-4.14.3-13.el8.aarch64                       68/76 
+2026-08-23T06:10:05.7270236Z   Running scriptlet: rpm-libs-4.14.3-13.el8.aarch64                       68/76 
+2026-08-23T06:10:05.7279681Z   Cleanup          : libstdc++-8.4.1-1.el8.aarch64                        69/76 
+2026-08-23T06:10:05.7904064Z   Running scriptlet: libstdc++-8.4.1-1.el8.aarch64                        69/76 
+2026-08-23T06:10:05.8081954Z   Cleanup          : libxcrypt-4.1.1-4.el8.aarch64                        70/76 
+2026-08-23T06:10:05.8309250Z   Cleanup          : file-libs-5.33-16.el8_3.1.aarch64                    71/76 
+2026-08-23T06:10:05.9951683Z   Cleanup          : elfutils-libelf-0.182-3.el8.aarch64                  72/76 
+2026-08-23T06:10:06.0872770Z   Cleanup          : glibc-2.28-151.el8.aarch64                           73/76 
+2026-08-23T06:10:06.1106087Z   Cleanup          : glibc-minimal-langpack-2.28-151.el8.aarch64          74/76 
+2026-08-23T06:10:06.1291755Z   Cleanup          : glibc-common-2.28-151.el8.aarch64                    75/76 
+2026-08-23T06:10:06.1300749Z   Cleanup          : libgcc-8.4.1-1.el8.aarch64                           76/76 
+2026-08-23T06:10:06.2654843Z   Running scriptlet: libgcc-8.4.1-1.el8.aarch64                           76/76 
+2026-08-23T06:10:06.3510188Z   Running scriptlet: guile-5:2.0.14-7.el8.aarch64                         76/76 
+2026-08-23T06:10:07.4001437Z   Running scriptlet: libgcc-8.4.1-1.el8.aarch64                           76/76 
+2026-08-23T06:10:08.0497432Z   Running scriptlet: glibc-common-2.28-164.el8.aarch64                    76/76 
+2026-08-23T06:10:08.0502133Z   Verifying        : annobin-9.72-1.el8_5.2.aarch64                        1/76 
+2026-08-23T06:10:08.0507872Z   Verifying        : cpp-8.5.0-4.el8_5.aarch64                             2/76 
+2026-08-23T06:10:08.0513850Z   Verifying        : dwz-0.12-10.el8.aarch64                               3/76 
+2026-08-23T06:10:08.0519430Z   Verifying        : efi-srpm-macros-3-3.el8.noarch                        4/76 
+2026-08-23T06:10:08.0525350Z   Verifying        : gc-7.6.4-3.el8.aarch64                                5/76 
+2026-08-23T06:10:08.0531107Z   Verifying        : gcc-8.5.0-4.el8_5.aarch64                             6/76 
+2026-08-23T06:10:08.0537386Z   Verifying        : gcc-c++-8.5.0-4.el8_5.aarch64                         7/76 
+2026-08-23T06:10:08.0543572Z   Verifying        : gdb-headless-8.2-16.el8.aarch64                       8/76 
+2026-08-23T06:10:08.0549637Z   Verifying        : ghc-srpm-macros-1.4.2-7.el8.noarch                    9/76 
+2026-08-23T06:10:08.0554925Z   Verifying        : go-srpm-macros-2-17.el8.noarch                       10/76 
+2026-08-23T06:10:08.0560065Z   Verifying        : guile-5:2.0.14-7.el8.aarch64                         11/76 
+2026-08-23T06:10:08.0566177Z   Verifying        : isl-0.16.1-6.el8.aarch64                             12/76 
+2026-08-23T06:10:08.0572259Z   Verifying        : libatomic_ops-7.6.2-3.el8.aarch64                    13/76 
+2026-08-23T06:10:08.0578828Z   Verifying        : libmpc-1.1.0-9.1.el8.aarch64                         14/76 
+2026-08-23T06:10:08.0584924Z   Verifying        : libstdc++-devel-8.5.0-4.el8_5.aarch64                15/76 
+2026-08-23T06:10:08.0591541Z   Verifying        : ocaml-srpm-macros-5-4.el8.noarch                     16/76 
+2026-08-23T06:10:08.0597118Z   Verifying        : openblas-srpm-macros-2-2.el8.noarch                  17/76 
+2026-08-23T06:10:08.0603572Z   Verifying        : perl-srpm-macros-1-25.el8.noarch                     18/76 
+2026-08-23T06:10:08.0609879Z   Verifying        : python-rpm-macros-3-41.el8.noarch                    19/76 
+2026-08-23T06:10:08.0616019Z   Verifying        : python-srpm-macros-3-41.el8.noarch                   20/76 
+2026-08-23T06:10:08.0622414Z   Verifying        : python3-rpm-macros-3-41.el8.noarch                   21/76 
+2026-08-23T06:10:08.0628719Z   Verifying        : qt5-srpm-macros-5.15.2-1.el8.noarch                  22/76 
+2026-08-23T06:10:08.0634577Z   Verifying        : redhat-rpm-config-125-1.el8.noarch                   23/76 
+2026-08-23T06:10:08.0640665Z   Verifying        : rpm-build-4.14.3-19.el8.aarch64                      24/76 
+2026-08-23T06:10:08.0646087Z   Verifying        : rust-srpm-macros-5-2.el8.noarch                      25/76 
+2026-08-23T06:10:08.0651911Z   Verifying        : zstd-1.4.4-1.el8.aarch64                             26/76 
+2026-08-23T06:10:08.0657633Z   Verifying        : bzip2-1.0.6-26.el8.aarch64                           27/76 
+2026-08-23T06:10:08.0663480Z   Verifying        : diffutils-3.6-6.el8.aarch64                          28/76 
+2026-08-23T06:10:08.0670584Z   Verifying        : elfutils-0.185-1.el8.aarch64                         29/76 
+2026-08-23T06:10:08.0676110Z   Verifying        : elfutils-debuginfod-client-0.185-1.el8.aarch64       30/76 
+2026-08-23T06:10:08.0682246Z   Verifying        : file-5.33-20.el8.aarch64                             31/76 
+2026-08-23T06:10:08.0688461Z   Verifying        : glibc-devel-2.28-164.el8.aarch64                     32/76 
+2026-08-23T06:10:08.0695065Z   Verifying        : glibc-headers-2.28-164.el8.aarch64                   33/76 
+2026-08-23T06:10:08.0702365Z   Verifying        : glibc-langpack-en-2.28-164.el8.aarch64               34/76 
+2026-08-23T06:10:08.0708432Z   Verifying        : kernel-headers-4.18.0-348.7.1.el8_5.aarch64          35/76 
+2026-08-23T06:10:08.0714413Z   Verifying        : libasan-8.5.0-4.el8_5.aarch64                        36/76 
+2026-08-23T06:10:08.0720460Z   Verifying        : libatomic-8.5.0-4.el8_5.aarch64                      37/76 
+2026-08-23T06:10:08.0726044Z   Verifying        : libbabeltrace-1.5.4-3.el8.aarch64                    38/76 
+2026-08-23T06:10:08.0731762Z   Verifying        : libgomp-8.5.0-4.el8_5.aarch64                        39/76 
+2026-08-23T06:10:08.0737637Z   Verifying        : libpkgconf-1.4.2-1.el8.aarch64                       40/76 
+2026-08-23T06:10:08.0743322Z   Verifying        : libtool-ltdl-2.4.6-25.el8.aarch64                    41/76 
+2026-08-23T06:10:08.0749420Z   Verifying        : libubsan-8.5.0-4.el8_5.aarch64                       42/76 
+2026-08-23T06:10:08.0755099Z   Verifying        : libxcrypt-devel-4.1.1-6.el8.aarch64                  43/76 
+2026-08-23T06:10:08.0761148Z   Verifying        : make-1:4.2.1-10.el8.aarch64                          44/76 
+2026-08-23T06:10:08.0767046Z   Verifying        : patch-2.7.6-11.el8.aarch64                           45/76 
+2026-08-23T06:10:08.0772990Z   Verifying        : pkgconf-1.4.2-1.el8.aarch64                          46/76 
+2026-08-23T06:10:08.0779143Z   Verifying        : pkgconf-m4-1.4.2-1.el8.noarch                        47/76 
+2026-08-23T06:10:08.0784312Z   Verifying        : pkgconf-pkg-config-1.4.2-1.el8.aarch64               48/76 
+2026-08-23T06:10:08.0789338Z   Verifying        : unzip-6.0-45.el8_4.aarch64                           49/76 
+2026-08-23T06:10:08.0795126Z   Verifying        : zip-3.0-23.el8.aarch64                               50/76 
+2026-08-23T06:10:08.0801510Z   Verifying        : elfutils-libelf-0.185-1.el8.aarch64                  51/76 
+2026-08-23T06:10:08.0807407Z   Verifying        : elfutils-libelf-0.182-3.el8.aarch64                  52/76 
+2026-08-23T06:10:08.0813397Z   Verifying        : elfutils-libs-0.185-1.el8.aarch64                    53/76 
+2026-08-23T06:10:08.0820594Z   Verifying        : elfutils-libs-0.182-3.el8.aarch64                    54/76 
+2026-08-23T06:10:08.0828085Z   Verifying        : file-libs-5.33-20.el8.aarch64                        55/76 
+2026-08-23T06:10:08.0834590Z   Verifying        : file-libs-5.33-16.el8_3.1.aarch64                    56/76 
+2026-08-23T06:10:08.0840352Z   Verifying        : glibc-2.28-164.el8.aarch64                           57/76 
+2026-08-23T06:10:08.0847596Z   Verifying        : glibc-2.28-151.el8.aarch64                           58/76 
+2026-08-23T06:10:08.0853434Z   Verifying        : glibc-common-2.28-164.el8.aarch64                    59/76 
+2026-08-23T06:10:08.0860511Z   Verifying        : glibc-common-2.28-151.el8.aarch64                    60/76 
+2026-08-23T06:10:08.0867636Z   Verifying        : glibc-minimal-langpack-2.28-164.el8.aarch64          61/76 
+2026-08-23T06:10:08.0873335Z   Verifying        : glibc-minimal-langpack-2.28-151.el8.aarch64          62/76 
+2026-08-23T06:10:08.0878570Z   Verifying        : libgcc-8.5.0-4.el8_5.aarch64                         63/76 
+2026-08-23T06:10:08.0884170Z   Verifying        : libgcc-8.4.1-1.el8.aarch64                           64/76 
+2026-08-23T06:10:08.0890186Z   Verifying        : libstdc++-8.5.0-4.el8_5.aarch64                      65/76 
+2026-08-23T06:10:08.0896028Z   Verifying        : libstdc++-8.4.1-1.el8.aarch64                        66/76 
+2026-08-23T06:10:08.0902057Z   Verifying        : libxcrypt-4.1.1-6.el8.aarch64                        67/76 
+2026-08-23T06:10:08.0908418Z   Verifying        : libxcrypt-4.1.1-4.el8.aarch64                        68/76 
+2026-08-23T06:10:08.0914658Z   Verifying        : python3-rpm-4.14.3-19.el8.aarch64                    69/76 
+2026-08-23T06:10:08.0920681Z   Verifying        : python3-rpm-4.14.3-13.el8.aarch64                    70/76 
+2026-08-23T06:10:08.0925949Z   Verifying        : rpm-4.14.3-19.el8.aarch64                            71/76 
+2026-08-23T06:10:08.0932112Z   Verifying        : rpm-4.14.3-13.el8.aarch64                            72/76 
+2026-08-23T06:10:08.0938301Z   Verifying        : rpm-build-libs-4.14.3-19.el8.aarch64                 73/76 
+2026-08-23T06:10:08.0944120Z   Verifying        : rpm-build-libs-4.14.3-13.el8.aarch64                 74/76 
+2026-08-23T06:10:08.0949534Z   Verifying        : rpm-libs-4.14.3-19.el8.aarch64                       75/76 
+2026-08-23T06:10:09.8148657Z   Verifying        : rpm-libs-4.14.3-13.el8.aarch64                       76/76 
+2026-08-23T06:10:09.8149032Z 
+2026-08-23T06:10:09.8149127Z Upgraded:
+2026-08-23T06:10:09.8149515Z   elfutils-libelf-0.185-1.el8.aarch64                                           
+2026-08-23T06:10:09.8150095Z   elfutils-libs-0.185-1.el8.aarch64                                             
+2026-08-23T06:10:09.8150510Z   file-libs-5.33-20.el8.aarch64                                                 
+2026-08-23T06:10:09.8150888Z   glibc-2.28-164.el8.aarch64                                                    
+2026-08-23T06:10:09.8151236Z   glibc-common-2.28-164.el8.aarch64                                             
+2026-08-23T06:10:09.8151626Z   glibc-minimal-langpack-2.28-164.el8.aarch64                                   
+2026-08-23T06:10:09.8151984Z   libgcc-8.5.0-4.el8_5.aarch64                                                  
+2026-08-23T06:10:09.8152319Z   libstdc++-8.5.0-4.el8_5.aarch64                                               
+2026-08-23T06:10:09.8152650Z   libxcrypt-4.1.1-6.el8.aarch64                                                 
+2026-08-23T06:10:09.8153144Z   python3-rpm-4.14.3-19.el8.aarch64                                             
+2026-08-23T06:10:09.8153470Z   rpm-4.14.3-19.el8.aarch64                                                     
+2026-08-23T06:10:09.8153798Z   rpm-build-libs-4.14.3-19.el8.aarch64                                          
+2026-08-23T06:10:09.8154139Z   rpm-libs-4.14.3-19.el8.aarch64                                                
+2026-08-23T06:10:09.8154408Z Installed:
+2026-08-23T06:10:09.8154634Z   annobin-9.72-1.el8_5.2.aarch64                                                
+2026-08-23T06:10:09.8155194Z   bzip2-1.0.6-26.el8.aarch64                                                    
+2026-08-23T06:10:09.8155535Z   cpp-8.5.0-4.el8_5.aarch64                                                     
+2026-08-23T06:10:09.8155868Z   diffutils-3.6-6.el8.aarch64                                                   
+2026-08-23T06:10:09.8156200Z   dwz-0.12-10.el8.aarch64                                                       
+2026-08-23T06:10:09.8156726Z   efi-srpm-macros-3-3.el8.noarch                                                
+2026-08-23T06:10:09.8157093Z   elfutils-0.185-1.el8.aarch64                                                  
+2026-08-23T06:10:09.8157469Z   elfutils-debuginfod-client-0.185-1.el8.aarch64                                
+2026-08-23T06:10:09.8157832Z   file-5.33-20.el8.aarch64                                                      
+2026-08-23T06:10:09.8158151Z   gc-7.6.4-3.el8.aarch64                                                        
+2026-08-23T06:10:09.8158466Z   gcc-8.5.0-4.el8_5.aarch64                                                     
+2026-08-23T06:10:09.8158787Z   gcc-c++-8.5.0-4.el8_5.aarch64                                                 
+2026-08-23T06:10:09.8159135Z   gdb-headless-8.2-16.el8.aarch64                                               
+2026-08-23T06:10:09.8159505Z   ghc-srpm-macros-1.4.2-7.el8.noarch                                            
+2026-08-23T06:10:09.8159877Z   glibc-devel-2.28-164.el8.aarch64                                              
+2026-08-23T06:10:09.8160229Z   glibc-headers-2.28-164.el8.aarch64                                            
+2026-08-23T06:10:09.8160583Z   glibc-langpack-en-2.28-164.el8.aarch64                                        
+2026-08-23T06:10:09.8160941Z   go-srpm-macros-2-17.el8.noarch                                                
+2026-08-23T06:10:09.8161426Z   guile-5:2.0.14-7.el8.aarch64                                                  
+2026-08-23T06:10:09.8161746Z   isl-0.16.1-6.el8.aarch64                                                      
+2026-08-23T06:10:09.8162092Z   kernel-headers-4.18.0-348.7.1.el8_5.aarch64                                   
+2026-08-23T06:10:09.8162437Z   libasan-8.5.0-4.el8_5.aarch64                                                 
+2026-08-23T06:10:09.8162765Z   libatomic-8.5.0-4.el8_5.aarch64                                               
+2026-08-23T06:10:09.8163102Z   libatomic_ops-7.6.2-3.el8.aarch64                                             
+2026-08-23T06:10:09.8163447Z   libbabeltrace-1.5.4-3.el8.aarch64                                             
+2026-08-23T06:10:09.8163790Z   libgomp-8.5.0-4.el8_5.aarch64                                                 
+2026-08-23T06:10:09.8164114Z   libmpc-1.1.0-9.1.el8.aarch64                                                  
+2026-08-23T06:10:09.8164452Z   libpkgconf-1.4.2-1.el8.aarch64                                                
+2026-08-23T06:10:09.8164800Z   libstdc++-devel-8.5.0-4.el8_5.aarch64                                         
+2026-08-23T06:10:09.8165147Z   libtool-ltdl-2.4.6-25.el8.aarch64                                             
+2026-08-23T06:10:09.8165483Z   libubsan-8.5.0-4.el8_5.aarch64                                                
+2026-08-23T06:10:09.8165824Z   libxcrypt-devel-4.1.1-6.el8.aarch64                                           
+2026-08-23T06:10:09.8166161Z   make-1:4.2.1-10.el8.aarch64                                                   
+2026-08-23T06:10:09.8166591Z   ocaml-srpm-macros-5-4.el8.noarch                                              
+2026-08-23T06:10:09.8166957Z   openblas-srpm-macros-2-2.el8.noarch                                           
+2026-08-23T06:10:09.8167304Z   patch-2.7.6-11.el8.aarch64                                                    
+2026-08-23T06:10:09.8167653Z   perl-srpm-macros-1-25.el8.noarch                                              
+2026-08-23T06:10:09.8168000Z   pkgconf-1.4.2-1.el8.aarch64                                                   
+2026-08-23T06:10:09.8172214Z   pkgconf-m4-1.4.2-1.el8.noarch                                                 
+2026-08-23T06:10:09.8172794Z   pkgconf-pkg-config-1.4.2-1.el8.aarch64                                        
+2026-08-23T06:10:09.8173317Z   python-rpm-macros-3-41.el8.noarch                                             
+2026-08-23T06:10:09.8173860Z   python-srpm-macros-3-41.el8.noarch                                            
+2026-08-23T06:10:09.8174396Z   python3-rpm-macros-3-41.el8.noarch                                            
+2026-08-23T06:10:09.8174910Z   qt5-srpm-macros-5.15.2-1.el8.noarch                                           
+2026-08-23T06:10:09.8175436Z   redhat-rpm-config-125-1.el8.noarch                                            
+2026-08-23T06:10:09.8175960Z   rpm-build-4.14.3-19.el8.aarch64                                               
+2026-08-23T06:10:09.8176648Z   rust-srpm-macros-5-2.el8.noarch                                               
+2026-08-23T06:10:09.8177141Z   unzip-6.0-45.el8_4.aarch64                                                    
+2026-08-23T06:10:09.8177613Z   zip-3.0-23.el8.aarch64                                                        
+2026-08-23T06:10:09.8178089Z   zstd-1.4.4-1.el8.aarch64                                                      
+2026-08-23T06:10:09.8178404Z 
+2026-08-23T06:10:09.8178539Z Complete!
+2026-08-23T06:10:16.1463204Z Executing(%prep): /bin/sh -e /var/tmp/rpm-tmp.bUlPpS
+2026-08-23T06:10:16.2043272Z + umask 022
+2026-08-23T06:10:16.2047049Z + cd /root/rpmbuild/BUILD
+2026-08-23T06:10:16.2053103Z + cd /root/rpmbuild/BUILD
+2026-08-23T06:10:16.2054416Z + rm -rf smartctl-ps3stor-1.0.0
+2026-08-23T06:10:16.2351235Z + /usr/bin/gzip -dc /root/rpmbuild/SOURCES/smartctl-ps3stor-1.0.0.tar.gz
+2026-08-23T06:10:16.2359220Z + /usr/bin/tar -xof -
+2026-08-23T06:10:16.9898437Z + STATUS=0
+2026-08-23T06:10:16.9910440Z + '[' 0 -ne 0 ']'
+2026-08-23T06:10:16.9918545Z + cd smartctl-ps3stor-1.0.0
+2026-08-23T06:10:16.9921953Z + /usr/bin/chmod -Rf a+rX,u+w,g-w,o-w .
+2026-08-23T06:10:17.0231304Z + exit 0
+2026-08-23T06:10:17.1025273Z Executing(%build): /bin/sh -e /var/tmp/rpm-tmp.xGx1JQ
+2026-08-23T06:10:17.1562909Z + umask 022
+2026-08-23T06:10:17.1567216Z + cd /root/rpmbuild/BUILD
+2026-08-23T06:10:17.1573416Z + cd smartctl-ps3stor-1.0.0
+2026-08-23T06:10:17.1584782Z + CFLAGS='-O2 -g -pipe -Wall -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -Wp,-D_GLIBCXX_ASSERTIONS -fexceptions -fstack-protector-strong -grecord-gcc-switches -specs=/usr/lib/rpm/redhat/redhat-hardened-cc1 -specs=/usr/lib/rpm/redhat/redhat-annobin-cc1 -fasynchronous-unwind-tables -fstack-clash-protection'
+2026-08-23T06:10:17.1586564Z + export CFLAGS
+2026-08-23T06:10:17.1590485Z + CXXFLAGS='-O2 -g -pipe -Wall -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -Wp,-D_GLIBCXX_ASSERTIONS -fexceptions -fstack-protector-strong -grecord-gcc-switches -specs=/usr/lib/rpm/redhat/redhat-hardened-cc1 -specs=/usr/lib/rpm/redhat/redhat-annobin-cc1 -fasynchronous-unwind-tables -fstack-clash-protection'
+2026-08-23T06:10:17.1592977Z + export CXXFLAGS
+2026-08-23T06:10:17.1596730Z + FFLAGS='-O2 -g -pipe -Wall -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -Wp,-D_GLIBCXX_ASSERTIONS -fexceptions -fstack-protector-strong -grecord-gcc-switches -specs=/usr/lib/rpm/redhat/redhat-hardened-cc1 -specs=/usr/lib/rpm/redhat/redhat-annobin-cc1 -fasynchronous-unwind-tables -fstack-clash-protection -I/usr/lib64/gfortran/modules'
+2026-08-23T06:10:17.1598441Z + export FFLAGS
+2026-08-23T06:10:17.1600858Z + FCFLAGS='-O2 -g -pipe -Wall -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -Wp,-D_GLIBCXX_ASSERTIONS -fexceptions -fstack-protector-strong -grecord-gcc-switches -specs=/usr/lib/rpm/redhat/redhat-hardened-cc1 -specs=/usr/lib/rpm/redhat/redhat-annobin-cc1 -fasynchronous-unwind-tables -fstack-clash-protection -I/usr/lib64/gfortran/modules'
+2026-08-23T06:10:17.1602999Z + export FCFLAGS
+2026-08-23T06:10:17.1603418Z + LDFLAGS='-Wl,-z,relro  -Wl,-z,now -specs=/usr/lib/rpm/redhat/redhat-hardened-ld'
+2026-08-23T06:10:17.1608029Z + export LDFLAGS
+2026-08-23T06:10:17.1617607Z + '[' 1 = 1 ']'
+2026-08-23T06:10:17.1668747Z +++ dirname ./configure
+2026-08-23T06:10:17.1969391Z ++ find . -name config.guess -o -name config.sub
+2026-08-23T06:10:17.2320829Z + for i in $(find $(dirname ./configure) -name config.guess -o -name config.sub)
+2026-08-23T06:10:17.2345625Z ++ basename ./config.sub
+2026-08-23T06:10:17.2589746Z + '[' -f /usr/lib/rpm/redhat/config.sub ']'
+2026-08-23T06:10:17.2595983Z + /usr/bin/rm -f ./config.sub
+2026-08-23T06:10:17.2886618Z ++ basename ./config.sub
+2026-08-23T06:10:17.3126627Z + /usr/bin/cp -fv /usr/lib/rpm/redhat/config.sub ./config.sub
+2026-08-23T06:10:17.3383900Z '/usr/lib/rpm/redhat/config.sub' -> './config.sub'
+2026-08-23T06:10:17.3402094Z + for i in $(find $(dirname ./configure) -name config.guess -o -name config.sub)
+2026-08-23T06:10:17.3423249Z ++ basename ./config.guess
+2026-08-23T06:10:17.3664197Z + '[' -f /usr/lib/rpm/redhat/config.guess ']'
+2026-08-23T06:10:17.3679329Z + /usr/bin/rm -f ./config.guess
+2026-08-23T06:10:17.3937221Z ++ basename ./config.guess
+2026-08-23T06:10:17.4177147Z + /usr/bin/cp -fv /usr/lib/rpm/redhat/config.guess ./config.guess
+2026-08-23T06:10:17.4432177Z '/usr/lib/rpm/redhat/config.guess' -> './config.guess'
+2026-08-23T06:10:17.4456493Z + '[' 1 = 1 ']'
+2026-08-23T06:10:17.4456859Z + '[' x '!=' 'x-Wl,-z,now -specs=/usr/lib/rpm/redhat/redhat-hardened-ld' ']'
+2026-08-23T06:10:17.4475598Z ++ find . -name ltmain.sh
+2026-08-23T06:10:17.4803932Z + ./configure --build=aarch64-redhat-linux-gnu --host=aarch64-redhat-linux-gnu --program-prefix= --disable-dependency-tracking --prefix=/usr --exec-prefix=/usr --bindir=/usr/bin --sbindir=/usr/sbin --sysconfdir=/etc --datadir=/usr/share --includedir=/usr/include --libdir=/usr/lib64 --libexecdir=/usr/libexec --localstatedir=/var --sharedstatedir=/var/lib --mandir=/usr/share/man --infodir=/usr/share/info
+2026-08-23T06:10:19.5255835Z checking for a BSD-compatible install... /usr/bin/install -c
+2026-08-23T06:10:19.5675228Z checking whether build environment is sane... yes
+2026-08-23T06:10:19.7452353Z checking for a race-free mkdir -p... /usr/bin/mkdir -p
+2026-08-23T06:10:19.7466085Z checking for gawk... gawk
+2026-08-23T06:10:19.9099020Z checking whether make sets $(MAKE)... yes
+2026-08-23T06:10:20.0504384Z checking whether make supports nested variables... yes
+2026-08-23T06:10:20.1481358Z checking whether to enable maintainer-specific portions of Makefiles... no
+2026-08-23T06:10:20.1517117Z checking for aarch64-redhat-linux-gnu-g++... no
+2026-08-23T06:10:20.1530057Z checking for aarch64-redhat-linux-gnu-c++... no
+2026-08-23T06:10:20.1542742Z checking for aarch64-redhat-linux-gnu-gpp... no
+2026-08-23T06:10:20.1555104Z checking for aarch64-redhat-linux-gnu-aCC... no
+2026-08-23T06:10:20.1567454Z checking for aarch64-redhat-linux-gnu-CC... no
+2026-08-23T06:10:20.1580127Z checking for aarch64-redhat-linux-gnu-cxx... no
+2026-08-23T06:10:20.1592951Z checking for aarch64-redhat-linux-gnu-cc++... no
+2026-08-23T06:10:20.1605418Z checking for aarch64-redhat-linux-gnu-cl.exe... no
+2026-08-23T06:10:20.1617692Z checking for aarch64-redhat-linux-gnu-FCC... no
+2026-08-23T06:10:20.1630092Z checking for aarch64-redhat-linux-gnu-KCC... no
+2026-08-23T06:10:20.1642328Z checking for aarch64-redhat-linux-gnu-RCC... no
+2026-08-23T06:10:20.1655186Z checking for aarch64-redhat-linux-gnu-xlC_r... no
+2026-08-23T06:10:20.1668037Z checking for aarch64-redhat-linux-gnu-xlC... no
+2026-08-23T06:10:20.1680439Z checking for aarch64-redhat-linux-gnu-clang++... no
+2026-08-23T06:10:20.1692055Z checking for g++... g++
+2026-08-23T06:10:21.4302116Z checking whether the C++ compiler works... yes
+2026-08-23T06:10:21.4305692Z checking for C++ compiler default output file name... a.out
+2026-08-23T06:10:22.2098597Z checking for suffix of executables... 
+2026-08-23T06:10:23.3821395Z checking whether we are cross compiling... no
+2026-08-23T06:10:24.0170721Z checking for suffix of object files... o
+2026-08-23T06:10:24.5955209Z checking whether the compiler supports GNU C++... yes
+2026-08-23T06:10:25.0840818Z checking whether g++ accepts -g... yes
+2026-08-23T06:10:26.8611900Z checking for g++ option to enable C++11 features... none needed
+2026-08-23T06:10:27.0545495Z checking whether make supports the include directive... yes (GNU style)
+2026-08-23T06:10:27.0574952Z checking dependency style of g++... none
+2026-08-23T06:10:27.0599299Z checking for aarch64-redhat-linux-gnu-gcc... no
+2026-08-23T06:10:27.0620069Z checking for gcc... gcc
+2026-08-23T06:10:28.1829376Z checking whether the compiler supports GNU C... yes
+2026-08-23T06:10:28.6476823Z checking whether gcc accepts -g... yes
+2026-08-23T06:10:30.1524247Z checking for gcc option to enable C11 features... none needed
+2026-08-23T06:10:30.9538211Z checking whether gcc understands -c and -o together... yes
+2026-08-23T06:10:30.9567778Z checking dependency style of gcc... none
+2026-08-23T06:10:30.9598064Z checking dependency style of gcc... none
+2026-08-23T06:10:30.9633245Z checking for aarch64-redhat-linux-gnu-pkg-config... /usr/bin/aarch64-redhat-linux-gnu-pkg-config
+2026-08-23T06:10:31.0262835Z checking pkg-config is at least version 0.9.0... yes
+2026-08-23T06:10:31.4198842Z checking build system type... aarch64-redhat-linux-gnu
+2026-08-23T06:10:31.6218281Z checking host system type... aarch64-redhat-linux-gnu
+2026-08-23T06:10:31.6242744Z checking for aarch64-redhat-linux-gnu-nm... no
+2026-08-23T06:10:31.6262840Z checking for nm... nm
+2026-08-23T06:10:31.6313342Z checking whether reproducible build is selected (SOURCE_DATE_EPOCH)... no
+2026-08-23T06:10:31.6323614Z checking whether this is a build from SVN... no
+2026-08-23T06:10:32.1354540Z checking for stdio.h... yes
+2026-08-23T06:10:32.7173341Z checking for stdlib.h... yes
+2026-08-23T06:10:33.3225652Z checking for string.h... yes
+2026-08-23T06:10:33.9376952Z checking for inttypes.h... yes
+2026-08-23T06:10:34.5484800Z checking for stdint.h... yes
+2026-08-23T06:10:35.1604740Z checking for strings.h... yes
+2026-08-23T06:10:35.7821103Z checking for sys/stat.h... yes
+2026-08-23T06:10:36.4100193Z checking for sys/types.h... yes
+2026-08-23T06:10:37.0764039Z checking for unistd.h... yes
+2026-08-23T06:10:37.7394324Z checking for locale.h... yes
+2026-08-23T06:10:38.4031317Z checking for byteswap.h... yes
+2026-08-23T06:10:39.0721010Z checking for sys/sysmacros.h... yes
+2026-08-23T06:10:39.5785757Z checking for linux/compiler.h... no
+2026-08-23T06:10:40.2481692Z checking for linux/cciss_ioctl.h... yes
+2026-08-23T06:10:41.9124534Z checking for __int128... yes
+2026-08-23T06:10:42.8146962Z checking for long double with more range or precision than double... yes
+2026-08-23T06:10:43.7528132Z checking for getopt_long... yes
+2026-08-23T06:10:45.4637508Z checking whether byte ordering is bigendian... no
+2026-08-23T06:10:46.1583432Z checking whether g++ supports __attribute__((packed))... yes
+2026-08-23T06:10:46.6717687Z checking for cap-ng.h... no
+2026-08-23T06:10:47.1790446Z checking for systemd/sd-daemon.h... no
+2026-08-23T06:10:48.1147727Z checking for sigaction... yes
+2026-08-23T06:10:49.1533399Z checking for g++ option to accept C++17... -std=gnu++17
+2026-08-23T06:10:49.7320766Z checking for g++ option to accept C++14 but not C++17... none needed
+2026-08-23T06:10:50.7689833Z checking for g++ option to accept C++11 but not C++14... -std=gnu++11
+2026-08-23T06:10:51.7057588Z checking for regcomp... yes
+2026-08-23T06:10:51.7090399Z checking whether the OS provides a POSIX API... yes
+2026-08-23T06:10:51.7803390Z checking whether os_linux.cpp uses new interface... yes
+2026-08-23T06:10:51.7809535Z checking whether NVMe device scanning could be safely enabled... yes
+2026-08-23T06:10:52.1519984Z checking whether _FORTIFY_SOURCE is predefined... yes
+2026-08-23T06:10:52.4162923Z checking that generated files are newer than configure... done
+2026-08-23T06:10:52.4199613Z configure: creating ./config.status
+2026-08-23T06:10:54.2603529Z config.status: creating Makefile
+2026-08-23T06:10:54.5202767Z config.status: creating config.h
+2026-08-23T06:10:54.7289484Z config.status: executing depfiles commands
+2026-08-23T06:10:54.8002698Z checking whether make sets $(MAKE)... (cached) yes
+2026-08-23T06:10:54.8562492Z configure:
+2026-08-23T06:10:54.8564245Z -----------------------------------------------------------------------------
+2026-08-23T06:10:54.8564729Z smartmontools-7.4 configuration:
+2026-08-23T06:10:54.8565083Z host operating system:  aarch64-redhat-linux-gnu
+2026-08-23T06:10:54.8565356Z C++ compiler:           g++
+2026-08-23T06:10:54.8565545Z C compiler:             gcc
+2026-08-23T06:10:54.8565730Z preprocessor flags:     
+2026-08-23T06:10:54.8566942Z C++ compiler flags:     -O2 -g -pipe -Wall -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -Wp,-D_GLIBCXX_ASSERTIONS -fexceptions -fstack-protector-strong -grecord-gcc-switches -specs=/usr/lib/rpm/redhat/redhat-hardened-cc1 -specs=/usr/lib/rpm/redhat/redhat-annobin-cc1 -fasynchronous-unwind-tables -fstack-clash-protection -std=gnu++11 -W
+2026-08-23T06:10:54.8568733Z C compiler flags:       -O2 -g -pipe -Wall -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -Wp,-D_GLIBCXX_ASSERTIONS -fexceptions -fstack-protector-strong -grecord-gcc-switches -specs=/usr/lib/rpm/redhat/redhat-hardened-cc1 -specs=/usr/lib/rpm/redhat/redhat-annobin-cc1 -fasynchronous-unwind-tables -fstack-clash-protection
+2026-08-23T06:10:54.8569780Z linker flags:           -Wl,-z,relro  -Wl,-z,now -specs=/usr/lib/rpm/redhat/redhat-hardened-ld
+2026-08-23T06:10:54.8570143Z OS specific modules:    os_linux.o cciss.o dev_areca.o  
+2026-08-23T06:10:54.8570401Z binary install path:    /usr/sbin
+2026-08-23T06:10:54.8570612Z man page install path:  /usr/share/man
+2026-08-23T06:10:54.8570851Z doc file install path:  /usr/share/doc/smartmontools
+2026-08-23T06:10:54.8571162Z examples install path:  /usr/share/doc/smartmontools/examplescripts
+2026-08-23T06:10:54.8571483Z drive database file:    /usr/share/smartmontools/drivedb.h
+2026-08-23T06:10:54.8571776Z database update script: /usr/sbin/update-smart-drivedb
+2026-08-23T06:10:54.8572216Z database update branch: branches/RELEASE_7_3_DRIVEDB
+2026-08-23T06:10:54.8572459Z download tools:         curl wget lynx svn
+2026-08-23T06:10:54.8572679Z GnuPG for verification: gpg
+2026-08-23T06:10:54.8572890Z local drive database:   /etc/smart_drivedb.h
+2026-08-23T06:10:54.8573124Z smartd config file:     /etc/smartd.conf
+2026-08-23T06:10:54.8573354Z smartd warning script:  /etc/smartd_warning.sh
+2026-08-23T06:10:54.8573597Z smartd plugin path:     /etc/smartd_warning.d
+2026-08-23T06:10:54.8573851Z PATH within scripts:    /usr/local/bin:/usr/bin:/bin
+2026-08-23T06:10:54.8574092Z smartd initd script:    [disabled]
+2026-08-23T06:10:54.8574294Z smartd save files:      [disabled]
+2026-08-23T06:10:54.8574485Z smartd attribute logs:  [disabled]
+2026-08-23T06:10:54.8574695Z SELinux support:        no
+2026-08-23T06:10:54.8574887Z libcap-ng support:      no
+2026-08-23T06:10:54.8575071Z systemd notify support: no
+2026-08-23T06:10:54.8575251Z NVMe DEVICESCAN:        yes
+2026-08-23T06:10:54.8575501Z -----------------------------------------------------------------------------
+2026-08-23T06:10:54.8575709Z 
+2026-08-23T06:10:54.9234763Z configure: WARNING:
+2026-08-23T06:10:54.9235235Z systemd(1) is used on this system but smartd systemd notify support will
+2026-08-23T06:10:54.9235679Z not be available because a required library is missing.
+2026-08-23T06:10:54.9235983Z Use option '--without-libsystemd' to suppress this warning.
+2026-08-23T06:10:54.9236173Z 
+2026-08-23T06:10:55.4871279Z + /usr/bin/make -O -j4
+2026-08-23T06:10:55.7380319Z Version no change
+2026-08-23T06:10:55.7385746Z /usr/bin/make  all-am
+2026-08-23T06:10:56.3271272Z make[1]: Entering directory '/root/rpmbuild/BUILD/smartctl-ps3stor-1.0.0'
+2026-08-23T06:10:56.3272163Z  cat ChangeLog NEWS $(SOURCES) | $(VERSION_FROM_SVN_IDS) > svnversion.h
+2026-08-23T06:10:56.3273086Z make[1]: Leaving directory '/root/rpmbuild/BUILD/smartctl-ps3stor-1.0.0'
+2026-08-23T06:10:57.6940641Z make[1]: Entering directory '/root/rpmbuild/BUILD/smartctl-ps3stor-1.0.0'
+2026-08-23T06:10:57.6944664Z g++ -DHAVE_CONFIG_H -I. -I./ps3lib   -DBUILD_INFO='"(local build)"' -DSMARTMONTOOLS_SYSCONFDIR='"/etc"' -DSMARTMONTOOLS_SMARTDSCRIPTDIR='"/etc"' -DSMARTMONTOOLS_DRIVEDBDIR='"/usr/share/smartmontools"'        -O2 -g -pipe -Wall -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -Wp,-D_GLIBCXX_ASSERTIONS -fexceptions -fstack-protector-strong -grecord-gcc-switches -specs=/usr/lib/rpm/redhat/redhat-hardened-cc1 -specs=/usr/lib/rpm/redhat/redhat-annobin-cc1 -fasynchronous-unwind-tables -fstack-clash-protection -std=gnu++11 -W -c -o atacmdnames.o atacmdnames.cpp
+2026-08-23T06:10:57.6948030Z make[1]: Leaving directory '/root/rpmbuild/BUILD/smartctl-ps3stor-1.0.0'
+2026-08-23T06:11:00.8581624Z make[1]: Entering directory '/root/rpmbuild/BUILD/smartctl-ps3stor-1.0.0'
+2026-08-23T06:11:00.8585536Z g++ -DHAVE_CONFIG_H -I. -I./ps3lib   -DBUILD_INFO='"(local build)"' -DSMARTMONTOOLS_SYSCONFDIR='"/etc"' -DSMARTMONTOOLS_SMARTDSCRIPTDIR='"/etc"' -DSMARTMONTOOLS_DRIVEDBDIR='"/usr/share/smartmontools"'        -O2 -g -pipe -Wall -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -Wp,-D_GLIBCXX_ASSERTIONS -fexceptions -fstack-protector-strong -grecord-gcc-switches -specs=/usr/lib/rpm/redhat/redhat-hardened-cc1 -specs=/usr/lib/rpm/redhat/redhat-annobin-cc1 -fasynchronous-unwind-tables -fstack-clash-protection -std=gnu++11 -W -c -o ataidentify.o ataidentify.cpp
+2026-08-23T06:11:00.8590440Z ataidentify.cpp: In function 'void ata_print_identify_data(const void*, bool, int)':
+2026-08-23T06:11:00.8591011Z make[1]: Leaving directory '/root/rpmbuild/BUILD/smartctl-ps3stor-1.0.0'
+2026-08-23T06:11:00.8592173Z ataidentify.cpp:652:44: warning: '%0*x' directive output may be truncated writing between 1 and 536870911 bytes into a region of size 18 [-Wformat-truncation=]
+2026-08-23T06:11:00.8593121Z            snprintf(valstr, sizeof(valstr), "0x%0*x", (bit - bit2 + 4) >> 2, b);
+2026-08-23T06:11:00.8593752Z                                             ^~~~~~~~
+2026-08-23T06:11:00.8594341Z ataidentify.cpp:652:44: note: directive argument in the range [0, 65535]
+2026-08-23T06:11:00.8595143Z In file included from /usr/include/stdio.h:873,
+2026-08-23T06:11:00.8595607Z                  from utility.h:22,
+2026-08-23T06:11:00.8596033Z                  from ataidentify.cpp:19:
+2026-08-23T06:11:00.8597049Z /usr/include/bits/stdio2.h:67:35: note: '__builtin___snprintf_chk' output between 4 and 536870914 bytes into a destination of size 20
+2026-08-23T06:11:00.8597938Z    return __builtin___snprintf_chk (__s, __n, __USE_FORTIFY_LEVEL - 1,
+2026-08-23T06:11:00.8598783Z           ~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+2026-08-23T06:11:00.8599531Z         __bos (__s), __fmt, __va_arg_pack ());
+2026-08-23T06:11:00.8600097Z         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+2026-08-23T06:11:02.3789234Z make[1]: Entering directory '/root/rpmbuild/BUILD/smartctl-ps3stor-1.0.0'
+2026-08-23T06:11:02.3798597Z g++ -DHAVE_CONFIG_H -I. -I./ps3lib   -DBUILD_INFO='"(local build)"' -DSMARTMONTOOLS_SYSCONFDIR='"/etc"' -DSMARTMONTOOLS_SMARTDSCRIPTDIR='"/etc"' -DSMARTMONTOOLS_DRIVEDBDIR='"/usr/share/smartmontools"'        -O2 -g -pipe -Wall -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -Wp,-D_GLIBCXX_ASSERTIONS -fexceptions -fstack-protector-strong -grecord-gcc-switches -specs=/usr/lib/rpm/redhat/redhat-hardened-cc1 -specs=/usr/lib/rpm/redhat/redhat-annobin-cc1 -fasynchronous-unwind-tables -fstack-clash-protection -std=gnu++11 -W -c -o dev_ata_cmd_set.o dev_ata_cmd_set.cpp
+2026-08-23T06:11:02.3808149Z make[1]: Leaving directory '/root/rpmbuild/BUILD/smartctl-ps3stor-1.0.0'
+2026-08-23T06:11:07.0832019Z make[1]: Entering directory '/root/rpmbuild/BUILD/smartctl-ps3stor-1.0.0'
+2026-08-23T06:11:07.0841072Z g++ -DHAVE_CONFIG_H -I. -I./ps3lib   -DBUILD_INFO='"(local build)"' -DSMARTMONTOOLS_SYSCONFDIR='"/etc"' -DSMARTMONTOOLS_SMARTDSCRIPTDIR='"/etc"' -DSMARTMONTOOLS_DRIVEDBDIR='"/usr/share/smartmontools"'        -O2 -g -pipe -Wall -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -Wp,-D_GLIBCXX_ASSERTIONS -fexceptions -fstack-protector-strong -grecord-gcc-switches -specs=/usr/lib/rpm/redhat/redhat-hardened-cc1 -specs=/usr/lib/rpm/redhat/redhat-annobin-cc1 -fasynchronous-unwind-tables -fstack-clash-protection -std=gnu++11 -W -c -o dev_intelliprop.o dev_intelliprop.cpp
+2026-08-23T06:11:07.0844068Z make[1]: Leaving directory '/root/rpmbuild/BUILD/smartctl-ps3stor-1.0.0'
+2026-08-23T06:11:11.6134656Z make[1]: Entering directory '/root/rpmbuild/BUILD/smartctl-ps3stor-1.0.0'
+2026-08-23T06:11:11.6144322Z g++ -DHAVE_CONFIG_H -I. -I./ps3lib   -DBUILD_INFO='"(local build)"' -DSMARTMONTOOLS_SYSCONFDIR='"/etc"' -DSMARTMONTOOLS_SMARTDSCRIPTDIR='"/etc"' -DSMARTMONTOOLS_DRIVEDBDIR='"/usr/share/smartmontools"'        -O2 -g -pipe -Wall -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -Wp,-D_GLIBCXX_ASSERTIONS -fexceptions -fstack-protector-strong -grecord-gcc-switches -specs=/usr/lib/rpm/redhat/redhat-hardened-cc1 -specs=/usr/lib/rpm/redhat/redhat-annobin-cc1 -fasynchronous-unwind-tables -fstack-clash-protection -std=gnu++11 -W -c -o atacmds.o atacmds.cpp
+2026-08-23T06:11:11.6153221Z make[1]: Leaving directory '/root/rpmbuild/BUILD/smartctl-ps3stor-1.0.0'
+2026-08-23T06:11:12.6712310Z make[1]: Entering directory '/root/rpmbuild/BUILD/smartctl-ps3stor-1.0.0'
+2026-08-23T06:11:12.6722047Z g++ -DHAVE_CONFIG_H -I. -I./ps3lib   -DBUILD_INFO='"(local build)"' -DSMARTMONTOOLS_SYSCONFDIR='"/etc"' -DSMARTMONTOOLS_SMARTDSCRIPTDIR='"/etc"' -DSMARTMONTOOLS_DRIVEDBDIR='"/usr/share/smartmontools"'        -O2 -g -pipe -Wall -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -Wp,-D_GLIBCXX_ASSERTIONS -fexceptions -fstack-protector-strong -grecord-gcc-switches -specs=/usr/lib/rpm/redhat/redhat-hardened-cc1 -specs=/usr/lib/rpm/redhat/redhat-annobin-cc1 -fasynchronous-unwind-tables -fstack-clash-protection -std=gnu++11 -W -c -o dev_interface.o dev_interface.cpp
+2026-08-23T06:11:12.6730818Z make[1]: Leaving directory '/root/rpmbuild/BUILD/smartctl-ps3stor-1.0.0'
+2026-08-23T06:11:15.2739316Z make[1]: Entering directory '/root/rpmbuild/BUILD/smartctl-ps3stor-1.0.0'
+2026-08-23T06:11:15.2749612Z g++ -DHAVE_CONFIG_H -I. -I./ps3lib   -DBUILD_INFO='"(local build)"' -DSMARTMONTOOLS_SYSCONFDIR='"/etc"' -DSMARTMONTOOLS_SMARTDSCRIPTDIR='"/etc"' -DSMARTMONTOOLS_DRIVEDBDIR='"/usr/share/smartmontools"'        -O2 -g -pipe -Wall -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -Wp,-D_GLIBCXX_ASSERTIONS -fexceptions -fstack-protector-strong -grecord-gcc-switches -specs=/usr/lib/rpm/redhat/redhat-hardened-cc1 -specs=/usr/lib/rpm/redhat/redhat-annobin-cc1 -fasynchronous-unwind-tables -fstack-clash-protection -std=gnu++11 -W -c -o dev_jmb39x_raid.o dev_jmb39x_raid.cpp
+2026-08-23T06:11:15.2753114Z make[1]: Leaving directory '/root/rpmbuild/BUILD/smartctl-ps3stor-1.0.0'
+2026-08-23T06:11:17.9063257Z make[1]: Entering directory '/root/rpmbuild/BUILD/smartctl-ps3stor-1.0.0'
+2026-08-23T06:11:17.9068359Z g++ -DHAVE_CONFIG_H -I. -I./ps3lib   -DBUILD_INFO='"(local build)"' -DSMARTMONTOOLS_SYSCONFDIR='"/etc"' -DSMARTMONTOOLS_SMARTDSCRIPTDIR='"/etc"' -DSMARTMONTOOLS_DRIVEDBDIR='"/usr/share/smartmontools"'        -O2 -g -pipe -Wall -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -Wp,-D_GLIBCXX_ASSERTIONS -fexceptions -fstack-protector-strong -grecord-gcc-switches -specs=/usr/lib/rpm/redhat/redhat-hardened-cc1 -specs=/usr/lib/rpm/redhat/redhat-annobin-cc1 -fasynchronous-unwind-tables -fstack-clash-protection -std=gnu++11 -W -c -o farmcmds.o farmcmds.cpp
+2026-08-23T06:11:17.9071540Z make[1]: Leaving directory '/root/rpmbuild/BUILD/smartctl-ps3stor-1.0.0'
+2026-08-23T06:11:24.6440140Z make[1]: Entering directory '/root/rpmbuild/BUILD/smartctl-ps3stor-1.0.0'
+2026-08-23T06:11:24.6448824Z g++ -DHAVE_CONFIG_H -I. -I./ps3lib   -DBUILD_INFO='"(local build)"' -DSMARTMONTOOLS_SYSCONFDIR='"/etc"' -DSMARTMONTOOLS_SMARTDSCRIPTDIR='"/etc"' -DSMARTMONTOOLS_DRIVEDBDIR='"/usr/share/smartmontools"'        -O2 -g -pipe -Wall -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -Wp,-D_GLIBCXX_ASSERTIONS -fexceptions -fstack-protector-strong -grecord-gcc-switches -specs=/usr/lib/rpm/redhat/redhat-hardened-cc1 -specs=/usr/lib/rpm/redhat/redhat-annobin-cc1 -fasynchronous-unwind-tables -fstack-clash-protection -std=gnu++11 -W -c -o farmprint.o farmprint.cpp
+2026-08-23T06:11:24.6457209Z make[1]: Leaving directory '/root/rpmbuild/BUILD/smartctl-ps3stor-1.0.0'
+2026-08-23T06:11:28.4747160Z make[1]: Entering directory '/root/rpmbuild/BUILD/smartctl-ps3stor-1.0.0'
+2026-08-23T06:11:28.4755190Z g++ -DHAVE_CONFIG_H -I. -I./ps3lib   -DBUILD_INFO='"(local build)"' -DSMARTMONTOOLS_SYSCONFDIR='"/etc"' -DSMARTMONTOOLS_SMARTDSCRIPTDIR='"/etc"' -DSMARTMONTOOLS_DRIVEDBDIR='"/usr/share/smartmontools"'        -O2 -g -pipe -Wall -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -Wp,-D_GLIBCXX_ASSERTIONS -fexceptions -fstack-protector-strong -grecord-gcc-switches -specs=/usr/lib/rpm/redhat/redhat-hardened-cc1 -specs=/usr/lib/rpm/redhat/redhat-annobin-cc1 -fasynchronous-unwind-tables -fstack-clash-protection -std=gnu++11 -W -c -o knowndrives.o knowndrives.cpp
+2026-08-23T06:11:28.4759063Z make[1]: Leaving directory '/root/rpmbuild/BUILD/smartctl-ps3stor-1.0.0'
+2026-08-23T06:11:28.5199513Z make[1]: Entering directory '/root/rpmbuild/BUILD/smartctl-ps3stor-1.0.0'
+2026-08-23T06:11:28.5207783Z g++ -DHAVE_CONFIG_H -I. -I./ps3lib   -DBUILD_INFO='"(local build)"' -DSMARTMONTOOLS_SYSCONFDIR='"/etc"' -DSMARTMONTOOLS_SMARTDSCRIPTDIR='"/etc"' -DSMARTMONTOOLS_DRIVEDBDIR='"/usr/share/smartmontools"'        -O2 -g -pipe -Wall -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -Wp,-D_GLIBCXX_ASSERTIONS -fexceptions -fstack-protector-strong -grecord-gcc-switches -specs=/usr/lib/rpm/redhat/redhat-hardened-cc1 -specs=/usr/lib/rpm/redhat/redhat-annobin-cc1 -fasynchronous-unwind-tables -fstack-clash-protection -std=gnu++11 -W -c -o ataprint.o ataprint.cpp
+2026-08-23T06:11:28.5213305Z make[1]: Leaving directory '/root/rpmbuild/BUILD/smartctl-ps3stor-1.0.0'
+2026-08-23T06:11:29.7198368Z make[1]: Entering directory '/root/rpmbuild/BUILD/smartctl-ps3stor-1.0.0'
+2026-08-23T06:11:29.7207913Z g++ -DHAVE_CONFIG_H -I. -I./ps3lib   -DBUILD_INFO='"(local build)"' -DSMARTMONTOOLS_SYSCONFDIR='"/etc"' -DSMARTMONTOOLS_SMARTDSCRIPTDIR='"/etc"' -DSMARTMONTOOLS_DRIVEDBDIR='"/usr/share/smartmontools"'        -O2 -g -pipe -Wall -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -Wp,-D_GLIBCXX_ASSERTIONS -fexceptions -fstack-protector-strong -grecord-gcc-switches -specs=/usr/lib/rpm/redhat/redhat-hardened-cc1 -specs=/usr/lib/rpm/redhat/redhat-annobin-cc1 -fasynchronous-unwind-tables -fstack-clash-protection -std=gnu++11 -W -c -o json.o json.cpp
+2026-08-23T06:11:29.7217501Z make[1]: Leaving directory '/root/rpmbuild/BUILD/smartctl-ps3stor-1.0.0'
+2026-08-23T06:11:30.3854351Z make[1]: Entering directory '/root/rpmbuild/BUILD/smartctl-ps3stor-1.0.0'
+2026-08-23T06:11:30.3863623Z g++ -DHAVE_CONFIG_H -I. -I./ps3lib   -DBUILD_INFO='"(local build)"' -DSMARTMONTOOLS_SYSCONFDIR='"/etc"' -DSMARTMONTOOLS_SMARTDSCRIPTDIR='"/etc"' -DSMARTMONTOOLS_DRIVEDBDIR='"/usr/share/smartmontools"'        -O2 -g -pipe -Wall -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -Wp,-D_GLIBCXX_ASSERTIONS -fexceptions -fstack-protector-strong -grecord-gcc-switches -specs=/usr/lib/rpm/redhat/redhat-hardened-cc1 -specs=/usr/lib/rpm/redhat/redhat-annobin-cc1 -fasynchronous-unwind-tables -fstack-clash-protection -std=gnu++11 -W -c -o nvmecmds.o nvmecmds.cpp
+2026-08-23T06:11:30.3872445Z make[1]: Leaving directory '/root/rpmbuild/BUILD/smartctl-ps3stor-1.0.0'
+2026-08-23T06:11:38.5768255Z make[1]: Entering directory '/root/rpmbuild/BUILD/smartctl-ps3stor-1.0.0'
+2026-08-23T06:11:38.5777027Z g++ -DHAVE_CONFIG_H -I. -I./ps3lib   -DBUILD_INFO='"(local build)"' -DSMARTMONTOOLS_SYSCONFDIR='"/etc"' -DSMARTMONTOOLS_SMARTDSCRIPTDIR='"/etc"' -DSMARTMONTOOLS_DRIVEDBDIR='"/usr/share/smartmontools"'        -O2 -g -pipe -Wall -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -Wp,-D_GLIBCXX_ASSERTIONS -fexceptions -fstack-protector-strong -grecord-gcc-switches -specs=/usr/lib/rpm/redhat/redhat-hardened-cc1 -specs=/usr/lib/rpm/redhat/redhat-annobin-cc1 -fasynchronous-unwind-tables -fstack-clash-protection -std=gnu++11 -W -c -o scsinvme.o scsinvme.cpp
+2026-08-23T06:11:38.5785068Z make[1]: Leaving directory '/root/rpmbuild/BUILD/smartctl-ps3stor-1.0.0'
+2026-08-23T06:11:38.9662331Z make[1]: Entering directory '/root/rpmbuild/BUILD/smartctl-ps3stor-1.0.0'
+2026-08-23T06:11:38.9671437Z g++ -DHAVE_CONFIG_H -I. -I./ps3lib   -DBUILD_INFO='"(local build)"' -DSMARTMONTOOLS_SYSCONFDIR='"/etc"' -DSMARTMONTOOLS_SMARTDSCRIPTDIR='"/etc"' -DSMARTMONTOOLS_DRIVEDBDIR='"/usr/share/smartmontools"'        -O2 -g -pipe -Wall -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -Wp,-D_GLIBCXX_ASSERTIONS -fexceptions -fstack-protector-strong -grecord-gcc-switches -specs=/usr/lib/rpm/redhat/redhat-hardened-cc1 -specs=/usr/lib/rpm/redhat/redhat-annobin-cc1 -fasynchronous-unwind-tables -fstack-clash-protection -std=gnu++11 -W -c -o nvmeprint.o nvmeprint.cpp
+2026-08-23T06:11:38.9680122Z make[1]: Leaving directory '/root/rpmbuild/BUILD/smartctl-ps3stor-1.0.0'
+2026-08-23T06:11:40.2972722Z make[1]: Entering directory '/root/rpmbuild/BUILD/smartctl-ps3stor-1.0.0'
+2026-08-23T06:11:40.2976238Z g++ -DHAVE_CONFIG_H -I. -I./ps3lib   -DBUILD_INFO='"(local build)"' -DSMARTMONTOOLS_SYSCONFDIR='"/etc"' -DSMARTMONTOOLS_SMARTDSCRIPTDIR='"/etc"' -DSMARTMONTOOLS_DRIVEDBDIR='"/usr/share/smartmontools"'        -O2 -g -pipe -Wall -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -Wp,-D_GLIBCXX_ASSERTIONS -fexceptions -fstack-protector-strong -grecord-gcc-switches -specs=/usr/lib/rpm/redhat/redhat-hardened-cc1 -specs=/usr/lib/rpm/redhat/redhat-annobin-cc1 -fasynchronous-unwind-tables -fstack-clash-protection -std=gnu++11 -W -c -o scsicmds.o scsicmds.cpp
+2026-08-23T06:11:40.2979064Z make[1]: Leaving directory '/root/rpmbuild/BUILD/smartctl-ps3stor-1.0.0'
+2026-08-23T06:11:42.6801823Z make[1]: Entering directory '/root/rpmbuild/BUILD/smartctl-ps3stor-1.0.0'
+2026-08-23T06:11:42.6804744Z g++ -DHAVE_CONFIG_H -I. -I./ps3lib   -DBUILD_INFO='"(local build)"' -DSMARTMONTOOLS_SYSCONFDIR='"/etc"' -DSMARTMONTOOLS_SMARTDSCRIPTDIR='"/etc"' -DSMARTMONTOOLS_DRIVEDBDIR='"/usr/share/smartmontools"'        -O2 -g -pipe -Wall -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -Wp,-D_GLIBCXX_ASSERTIONS -fexceptions -fstack-protector-strong -grecord-gcc-switches -specs=/usr/lib/rpm/redhat/redhat-hardened-cc1 -specs=/usr/lib/rpm/redhat/redhat-annobin-cc1 -fasynchronous-unwind-tables -fstack-clash-protection -std=gnu++11 -W -c -o scsiata.o scsiata.cpp
+2026-08-23T06:11:42.6808567Z make[1]: Leaving directory '/root/rpmbuild/BUILD/smartctl-ps3stor-1.0.0'
+2026-08-23T06:11:46.9695721Z make[1]: Entering directory '/root/rpmbuild/BUILD/smartctl-ps3stor-1.0.0'
+2026-08-23T06:11:46.9704856Z g++ -DHAVE_CONFIG_H -I. -I./ps3lib   -DBUILD_INFO='"(local build)"' -DSMARTMONTOOLS_SYSCONFDIR='"/etc"' -DSMARTMONTOOLS_SMARTDSCRIPTDIR='"/etc"' -DSMARTMONTOOLS_DRIVEDBDIR='"/usr/share/smartmontools"'        -O2 -g -pipe -Wall -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -Wp,-D_GLIBCXX_ASSERTIONS -fexceptions -fstack-protector-strong -grecord-gcc-switches -specs=/usr/lib/rpm/redhat/redhat-hardened-cc1 -specs=/usr/lib/rpm/redhat/redhat-annobin-cc1 -fasynchronous-unwind-tables -fstack-clash-protection -std=gnu++11 -W -c -o cciss.o cciss.cpp
+2026-08-23T06:11:46.9713634Z make[1]: Leaving directory '/root/rpmbuild/BUILD/smartctl-ps3stor-1.0.0'
+2026-08-23T06:11:47.4951249Z make[1]: Entering directory '/root/rpmbuild/BUILD/smartctl-ps3stor-1.0.0'
+2026-08-23T06:11:47.4991555Z g++ -DHAVE_CONFIG_H -I. -I./ps3lib   -DBUILD_INFO='"(local build)"' -DSMARTMONTOOLS_SYSCONFDIR='"/etc"' -DSMARTMONTOOLS_SMARTDSCRIPTDIR='"/etc"' -DSMARTMONTOOLS_DRIVEDBDIR='"/usr/share/smartmontools"'        -O2 -g -pipe -Wall -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -Wp,-D_GLIBCXX_ASSERTIONS -fexceptions -fstack-protector-strong -grecord-gcc-switches -specs=/usr/lib/rpm/redhat/redhat-hardened-cc1 -specs=/usr/lib/rpm/redhat/redhat-annobin-cc1 -fasynchronous-unwind-tables -fstack-clash-protection -std=gnu++11 -W -c -o utility.o utility.cpp
+2026-08-23T06:11:47.5000380Z make[1]: Leaving directory '/root/rpmbuild/BUILD/smartctl-ps3stor-1.0.0'
+2026-08-23T06:11:54.0739826Z make[1]: Entering directory '/root/rpmbuild/BUILD/smartctl-ps3stor-1.0.0'
+2026-08-23T06:11:54.0749106Z g++ -DHAVE_CONFIG_H -I. -I./ps3lib   -DBUILD_INFO='"(local build)"' -DSMARTMONTOOLS_SYSCONFDIR='"/etc"' -DSMARTMONTOOLS_SMARTDSCRIPTDIR='"/etc"' -DSMARTMONTOOLS_DRIVEDBDIR='"/usr/share/smartmontools"'        -O2 -g -pipe -Wall -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -Wp,-D_GLIBCXX_ASSERTIONS -fexceptions -fstack-protector-strong -grecord-gcc-switches -specs=/usr/lib/rpm/redhat/redhat-hardened-cc1 -specs=/usr/lib/rpm/redhat/redhat-annobin-cc1 -fasynchronous-unwind-tables -fstack-clash-protection -std=gnu++11 -W -c -o dev_areca.o dev_areca.cpp
+2026-08-23T06:11:54.0758021Z make[1]: Leaving directory '/root/rpmbuild/BUILD/smartctl-ps3stor-1.0.0'
+2026-08-23T06:11:59.1062408Z make[1]: Entering directory '/root/rpmbuild/BUILD/smartctl-ps3stor-1.0.0'
+2026-08-23T06:11:59.1071027Z g++ -DHAVE_CONFIG_H -I. -I./ps3lib   -DBUILD_INFO='"(local build)"' -DSMARTMONTOOLS_SYSCONFDIR='"/etc"' -DSMARTMONTOOLS_SMARTDSCRIPTDIR='"/etc"' -DSMARTMONTOOLS_DRIVEDBDIR='"/usr/share/smartmontools"'        -O2 -g -pipe -Wall -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -Wp,-D_GLIBCXX_ASSERTIONS -fexceptions -fstack-protector-strong -grecord-gcc-switches -specs=/usr/lib/rpm/redhat/redhat-hardened-cc1 -specs=/usr/lib/rpm/redhat/redhat-annobin-cc1 -fasynchronous-unwind-tables -fstack-clash-protection -std=gnu++11 -W -c -o popen_as_ugid.o popen_as_ugid.cpp
+2026-08-23T06:11:59.1080046Z make[1]: Leaving directory '/root/rpmbuild/BUILD/smartctl-ps3stor-1.0.0'
+2026-08-23T06:12:01.0352059Z make[1]: Entering directory '/root/rpmbuild/BUILD/smartctl-ps3stor-1.0.0'
+2026-08-23T06:12:01.0358790Z /bin/sh ./config.status --file=update-smart-drivedb
+2026-08-23T06:12:01.0359686Z config.status: creating update-smart-drivedb
+2026-08-23T06:12:01.0360380Z chmod +x update-smart-drivedb
+2026-08-23T06:12:01.0366457Z make[1]: Leaving directory '/root/rpmbuild/BUILD/smartctl-ps3stor-1.0.0'
+2026-08-23T06:12:02.9129296Z make[1]: Entering directory '/root/rpmbuild/BUILD/smartctl-ps3stor-1.0.0'
+2026-08-23T06:12:02.9135806Z /bin/sh ./config.status --file=smartd_warning.sh
+2026-08-23T06:12:02.9137120Z config.status: creating smartd_warning.sh
+2026-08-23T06:12:02.9137695Z chmod +x smartd_warning.sh
+2026-08-23T06:12:02.9143263Z make[1]: Leaving directory '/root/rpmbuild/BUILD/smartctl-ps3stor-1.0.0'
+2026-08-23T06:12:03.5162197Z make[1]: Entering directory '/root/rpmbuild/BUILD/smartctl-ps3stor-1.0.0'
+2026-08-23T06:12:03.5169251Z  $(MAN_FILTER) < ./smartd.conf.5.in > smartd.conf.5
+2026-08-23T06:12:03.5175532Z make[1]: Leaving directory '/root/rpmbuild/BUILD/smartctl-ps3stor-1.0.0'
+2026-08-23T06:12:04.1424762Z make[1]: Entering directory '/root/rpmbuild/BUILD/smartctl-ps3stor-1.0.0'
+2026-08-23T06:12:04.1428058Z  $(MAN_FILTER) < ./smartctl.8.in > smartctl.8
+2026-08-23T06:12:04.1429030Z make[1]: Leaving directory '/root/rpmbuild/BUILD/smartctl-ps3stor-1.0.0'
+2026-08-23T06:12:04.7445669Z make[1]: Entering directory '/root/rpmbuild/BUILD/smartctl-ps3stor-1.0.0'
+2026-08-23T06:12:04.7452623Z  $(MAN_FILTER) < ./smartd.8.in > smartd.8
+2026-08-23T06:12:04.7459177Z make[1]: Leaving directory '/root/rpmbuild/BUILD/smartctl-ps3stor-1.0.0'
+2026-08-23T06:12:05.3721929Z make[1]: Entering directory '/root/rpmbuild/BUILD/smartctl-ps3stor-1.0.0'
+2026-08-23T06:12:05.3728705Z  $(MAN_FILTER) < ./update-smart-drivedb.8.in > update-smart-drivedb.8
+2026-08-23T06:12:05.3734884Z make[1]: Leaving directory '/root/rpmbuild/BUILD/smartctl-ps3stor-1.0.0'
+2026-08-23T06:12:06.4359929Z make[1]: Entering directory '/root/rpmbuild/BUILD/smartctl-ps3stor-1.0.0'
+2026-08-23T06:12:06.4369150Z g++ -DHAVE_CONFIG_H -I. -I./ps3lib   -DBUILD_INFO='"(local build)"' -DSMARTMONTOOLS_SYSCONFDIR='"/etc"' -DSMARTMONTOOLS_SMARTDSCRIPTDIR='"/etc"' -DSMARTMONTOOLS_DRIVEDBDIR='"/usr/share/smartmontools"'        -O2 -g -pipe -Wall -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -Wp,-D_GLIBCXX_ASSERTIONS -fexceptions -fstack-protector-strong -grecord-gcc-switches -specs=/usr/lib/rpm/redhat/redhat-hardened-cc1 -specs=/usr/lib/rpm/redhat/redhat-annobin-cc1 -fasynchronous-unwind-tables -fstack-clash-protection -std=gnu++11 -W -c -o os_linux.o os_linux.cpp
+2026-08-23T06:12:06.4375321Z make[1]: Leaving directory '/root/rpmbuild/BUILD/smartctl-ps3stor-1.0.0'
+2026-08-23T06:12:08.2813964Z make[1]: Entering directory '/root/rpmbuild/BUILD/smartctl-ps3stor-1.0.0'
+2026-08-23T06:12:08.2817304Z g++ -DHAVE_CONFIG_H -I. -I./ps3lib   -DBUILD_INFO='"(local build)"' -DSMARTMONTOOLS_SYSCONFDIR='"/etc"' -DSMARTMONTOOLS_SMARTDSCRIPTDIR='"/etc"' -DSMARTMONTOOLS_DRIVEDBDIR='"/usr/share/smartmontools"'        -O2 -g -pipe -Wall -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -Wp,-D_GLIBCXX_ASSERTIONS -fexceptions -fstack-protector-strong -grecord-gcc-switches -specs=/usr/lib/rpm/redhat/redhat-hardened-cc1 -specs=/usr/lib/rpm/redhat/redhat-annobin-cc1 -fasynchronous-unwind-tables -fstack-clash-protection -std=gnu++11 -W -c -o scsiprint.o scsiprint.cpp
+2026-08-23T06:12:08.2820093Z make[1]: Leaving directory '/root/rpmbuild/BUILD/smartctl-ps3stor-1.0.0'
+2026-08-23T06:12:16.2162469Z make[1]: Entering directory '/root/rpmbuild/BUILD/smartctl-ps3stor-1.0.0'
+2026-08-23T06:12:16.2165195Z g++ -DHAVE_CONFIG_H -I. -I./ps3lib   -DBUILD_INFO='"(local build)"' -DSMARTMONTOOLS_SYSCONFDIR='"/etc"' -DSMARTMONTOOLS_SMARTDSCRIPTDIR='"/etc"' -DSMARTMONTOOLS_DRIVEDBDIR='"/usr/share/smartmontools"'        -O2 -g -pipe -Wall -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -Wp,-D_GLIBCXX_ASSERTIONS -fexceptions -fstack-protector-strong -grecord-gcc-switches -specs=/usr/lib/rpm/redhat/redhat-hardened-cc1 -specs=/usr/lib/rpm/redhat/redhat-annobin-cc1 -fasynchronous-unwind-tables -fstack-clash-protection -std=gnu++11 -W -c -o smartctl.o smartctl.cpp
+2026-08-23T06:12:16.2167741Z make[1]: Leaving directory '/root/rpmbuild/BUILD/smartctl-ps3stor-1.0.0'
+2026-08-23T06:12:17.5323441Z make[1]: Entering directory '/root/rpmbuild/BUILD/smartctl-ps3stor-1.0.0'
+2026-08-23T06:12:17.5327234Z g++  -O2 -g -pipe -Wall -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -Wp,-D_GLIBCXX_ASSERTIONS -fexceptions -fstack-protector-strong -grecord-gcc-switches -specs=/usr/lib/rpm/redhat/redhat-hardened-cc1 -specs=/usr/lib/rpm/redhat/redhat-annobin-cc1 -fasynchronous-unwind-tables -fstack-clash-protection -std=gnu++11 -W  -Wl,-z,relro  -Wl,-z,now -specs=/usr/lib/rpm/redhat/redhat-hardened-ld -o smartctl smartctl.o atacmdnames.o atacmds.o ataidentify.o ataprint.o dev_ata_cmd_set.o dev_intelliprop.o dev_interface.o dev_jmb39x_raid.o farmcmds.o farmprint.o json.o knowndrives.o nvmecmds.o nvmeprint.o scsicmds.o scsiata.o scsinvme.o scsiprint.o utility.o     os_linux.o cciss.o dev_areca.o      -L ./ps3lib -lps3_aarch64 -lpthread
+2026-08-23T06:12:17.5331137Z make[1]: Leaving directory '/root/rpmbuild/BUILD/smartctl-ps3stor-1.0.0'
+2026-08-23T06:12:20.0653159Z make[1]: Entering directory '/root/rpmbuild/BUILD/smartctl-ps3stor-1.0.0'
+2026-08-23T06:12:20.0655769Z g++ -DHAVE_CONFIG_H -I. -I./ps3lib   -DBUILD_INFO='"(local build)"' -DSMARTMONTOOLS_SYSCONFDIR='"/etc"' -DSMARTMONTOOLS_SMARTDSCRIPTDIR='"/etc"' -DSMARTMONTOOLS_DRIVEDBDIR='"/usr/share/smartmontools"'        -O2 -g -pipe -Wall -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -Wp,-D_GLIBCXX_ASSERTIONS -fexceptions -fstack-protector-strong -grecord-gcc-switches -specs=/usr/lib/rpm/redhat/redhat-hardened-cc1 -specs=/usr/lib/rpm/redhat/redhat-annobin-cc1 -fasynchronous-unwind-tables -fstack-clash-protection -std=gnu++11 -W -c -o smartd.o smartd.cpp
+2026-08-23T06:12:20.0658497Z make[1]: Leaving directory '/root/rpmbuild/BUILD/smartctl-ps3stor-1.0.0'
+2026-08-23T06:12:21.1549050Z make[1]: Entering directory '/root/rpmbuild/BUILD/smartctl-ps3stor-1.0.0'
+2026-08-23T06:12:21.1551032Z g++  -O2 -g -pipe -Wall -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -Wp,-D_GLIBCXX_ASSERTIONS -fexceptions -fstack-protector-strong -grecord-gcc-switches -specs=/usr/lib/rpm/redhat/redhat-hardened-cc1 -specs=/usr/lib/rpm/redhat/redhat-annobin-cc1 -fasynchronous-unwind-tables -fstack-clash-protection -std=gnu++11 -W  -Wl,-z,relro  -Wl,-z,now -specs=/usr/lib/rpm/redhat/redhat-hardened-ld -o smartd smartd.o atacmdnames.o atacmds.o dev_ata_cmd_set.o dev_intelliprop.o dev_interface.o dev_jmb39x_raid.o knowndrives.o nvmecmds.o scsicmds.o scsiata.o scsinvme.o utility.o popen_as_ugid.o     os_linux.o cciss.o dev_areca.o        -L ./ps3lib -lps3_aarch64 -lpthread
+2026-08-23T06:12:21.1553109Z make[1]: Leaving directory '/root/rpmbuild/BUILD/smartctl-ps3stor-1.0.0'
+2026-08-23T06:12:21.1595396Z + exit 0
+2026-08-23T06:12:21.3157275Z Executing(%install): /bin/sh -e /var/tmp/rpm-tmp.I1GwzR
+2026-08-23T06:12:21.3745297Z + umask 022
+2026-08-23T06:12:21.3748991Z + cd /root/rpmbuild/BUILD
+2026-08-23T06:12:21.3757170Z + '[' /root/rpmbuild/BUILDROOT/smartctl-ps3stor-1.0.0-1.el8.aarch64 '!=' / ']'
+2026-08-23T06:12:21.3765968Z + rm -rf /root/rpmbuild/BUILDROOT/smartctl-ps3stor-1.0.0-1.el8.aarch64
+2026-08-23T06:12:21.4075564Z ++ dirname /root/rpmbuild/BUILDROOT/smartctl-ps3stor-1.0.0-1.el8.aarch64
+2026-08-23T06:12:21.4317873Z + mkdir -p /root/rpmbuild/BUILDROOT
+2026-08-23T06:12:21.4562756Z + mkdir /root/rpmbuild/BUILDROOT/smartctl-ps3stor-1.0.0-1.el8.aarch64
+2026-08-23T06:12:21.4804390Z + cd smartctl-ps3stor-1.0.0
+2026-08-23T06:12:21.4808170Z + /usr/bin/make install DESTDIR=/root/rpmbuild/BUILDROOT/smartctl-ps3stor-1.0.0-1.el8.aarch64 'INSTALL=/usr/bin/install -p'
+2026-08-23T06:12:21.6856982Z make[1]: Entering directory '/root/rpmbuild/BUILD/smartctl-ps3stor-1.0.0'
+2026-08-23T06:12:21.7951796Z  /usr/bin/mkdir -p '/root/rpmbuild/BUILDROOT/smartctl-ps3stor-1.0.0-1.el8.aarch64/usr/sbin'
+2026-08-23T06:12:21.8946644Z   /usr/bin/install -p smartctl smartd '/root/rpmbuild/BUILDROOT/smartctl-ps3stor-1.0.0-1.el8.aarch64/usr/sbin'
+2026-08-23T06:12:22.0279631Z  /usr/bin/mkdir -p '/root/rpmbuild/BUILDROOT/smartctl-ps3stor-1.0.0-1.el8.aarch64/usr/sbin'
+2026-08-23T06:12:22.1181211Z  /usr/bin/install -p update-smart-drivedb '/root/rpmbuild/BUILDROOT/smartctl-ps3stor-1.0.0-1.el8.aarch64/usr/sbin'
+2026-08-23T06:12:22.1515101Z /usr/bin/mkdir -p '/root/rpmbuild/BUILDROOT/smartctl-ps3stor-1.0.0-1.el8.aarch64/etc'
+2026-08-23T06:12:22.2177287Z  /usr/bin/install -p -m 644 './smartd.conf' '/root/rpmbuild/BUILDROOT/smartctl-ps3stor-1.0.0-1.el8.aarch64/etc/smartd.conf'
+2026-08-23T06:12:22.2909320Z  /usr/bin/mkdir -p '/root/rpmbuild/BUILDROOT/smartctl-ps3stor-1.0.0-1.el8.aarch64/etc/smartd_warning.d'
+2026-08-23T06:12:22.3215536Z  /usr/bin/mkdir -p '/root/rpmbuild/BUILDROOT/smartctl-ps3stor-1.0.0-1.el8.aarch64/usr/share/smartmontools'
+2026-08-23T06:12:22.3912798Z  /usr/bin/mkdir -p '/root/rpmbuild/BUILDROOT/smartctl-ps3stor-1.0.0-1.el8.aarch64/usr/share/doc/smartmontools'
+2026-08-23T06:12:22.4605075Z  /usr/bin/install -p -m 644 AUTHORS ChangeLog ChangeLog-6.0-7.0 COPYING INSTALL NEWS README TODO smartd.conf '/root/rpmbuild/BUILDROOT/smartctl-ps3stor-1.0.0-1.el8.aarch64/usr/share/doc/smartmontools'
+2026-08-23T06:12:22.5360500Z  /usr/bin/mkdir -p '/root/rpmbuild/BUILDROOT/smartctl-ps3stor-1.0.0-1.el8.aarch64/usr/share/smartmontools'
+2026-08-23T06:12:22.6007544Z  /usr/bin/install -p -m 644 drivedb.h '/root/rpmbuild/BUILDROOT/smartctl-ps3stor-1.0.0-1.el8.aarch64/usr/share/smartmontools'
+2026-08-23T06:12:22.6752109Z  /usr/bin/mkdir -p '/root/rpmbuild/BUILDROOT/smartctl-ps3stor-1.0.0-1.el8.aarch64/usr/share/doc/smartmontools/examplescripts'
+2026-08-23T06:12:22.7401897Z  /usr/bin/install -p -m 644 examplescripts/README '/root/rpmbuild/BUILDROOT/smartctl-ps3stor-1.0.0-1.el8.aarch64/usr/share/doc/smartmontools/examplescripts'
+2026-08-23T06:12:22.8168790Z  /usr/bin/mkdir -p '/root/rpmbuild/BUILDROOT/smartctl-ps3stor-1.0.0-1.el8.aarch64/usr/share/doc/smartmontools/examplescripts'
+2026-08-23T06:12:22.9075755Z  /usr/bin/install -p examplescripts/Example1 examplescripts/Example2 examplescripts/Example3 examplescripts/Example4 examplescripts/Example5 examplescripts/Example6 examplescripts/Example7 examplescripts/Example8 '/root/rpmbuild/BUILDROOT/smartctl-ps3stor-1.0.0-1.el8.aarch64/usr/share/doc/smartmontools/examplescripts'
+2026-08-23T06:12:22.9963974Z  /usr/bin/mkdir -p '/root/rpmbuild/BUILDROOT/smartctl-ps3stor-1.0.0-1.el8.aarch64/usr/share/man/man5'
+2026-08-23T06:12:23.1232669Z  /usr/bin/install -p -m 644 smartd.conf.5 '/root/rpmbuild/BUILDROOT/smartctl-ps3stor-1.0.0-1.el8.aarch64/usr/share/man/man5'
+2026-08-23T06:12:23.2118806Z  /usr/bin/mkdir -p '/root/rpmbuild/BUILDROOT/smartctl-ps3stor-1.0.0-1.el8.aarch64/usr/share/man/man8'
+2026-08-23T06:12:23.3337535Z  /usr/bin/install -p -m 644 smartctl.8 smartd.8 update-smart-drivedb.8 '/root/rpmbuild/BUILDROOT/smartctl-ps3stor-1.0.0-1.el8.aarch64/usr/share/man/man8'
+2026-08-23T06:12:23.4111095Z  /usr/bin/mkdir -p '/root/rpmbuild/BUILDROOT/smartctl-ps3stor-1.0.0-1.el8.aarch64/etc'
+2026-08-23T06:12:23.5007295Z  /usr/bin/install -p smartd_warning.sh '/root/rpmbuild/BUILDROOT/smartctl-ps3stor-1.0.0-1.el8.aarch64/etc'
+2026-08-23T06:12:23.6155456Z make[1]: Leaving directory '/root/rpmbuild/BUILD/smartctl-ps3stor-1.0.0'
+2026-08-23T06:12:23.6199997Z + /usr/lib/rpm/find-debuginfo.sh -j4 --strict-build-id -m -i --build-id-seed 1.0.0-1.el8 --unique-debug-suffix -1.0.0-1.el8.aarch64 --unique-debug-src-base smartctl-ps3stor-1.0.0-1.el8.aarch64 --run-dwz --dwz-low-mem-die-limit 10000000 --dwz-max-die-limit 50000000 -S debugsourcefiles.list /root/rpmbuild/BUILD/smartctl-ps3stor-1.0.0
+2026-08-23T06:12:24.0862930Z extracting debug info from /root/rpmbuild/BUILDROOT/smartctl-ps3stor-1.0.0-1.el8.aarch64/usr/sbin/smartd
+2026-08-23T06:12:24.0863612Z extracting debug info from /root/rpmbuild/BUILDROOT/smartctl-ps3stor-1.0.0-1.el8.aarch64/usr/sbin/smartctl
+2026-08-23T06:12:32.0062597Z /usr/lib/rpm/sepdebugcrcfix: Updated 2 CRC32s, 0 CRC32s did match.
+2026-08-23T06:12:32.1311557Z 3345 blocks
+2026-08-23T06:12:32.3436572Z + /usr/lib/rpm/check-buildroot
+2026-08-23T06:12:32.6492591Z + /usr/lib/rpm/redhat/brp-ldconfig
+2026-08-23T06:12:32.7077265Z /sbin/ldconfig: Warning: ignoring configuration file that cannot be opened: /etc/ld.so.conf: No such file or directory
+2026-08-23T06:12:32.7128978Z + /usr/lib/rpm/brp-compress
+2026-08-23T06:12:33.0152049Z + /usr/lib/rpm/brp-strip-static-archive /usr/bin/strip
+2026-08-23T06:12:33.9452511Z + /usr/lib/rpm/brp-python-bytecompile '' 1
+2026-08-23T06:12:34.1430670Z + /usr/lib/rpm/brp-python-hardlink
+2026-08-23T06:12:34.2285762Z + PYTHON3=/usr/libexec/platform-python
+2026-08-23T06:12:34.2286292Z + /usr/lib/rpm/redhat/brp-mangle-shebangs
+2026-08-23T06:12:36.2185871Z Processing files: smartctl-ps3stor-1.0.0-1.el8.aarch64
+2026-08-23T06:12:36.2992219Z Executing(%doc): /bin/sh -e /var/tmp/rpm-tmp.Ag6mfT
+2026-08-23T06:12:36.3523896Z + umask 022
+2026-08-23T06:12:36.3527711Z + cd /root/rpmbuild/BUILD
+2026-08-23T06:12:36.3534014Z + cd smartctl-ps3stor-1.0.0
+2026-08-23T06:12:36.3540260Z + DOCDIR=/root/rpmbuild/BUILDROOT/smartctl-ps3stor-1.0.0-1.el8.aarch64/usr/share/doc/smartctl-ps3stor
+2026-08-23T06:12:36.3543239Z + export LC_ALL=C
+2026-08-23T06:12:36.3543580Z + LC_ALL=C
+2026-08-23T06:12:36.3546093Z + export DOCDIR
+2026-08-23T06:12:36.3552281Z + /usr/bin/mkdir -p /root/rpmbuild/BUILDROOT/smartctl-ps3stor-1.0.0-1.el8.aarch64/usr/share/doc/smartctl-ps3stor
+2026-08-23T06:12:36.3816582Z + cp -pr AUTHORS /root/rpmbuild/BUILDROOT/smartctl-ps3stor-1.0.0-1.el8.aarch64/usr/share/doc/smartctl-ps3stor
+2026-08-23T06:12:36.4094775Z + cp -pr smartctl_ps3stor_README /root/rpmbuild/BUILDROOT/smartctl-ps3stor-1.0.0-1.el8.aarch64/usr/share/doc/smartctl-ps3stor
+2026-08-23T06:12:36.4364963Z + exit 0
+2026-08-23T06:12:36.5155761Z Executing(%license): /bin/sh -e /var/tmp/rpm-tmp.iHPrAR
+2026-08-23T06:12:36.5642843Z + umask 022
+2026-08-23T06:12:36.5646606Z + cd /root/rpmbuild/BUILD
+2026-08-23T06:12:36.5652788Z + cd smartctl-ps3stor-1.0.0
+2026-08-23T06:12:36.5658985Z + LICENSEDIR=/root/rpmbuild/BUILDROOT/smartctl-ps3stor-1.0.0-1.el8.aarch64/usr/share/licenses/smartctl-ps3stor
+2026-08-23T06:12:36.5661410Z + export LC_ALL=C
+2026-08-23T06:12:36.5662370Z + LC_ALL=C
+2026-08-23T06:12:36.5664599Z + export LICENSEDIR
+2026-08-23T06:12:36.5670772Z + /usr/bin/mkdir -p /root/rpmbuild/BUILDROOT/smartctl-ps3stor-1.0.0-1.el8.aarch64/usr/share/licenses/smartctl-ps3stor
+2026-08-23T06:12:36.5937517Z + cp -pr COPYING /root/rpmbuild/BUILDROOT/smartctl-ps3stor-1.0.0-1.el8.aarch64/usr/share/licenses/smartctl-ps3stor
+2026-08-23T06:12:36.6213152Z + exit 0
+2026-08-23T06:12:36.8951003Z Provides: smartctl-ps3stor = 1.0.0-1.el8 smartctl-ps3stor(aarch-64) = 1.0.0-1.el8
+2026-08-23T06:12:36.8951924Z Requires(rpmlib): rpmlib(CompressedFileNames) <= 3.0.4-1 rpmlib(FileDigests) <= 4.6.0-1 rpmlib(PayloadFilesHavePrefix) <= 4.0-1
+2026-08-23T06:12:36.8956059Z Requires: ld-linux-aarch64.so.1()(64bit) ld-linux-aarch64.so.1(GLIBC_2.17)(64bit) libc.so.6()(64bit) libc.so.6(GLIBC_2.17)(64bit) libc.so.6(GLIBC_2.25)(64bit) libc.so.6(GLIBC_2.27)(64bit) libgcc_s.so.1()(64bit) libgcc_s.so.1(GCC_3.0)(64bit) libm.so.6()(64bit) libpthread.so.0()(64bit) libpthread.so.0(GLIBC_2.17)(64bit) libstdc++.so.6()(64bit) libstdc++.so.6(CXXABI_1.3)(64bit) libstdc++.so.6(GLIBCXX_3.4)(64bit) libstdc++.so.6(GLIBCXX_3.4.19)(64bit) libstdc++.so.6(GLIBCXX_3.4.20)(64bit) libstdc++.so.6(GLIBCXX_3.4.21)(64bit) rtld(GNU_HASH)
+2026-08-23T06:12:36.8968267Z Processing files: smartctl-ps3stor-debugsource-1.0.0-1.el8.aarch64
+2026-08-23T06:12:37.5332626Z Provides: smartctl-ps3stor-debugsource = 1.0.0-1.el8 smartctl-ps3stor-debugsource(aarch-64) = 1.0.0-1.el8
+2026-08-23T06:12:37.5333315Z Requires(rpmlib): rpmlib(CompressedFileNames) <= 3.0.4-1 rpmlib(FileDigests) <= 4.6.0-1 rpmlib(PayloadFilesHavePrefix) <= 4.0-1
+2026-08-23T06:12:37.5340509Z Processing files: smartctl-ps3stor-debuginfo-1.0.0-1.el8.aarch64
+2026-08-23T06:12:38.2148797Z Provides: debuginfo(build-id) = b60018b1c8691f315b04fbbe3b55206f9eeab137 smartctl-ps3stor-debuginfo = 1.0.0-1.el8 smartctl-ps3stor-debuginfo(aarch-64) = 1.0.0-1.el8
+2026-08-23T06:12:38.2150053Z Requires(rpmlib): rpmlib(CompressedFileNames) <= 3.0.4-1 rpmlib(FileDigests) <= 4.6.0-1 rpmlib(PayloadFilesHavePrefix) <= 4.0-1
+2026-08-23T06:12:38.2150840Z Recommends: smartctl-ps3stor-debugsource(aarch-64) = 1.0.0-1.el8
+2026-08-23T06:12:38.2157814Z Checking for unpackaged file(s): /usr/lib/rpm/check-files /root/rpmbuild/BUILDROOT/smartctl-ps3stor-1.0.0-1.el8.aarch64
+2026-08-23T06:12:38.4284858Z error: Installed (but unpackaged) file(s) found:
+2026-08-23T06:12:38.4285144Z    /etc/smartd.conf
+2026-08-23T06:12:38.4285619Z    /etc/smartd_warning.sh
+2026-08-23T06:12:38.4285993Z    /usr/lib/debug/usr/sbin/smartd-1.0.0-1.el8.aarch64.debug
+2026-08-23T06:12:38.4286528Z    /usr/sbin/smartd
+2026-08-23T06:12:38.4286730Z    /usr/sbin/update-smart-drivedb
+2026-08-23T06:12:38.4286949Z    /usr/share/doc/smartmontools/AUTHORS
+2026-08-23T06:12:38.4287186Z    /usr/share/doc/smartmontools/COPYING
+2026-08-23T06:12:38.4287487Z    /usr/share/doc/smartmontools/ChangeLog
+2026-08-23T06:12:38.4287727Z    /usr/share/doc/smartmontools/ChangeLog-6.0-7.0
+2026-08-23T06:12:38.4287963Z    /usr/share/doc/smartmontools/INSTALL
+2026-08-23T06:12:38.4288169Z    /usr/share/doc/smartmontools/NEWS
+2026-08-23T06:12:38.4288455Z    /usr/share/doc/smartmontools/README
+2026-08-23T06:12:38.4288784Z    /usr/share/doc/smartmontools/TODO
+2026-08-23T06:12:38.4289150Z    /usr/share/doc/smartmontools/examplescripts/Example1
+2026-08-23T06:12:38.4289575Z    /usr/share/doc/smartmontools/examplescripts/Example2
+2026-08-23T06:12:38.4289978Z    /usr/share/doc/smartmontools/examplescripts/Example3
+2026-08-23T06:12:38.4290368Z    /usr/share/doc/smartmontools/examplescripts/Example4
+2026-08-23T06:12:38.4290738Z    /usr/share/doc/smartmontools/examplescripts/Example5
+2026-08-23T06:12:38.4290992Z    /usr/share/doc/smartmontools/examplescripts/Example6
+2026-08-23T06:12:38.4291334Z    /usr/share/doc/smartmontools/examplescripts/Example7
+2026-08-23T06:12:38.4291598Z    /usr/share/doc/smartmontools/examplescripts/Example8
+2026-08-23T06:12:38.4291877Z    /usr/share/doc/smartmontools/examplescripts/README
+2026-08-23T06:12:38.4292126Z    /usr/share/doc/smartmontools/smartd.conf
+2026-08-23T06:12:38.4292353Z    /usr/share/man/man5/smartd.conf.5.gz
+2026-08-23T06:12:38.4292562Z    /usr/share/man/man8/smartd.8.gz
+2026-08-23T06:12:38.4292784Z    /usr/share/man/man8/update-smart-drivedb.8.gz
+2026-08-23T06:12:38.4293020Z    /usr/share/smartmontools/drivedb.h
+2026-08-23T06:12:38.4293269Z     Installed (but unpackaged) file(s) found:
+2026-08-23T06:12:38.4293487Z    /etc/smartd.conf
+2026-08-23T06:12:38.4293656Z    /etc/smartd_warning.sh
+2026-08-23T06:12:38.4293881Z    /usr/lib/debug/usr/sbin/smartd-1.0.0-1.el8.aarch64.debug
+2026-08-23T06:12:38.4294125Z    /usr/sbin/smartd
+2026-08-23T06:12:38.4294294Z    /usr/sbin/update-smart-drivedb
+2026-08-23T06:12:38.4294506Z    /usr/share/doc/smartmontools/AUTHORS
+2026-08-23T06:12:38.4294879Z    /usr/share/doc/smartmontools/COPYING
+2026-08-23T06:12:38.4295093Z    /usr/share/doc/smartmontools/ChangeLog
+2026-08-23T06:12:38.4295324Z    /usr/share/doc/smartmontools/ChangeLog-6.0-7.0
+2026-08-23T06:12:38.4295554Z    /usr/share/doc/smartmontools/INSTALL
+2026-08-23T06:12:38.4295757Z    /usr/share/doc/smartmontools/NEWS
+2026-08-23T06:12:38.4295964Z    /usr/share/doc/smartmontools/README
+2026-08-23T06:12:38.4296168Z    /usr/share/doc/smartmontools/TODO
+2026-08-23T06:12:38.4296674Z    /usr/share/doc/smartmontools/examplescripts/Example1
+2026-08-23T06:12:38.4296987Z    /usr/share/doc/smartmontools/examplescripts/Example2
+2026-08-23T06:12:38.4297241Z    /usr/share/doc/smartmontools/examplescripts/Example3
+2026-08-23T06:12:38.4297502Z    /usr/share/doc/smartmontools/examplescripts/Example4
+2026-08-23T06:12:38.4297755Z    /usr/share/doc/smartmontools/examplescripts/Example5
+2026-08-23T06:12:38.4298016Z    /usr/share/doc/smartmontools/examplescripts/Example6
+2026-08-23T06:12:38.4298275Z    /usr/share/doc/smartmontools/examplescripts/Example7
+2026-08-23T06:12:38.4298527Z    /usr/share/doc/smartmontools/examplescripts/Example8
+2026-08-23T06:12:38.4298789Z    /usr/share/doc/smartmontools/examplescripts/README
+2026-08-23T06:12:38.4299048Z    /usr/share/doc/smartmontools/smartd.conf
+2026-08-23T06:12:38.4299281Z    /usr/share/man/man5/smartd.conf.5.gz
+2026-08-23T06:12:38.4299496Z    /usr/share/man/man8/smartd.8.gz
+2026-08-23T06:12:38.4299721Z    /usr/share/man/man8/update-smart-drivedb.8.gz
+2026-08-23T06:12:38.4299956Z    /usr/share/smartmontools/drivedb.h
+2026-08-23T06:12:38.4300101Z 
+2026-08-23T06:12:38.4300104Z 
+2026-08-23T06:12:38.4300172Z RPM build errors:
+2026-08-23T06:12:38.7516852Z ##[error]Process completed with exit code 1.
+2026-08-23T06:12:38.7594853Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+2026-08-23T06:12:38.7595757Z Post job cleanup.
+2026-08-23T06:12:38.9407102Z ##[group]Post cache
+2026-08-23T06:12:38.9408799Z Caching docker.io--tonistiigi--binfmt-latest-linux-x64 to GitHub Actions cache
+2026-08-23T06:12:38.9423393Z (node:7528) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-08-23T06:12:38.9423925Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-08-23T06:12:38.9608438Z [command]/usr/bin/tar --posix -cf cache.tzst --exclude cache.tzst -P -C /home/runner/work/smartctl-ps3stor/smartctl-ps3stor --files-from manifest.txt --use-compress-program zstdmt
+2026-08-23T06:12:39.3520328Z (node:7528) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+2026-08-23T06:12:40.2214421Z Sent 32265041 of 32265041 (100.0%), 35.1 MBs/sec
+2026-08-23T06:12:40.3600323Z ##[endgroup]
+2026-08-23T06:12:40.3760059Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+2026-08-23T06:12:40.3760954Z Post job cleanup.
+2026-08-23T06:12:40.4413178Z [command]/usr/bin/git version
+2026-08-23T06:12:40.4446822Z git version 2.55.0
+2026-08-23T06:12:40.4506829Z Temporarily overriding HOME='/home/runner/work/_temp/7e061815-2b58-4594-b028-9808843aaefa' before making global git config changes
+2026-08-23T06:12:40.4507974Z Adding repository directory to the temporary git global config as a safe directory
+2026-08-23T06:12:40.4510897Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/smartctl-ps3stor/smartctl-ps3stor
+2026-08-23T06:12:40.4541343Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-08-23T06:12:40.4569211Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-08-23T06:12:40.4779645Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-08-23T06:12:40.4805083Z http.https://github.com/.extraheader
+2026-08-23T06:12:40.4814937Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+2026-08-23T06:12:40.4845851Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-08-23T06:12:40.5066471Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-08-23T06:12:40.5096954Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-08-23T06:12:40.5418698Z Cleaning up orphan processes
+2026-08-23T06:12:40.5715653Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, docker/setup-qemu-action@v3. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/

@@ -34,6 +34,20 @@ natively for the target distribution so it links against the platform glibc.
 %install
 %make_install
 
+# This package intentionally ships ONLY the smartctl binary and its man page.
+# `make install` installs the full smartmontools tree (smartd, drivedb.h,
+# config files, docs, ...), so strip everything we do not package here.
+# Otherwise rpmbuild aborts with "Installed (but unpackaged) file(s) found".
+rm -f %{buildroot}%{_sbindir}/smartd
+rm -f %{buildroot}%{_sbindir}/update-smart-drivedb
+rm -f %{buildroot}%{_mandir}/man5/smartd.conf.5*
+rm -f %{buildroot}%{_mandir}/man8/smartd.8*
+rm -f %{buildroot}%{_mandir}/man8/update-smart-drivedb.8*
+rm -f %{buildroot}/etc/smartd.conf
+rm -f %{buildroot}/etc/smartd_warning.sh
+rm -rf %{buildroot}%{_datadir}/smartmontools
+rm -rf %{buildroot}%{_docdir}/smartmontools
+
 %files
 %license COPYING
 %doc AUTHORS
