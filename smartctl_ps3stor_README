@@ -1,0 +1,23 @@
+==========================================================
+SMARTCTL_PS3STOR README
+==========================================================
+首先参考 https://www.smartmontools.org/wiki/Download
+
+通过源码安装
+  1 解压压缩包 
+	tar zxvf smartctl_ps3_1_0_0.tar.gz
+  2 上面解压缩之后，进入目录，进行构建
+    cd smartctl_ps3_1_0_0
+	./configure
+	make
+  3 生成可执行文件smartctl 
+    
+支持的命令
+  1 smartctl --scan 
+  2 smartctl -x -d ps3stor,16 /dev/ctrl/1 
+                     ^      ^           ^
+                     |      |           |------ Controller ID
+                     |      |------ Device ID
+                     |------ps3stor的设备
+
+  3 smartctl -x -d ps3stor,16 /dev/ctrl/1 -j

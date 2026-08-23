@@ -1,0 +1,87 @@
+name: Build CentOS 8 RPMs (smartctl-ps3stor)
+
+# Publishes CentOS 8 (el8) RPMs for both x86_64 and aarch64 on every GitHub
+# release. The binary is built *inside* a CentOS 8 container, so it links
+# against the CentOS 8 glibc and is guaranteed runtime-compatible.
+#
+# Trigger:
+#   - A published GitHub Release (assets are attached automatically)
+#   - Manual run via workflow_dispatch (artifacts are uploaded only)
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+permissions:
+  contents: write   # needed to attach assets to the release
+
+jobs:
+  build-rpm:
+    name: Build RPM for ${{ matrix.arch }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: x86_64
+            platform: linux/amd64
+          - arch: aarch64
+            platform: linux/arm64
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Set up QEMU (aarch64 only)
+        if: matrix.arch == 'aarch64'
+        uses: docker/setup-qemu-action@v3
+        with:
+          platforms: arm64
+
+      - name: Build RPM in CentOS 8 container
+        env:
+          PLATFORM: ${{ matrix.platform }}
+        run: |
+          set -eux
+          docker run --rm --platform "$PLATFORM" \
+            -v "$PWD":/src -w /src centos:8 \
+            bash -c '
+              set -e
+              # CentOS 8 is end-of-life: the default mirrorlist is dead, so
+              # repoint the repos to vault.centos.org before installing anything.
+              sed -i "s/mirrorlist/#mirrorlist/g; s|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g" /etc/yum.repos.d/CentOS-Linux-*.repo || true
+
+              dnf -y install gcc-c++ make rpm-build gzip tar
+
+              mkdir -p /root/rpmbuild/{BUILD,RPMS,SRPMS,SOURCES,SPECS}
+              cd /src
+
+              # Start from a clean source tree so ./configure runs fresh.
+              make distclean >/dev/null 2>&1 || true
+
+              # Package the checked-out source into the tarball rpmbuild expects.
+              # The --transform prefix makes the top-level dir match %{name}-%{version}.
+              tar czf /root/rpmbuild/SOURCES/smartctl-ps3stor-1.0.0.tar.gz \
+                --transform "s,^,smartctl-ps3stor-1.0.0/," -C /src .
+
+              rpmbuild -bb \
+                --define "_topdir /root/rpmbuild" \
+                --define "dist .el8" \
+                /src/smartctl-ps3stor.spec
+
+              cp /root/rpmbuild/RPMS/*/*.rpm /src/
+            '
+
+      - name: Upload RPM artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: smartctl-ps3stor-el8-${{ matrix.arch }}
+          path: "*.rpm"
+          if-no-files-found: error
+
+      - name: Attach RPM to GitHub release
+        if: github.event_name == 'release'
+        uses: softprops/action-gh-release@v2
+        with:
+          files: "*.rpm"
