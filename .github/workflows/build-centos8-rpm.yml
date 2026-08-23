@@ -57,12 +57,24 @@ jobs:
               mkdir -p /root/rpmbuild/{BUILD,RPMS,SRPMS,SOURCES,SPECS}
               cd /src
 
+              # The autotools scripts (configure, config.sub, config.guess,
+              # install-sh, missing, depcomp, compile) may have been committed
+              # WITHOUT the executable bit -- common when the repo was created
+              # on Windows with core.fileMode=false. rpmbuild extracts the
+              # tarball and then runs ./configure, which would otherwise fail
+              # with "Permission denied". Force +x so the generated tarball
+              # carries the bit regardless of how the source was checked out.
+              chmod +x configure config.sub config.guess install-sh missing \
+                      depcomp compile autogen.sh 2>/dev/null || true
+
               # Start from a clean source tree so ./configure runs fresh.
               make distclean >/dev/null 2>&1 || true
 
               # Package the checked-out source into the tarball rpmbuild expects.
               # The --transform prefix makes the top-level dir match %{name}-%{version}.
+              # Exclude .git so the build does not pick up a git-based version string.
               tar czf /root/rpmbuild/SOURCES/smartctl-ps3stor-1.0.0.tar.gz \
+                --exclude=.git \
                 --transform "s,^,smartctl-ps3stor-1.0.0/," -C /src .
 
               rpmbuild -bb \

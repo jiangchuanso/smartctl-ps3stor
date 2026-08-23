@@ -42,5 +42,5 @@ natively for the target distribution so it links against the platform glibc.
 %{_mandir}/man8/smartctl.8*
 
 %changelog
-* Sat Aug 23 2026 smartctl-ps3stor maintainer <maintainer@example.com> - 1.0.0-1
+* Sun Aug 23 2026 smartctl-ps3stor maintainer <maintainer@example.com> - 1.0.0-1
 - Initial package: smartctl 7.4 with ps3stor device support.
