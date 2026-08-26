@@ -1,0 +1,13 @@
+[Unit]
+Description=smartctl SMART e-mail alert (oneshot)
+# 需要访问磁盘设备, 通常以 root 运行
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+# 若脚本或配置不在默认位置, 可调整 ExecStart 或追加 Environment
+# 例: Environment=SMARTCTL_EMAIL_CONF=/etc/smartctl/email.conf
+ExecStart=/usr/local/bin/smartctl-email-alert
+# 仅当退出码非 0 时记录失败(无告警时脚本返回 0)
+Nice=10

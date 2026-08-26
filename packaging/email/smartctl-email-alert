@@ -24,6 +24,8 @@ import ssl
 import subprocess
 import sys
 from datetime import datetime, timezone
+from email.message import EmailMessage
+from email.utils import formatdate
 
 DEFAULT_CONF = "/etc/smartctl/email.conf"
 SMARTCTL = "smartctl"
@@ -64,50 +66,59 @@ def load_config(path):
         "path": SMARTCTL,
         "extra_args": "",             # 额外传给 smartctl 的参数, 一般留空
     }
-    cp["thresholds"] = {
-        # 模板值: 属性名 = 字段:方向:阈值[,字段:方向:阈值]
-        #   字段 value=归一化值(通常越大越好), raw=原始计数值
-        #   方向 below=低于阈值告警, above=高于阈值告警
-        # 例:
-        # Reallocated_Sector_Ct = value:below:90, raw:above:0
-        # Current_Pending_Sector = raw:above:0
-        # Offline_Uncorrectable = raw:above:0
-        # UDMA_CRC_Error_Count = raw:above:10
-        # Power_On_Hours = raw:above:43800
-    }
+    # 注意: 不要用注释字符串预置 [thresholds] 键, 它们会被当成真实配置项
+    cp.add_section("thresholds")
     if os.path.exists(path):
-        cp.read(path)
+        # 显式 UTF-8 读取, 避免 Windows 默认 GBK 解码报错
+        with open(path, encoding="utf-8") as f:
+            cp.read_file(f)
     return cp
 
 
 # --------------------------------------------------------------------------
 # 磁盘发现 & SMART 采集
 # --------------------------------------------------------------------------
+def _parse_scan_output(out):
+    """解析 smartctl --scan 输出 -> [(device, dtype), ...]"""
+    disks = []
+    for line in out.splitlines():
+        line = line.strip()
+        if not line or line.startswith(("#", "ERROR", "smartctl", "Warning")):
+            continue
+        # 形如: /dev/sda -d sat # /dev/sda [SAT], ATA device
+        head = line.split(" # ")[0].strip() if " # " in line else line
+        parts = head.split()
+        if not parts:
+            continue
+        dev = parts[0]
+        dtype = ""
+        if len(parts) >= 3 and parts[1] == "-d":
+            # dtype 可能为多 token, 如 "sat /dev/sg2"
+            dtype = " ".join(parts[2:])
+        disks.append((dev, dtype))
+    return disks
+
+
 def discover_disks(cfg):
     """返回 [(device, dtype), ...]"""
-    if cfg["alert"].getboolean("scan_all"):
-        out = run_smartctl(cfg, ["--scan", "-d", "ata"])
-        out += run_smartctl(cfg, ["--scan", "-d", "scsi"])
-        disks = []
-        for line in out.splitlines():
-            line = line.strip()
-            if not line or line.startswith("#") or line.startswith("Warning"):
-                continue
-            # 形如: /dev/sda -d ata # ...
-            m = re.match(r"^(\S+)\s+-d\s+(\S+)", line)
-            if m:
-                disks.append((m.group(1), m.group(2)))
-            elif re.match(r"^(\S+)\s", line):
-                disks.append((line.split()[0], ""))
-        # 去重(ata 与 scsi 扫描可能重复同一设备)
-        seen = set()
-        uniq = []
-        for dev, dtype in disks:
-            if dev not in seen:
-                seen.add(dev)
-                uniq.append((dev, dtype))
-        return uniq
-    return [(d.strip(), "") for d in cfg["alert"].get("disks", "").split(",") if d.strip()]
+    if not cfg["alert"].getboolean("scan_all"):
+        return [(d.strip(), "") for d in cfg["alert"].get("disks", "").split(",") if d.strip()]
+
+    # 普通 --scan 已覆盖 ATA/SCSI/NVMe; 失败时兜底逐类型扫描
+    disks = _parse_scan_output(run_smartctl(cfg, ["--scan"]))
+    if not disks:
+        out = (run_smartctl(cfg, ["--scan", "-d", "ata"])
+               + run_smartctl(cfg, ["--scan", "-d", "scsi"])
+               + run_smartctl(cfg, ["--scan", "-d", "nvme"]))
+        disks = _parse_scan_output(out)
+
+    # 去重(保留首个 dtype)
+    seen, uniq = set(), []
+    for dev, dtype in disks:
+        if dev not in seen:
+            seen.add(dev)
+            uniq.append((dev, dtype))
+    return uniq
 
 
 def run_smartctl(cfg, args):
@@ -125,7 +136,7 @@ def run_smartctl(cfg, args):
 
 
 def get_disk_report(cfg, device, dtype):
-    darg = ["-d", dtype] if dtype else []
+    darg = ["-d"] + dtype.split() if dtype else []
     # -i 基本信息, -H 健康自检, -A SMART 属性表
     return run_smartctl(cfg, darg + ["-i", "-H", "-A", device])
 
@@ -167,6 +178,9 @@ def parse_smart(report, device):
             m = re.search(r"(?:Health Status|SMART/Health)\s*.*?:\s*(.+)", report)
             if m and "OK" in m.group(1).upper():
                 info["health"] = "PASSED"
+    # 归一化: SCSI/NVMe 报 OK/GOOD 应等同 PASSED, 避免误报
+    if info["health"] and info["health"] in ("OK", "GOOD", "NORMAL"):
+        info["health"] = "PASSED"
 
     # ATA SMART 属性表
     attr_re = re.compile(
@@ -232,12 +246,10 @@ def evaluate(disks, cfg):
     violations = []
     thresholds = cfg["thresholds"]
     temp_max = cfg["alert"].get("temp_max", "").strip()
-
-    # 便捷温度阈值 -> 视为 Temperature 属性 raw:above:N
+    limit_temp = None
     if temp_max:
         try:
-            thresholds = dict(thresholds)
-            thresholds.setdefault("__TEMP__", "raw:above:%s" % temp_max)
+            limit_temp = float(temp_max)
         except (ValueError, TypeError):
             pass
 
@@ -249,18 +261,13 @@ def evaluate(disks, cfg):
                                    "应为 PASSED"))
 
         # 温度(RAW, 便捷阈值)
-        if temp_max and d["temperature"] is not None:
-            try:
-                limit = float(temp_max)
-                if d["temperature"] > limit:
-                    violations.append((d, "温度", "%d℃" % d["temperature"], "> %d℃" % int(limit)))
-            except (ValueError, TypeError):
-                pass
+        if limit_temp is not None and d["temperature"] is not None:
+            if d["temperature"] > limit_temp:
+                violations.append((d, "温度", "%d℃" % d["temperature"],
+                                   "> %d℃" % int(limit_temp)))
 
         # 各属性模板值
         for name, spec in thresholds.items():
-            if name == "__TEMP__":
-                continue
             if name not in d["attributes"]:
                 continue
             attr = d["attributes"][name]
@@ -289,7 +296,7 @@ def build_summary(disks, violations):
     for d, metric, value, threshold in violations:
         lines.append("  • %s (%s): %s = %s，阈值 %s" % (
             d["device"], (d["model"] or "未知型号"), metric, value, threshold))
-    lines.append("\n完整 SMART 报告见附件。")
+    lines.append("\n完整 SMART 报告见下方正文。")
     return "\n".join(lines)
 
 
@@ -337,34 +344,42 @@ def save_state(path, state):
         pass
 
 
-def is_cooldown(violations, cfg):
+def _violation_signature(violations):
+    sig_parts = ["%s|%s|%s|%s" % (d["device"], d["model"], m, v)
+                 for d, m, v, _ in violations]
+    return hashlib.sha256("\n".join(sorted(sig_parts)).encode("utf-8")).hexdigest()[:16]
+
+
+def cooldown_active(violations, cfg):
+    """与上次告警相同且仍在冷却期内则返回 True(不修改状态文件)。"""
     cooldown = cfg["alert"].getint("cooldown_minutes")
     if cooldown <= 0 or not violations:
         return False
-    state_file = cfg["alert"]["state_file"]
-    state = load_state(state_file)
-
-    sig_parts = ["%s|%s|%s|%s" % (d["device"], d["model"], m, v)
-                 for d, m, v, _ in violations]
-    sig = hashlib.sha256("\n".join(sorted(sig_parts)).encode("utf-8")).hexdigest()[:16]
-
-    now = datetime.now(timezone.utc)
-    if state.get("last_signature") == sig:
-        try:
-            last = datetime.fromisoformat(state["last_alert_time"])
-            if not last.tzinfo:
-                last = last.replace(tzinfo=timezone.utc)
-            elapsed = (now - last).total_seconds() / 60.0
-            if elapsed < cooldown:
-                print("同一告警冷却中 (%.0f/%.0f min)，跳过发送" % (elapsed, cooldown))
-                return True
-        except Exception:  # noqa: BLE001
-            pass
-
-    state["last_signature"] = sig
-    state["last_alert_time"] = now.isoformat()
-    save_state(state_file, state)
+    state = load_state(cfg["alert"]["state_file"])
+    if state.get("last_signature") != _violation_signature(violations):
+        return False
+    try:
+        last = datetime.fromisoformat(state["last_alert_time"])
+        if not last.tzinfo:
+            last = last.replace(tzinfo=timezone.utc)
+        elapsed = (datetime.now(timezone.utc) - last).total_seconds() / 60.0
+        if elapsed < cooldown:
+            print("同一告警冷却中 (%.0f/%.0f min)，跳过发送" % (elapsed, cooldown))
+            return True
+    except Exception:  # noqa: BLE001
+        pass
     return False
+
+
+def mark_alert_sent(violations, cfg):
+    """邮件发送成功后调用: 记录告警签名与时间(供冷却使用)。"""
+    cooldown = cfg["alert"].getint("cooldown_minutes")
+    if cooldown <= 0 or not violations:
+        return
+    state = load_state(cfg["alert"]["state_file"])
+    state["last_signature"] = _violation_signature(violations)
+    state["last_alert_time"] = datetime.now(timezone.utc).isoformat()
+    save_state(cfg["alert"]["state_file"], state)
 
 
 # --------------------------------------------------------------------------
@@ -377,33 +392,16 @@ def send_email(cfg, subject, text_body, html_body=None):
         print("未配置收件人 (smtp.to)", file=sys.stderr)
         return False
 
-    msg = [
-        "From: %s" % s["from"],
-        "To: %s" % ", ".join(to_addrs),
-        "Subject: %s" % subject,
-        "Date: %s" % datetime.now(timezone.utc).strftime("%a, %d %b %Y %H:%M:%S +0000"),
-        "MIME-Version: 1.0",
-    ]
+    # 用 EmailMessage 构建, 自动完成 RFC2047 主题编码与 UTF-8 正文
+    msg = EmailMessage()
+    msg["From"] = s["from"]
+    msg["To"] = ", ".join(to_addrs)
+    msg["Subject"] = subject
+    msg["Date"] = formatdate(localtime=False)
+    msg.set_content(text_body)
     if html_body:
-        boundary = "smartctl-boundary-%d" % int(datetime.now().timestamp())
-        msg.append("Content-Type: multipart/alternative; boundary=%s" % boundary)
-        msg.append("")
-        msg.append("--%s" % boundary)
-        msg.append("Content-Type: text/plain; charset=utf-8")
-        msg.append("")
-        msg.append(text_body)
-        msg.append("")
-        msg.append("--%s" % boundary)
-        msg.append("Content-Type: text/html; charset=utf-8")
-        msg.append("")
-        msg.append(html_body)
-        msg.append("")
-        msg.append("--%s--" % boundary)
-    else:
-        msg.append("Content-Type: text/plain; charset=utf-8")
-        msg.append("")
-        msg.append(text_body)
-    data = "\n".join(msg)
+        msg.add_alternative(html_body, subtype="html")
+
     host, port = s["host"], int(s["port"])
 
     def auth(srv):
@@ -414,13 +412,13 @@ def send_email(cfg, subject, text_body, html_body=None):
         if s.getboolean("use_ssl"):
             with smtplib.SMTP_SSL(host, port, context=ssl.create_default_context()) as srv:
                 auth(srv)
-                srv.sendmail(s["from"], to_addrs, data)
+                srv.send_message(msg)
         else:
             with smtplib.SMTP(host, port) as srv:
                 if s.getboolean("use_tls"):
                     srv.starttls(context=ssl.create_default_context())
                 auth(srv)
-                srv.sendmail(s["from"], to_addrs, data)
+                srv.send_message(msg)
         return True
     except Exception as exc:  # noqa: BLE001
         print("邮件发送失败: %s" % exc, file=sys.stderr)
@@ -467,7 +465,7 @@ def main(argv):
         print("无告警：%d 块磁盘 SMART 指标均正常" % len(disks))
         return 0
 
-    if not dry_run and is_cooldown(violations, cfg):
+    if not dry_run and cooldown_active(violations, cfg):
         return 0
 
     subject = "%s %d 项磁盘 SMART 指标异常" % (cfg["smtp"]["subject_prefix"], len(violations))
@@ -479,6 +477,8 @@ def main(argv):
         return 0
 
     ok = send_email(cfg, subject, text_body, html_body)
+    if ok:
+        mark_alert_sent(violations, cfg)
     print("告警已发送：%d 项指标异常" % len(violations) if ok else "告警发送失败")
     return 0
 
