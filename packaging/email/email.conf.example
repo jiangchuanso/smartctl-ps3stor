@@ -1,0 +1,53 @@
+# smartctl SMART 邮件预警配置示例
+# 复制为 /etc/smartctl/email.conf 后修改并 chmod 600
+# 通过 cron / systemd timer 定期执行 smartctl-email-alert
+
+[smtp]
+# SMTP 服务器
+host = smtp.example.com
+port = 465
+# 登录凭据(留空表示匿名/本机中继)
+user =
+password =
+# 加密方式: use_ssl=true 走 SMTPS(465); use_tls=true 走 STARTTLS(587)
+use_ssl = false
+use_tls = true
+# 收发件人
+from = smartctl@yourhost.local
+to = admin@example.com, oncall@example.com
+subject_prefix = [SMART Alert]
+
+[alert]
+# 模式: alert = 仅超阈值时发送邮件; daily = 每次运行都发送完整报告
+mode = alert
+# 是否使用 smartctl -H 整体健康自检(非 PASSED 即告警)
+health_check = true
+# 便捷温度上限(℃), 留空表示不检查; 等同 Temperature 属性 raw:above:VALUE
+temp_max = 55
+# 同一告警冷却时间(分钟), 0 表示不冷却; 避免指标持续异常时邮件轰炸
+cooldown_minutes = 60
+# 自动扫描全部磁盘(true) 或仅检查下方 disks 列表(false)
+scan_all = true
+disks = /dev/sda,/dev/sdb
+# 告警状态文件(记录上次告警签名和时间, 用于冷却)
+state_file = /var/lib/smartctl/email-alert-state.json
+
+[smartctl]
+# smartctl 二进制路径(本仓库已提供 smartctl_ps3stor_x86_64 / _aarch64)
+path = smartctl
+# 额外参数: 一般留空
+extra_args =
+
+[thresholds]
+# 模板值: 属性名 = 字段:方向:阈值[,字段:方向:阈值]
+#   字段 value = 归一化值(通常越大越好); raw = 原始计数值
+#   方向 below = 低于阈值告警(归一化值劣化); above = 高于阈值告警(错误计数上升)
+#
+# 常见告警模板(可按需增删):
+Reallocated_Sector_Ct = value:below:90, raw:above:0
+Current_Pending_Sector = raw:above:0
+Offline_Uncorrectable   = raw:above:0
+Reported_Uncorrect      = raw:above:0
+UDMA_CRC_Error_Count    = raw:above:10
+Power_On_Hours          = raw:above:43800
+Seek_Error_Rate         = value:below:90

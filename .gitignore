@@ -29,5 +29,8 @@
 # Shipped build artifact tarball
 /bin/
 
-# Local tooling / memory
-/.workbuddy/
+
+
+# 忽略根目录所有以 . 开头的文件/文件夹（保留 .github CI 配置）
+/.*
+!/.github/
