@@ -1,6 +1,10 @@
 # smartctl-ps3stor
 
-> 中文 README。English version: [README.md](README.md).
+<p align="center">
+  <a href="https://github.com/jiangchuanso/smartctl-ps3stor/blob/main/README-ZH.md"><strong>中文</strong></a>
+  &nbsp;·&nbsp;
+  <a href="https://github.com/jiangchuanso/smartctl-ps3stor/blob/main/README.md">English</a>
+</p>
 
 # README-ZH（中文）
 
