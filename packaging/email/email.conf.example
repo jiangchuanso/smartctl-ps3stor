@@ -5,13 +5,15 @@
 [smtp]
 # SMTP 服务器
 host = smtp.example.com
-port = 465
+# 默认 25 端口明文 SMTP(非加密); 若服务器要求加密:
+#   use_ssl=true 走 SMTPS(465),  use_tls=true 走 STARTTLS(587)
+port = 25
 # 登录凭据(留空表示匿名/本机中继)
 user =
 password =
-# 加密方式: use_ssl=true 走 SMTPS(465); use_tls=true 走 STARTTLS(587)
+# 加密方式: 默认均关闭, 即 25 端口明文传输
 use_ssl = false
-use_tls = true
+use_tls = false
 # 收发件人
 from = smartctl@yourhost.local
 to = admin@example.com, oncall@example.com
