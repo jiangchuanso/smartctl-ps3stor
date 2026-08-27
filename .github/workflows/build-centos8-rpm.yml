@@ -73,9 +73,9 @@ jobs:
               # Package the checked-out source into the tarball rpmbuild expects.
               # The --transform prefix makes the top-level dir match %{name}-%{version}.
               # Exclude .git so the build does not pick up a git-based version string.
-              tar czf /root/rpmbuild/SOURCES/smartctl-ps3stor-1.0.0.tar.gz \
+              tar czf /root/rpmbuild/SOURCES/smartmontools-7.4.tar.gz \
                 --exclude=.git \
-                --transform "s,^,smartctl-ps3stor-1.0.0/," -C /src .
+                --transform "s,^,smartmontools-7.4/," -C /src .
 
               rpmbuild -bb \
                 --define "_topdir /root/rpmbuild" \
@@ -88,7 +88,7 @@ jobs:
       - name: Upload RPM artifact
         uses: actions/upload-artifact@v4
         with:
-          name: smartctl-ps3stor-el8-${{ matrix.arch }}
+          name: smartmontools-el8-${{ matrix.arch }}
           path: "*.rpm"
           if-no-files-found: error
 

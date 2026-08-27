@@ -1,5 +1,8 @@
-Name:           smartctl-ps3stor
-Version:        1.0.0
+# Package name and version follow the upstream smartmontools release so the
+# RPM is named smartmontools-7.4-<Release>.el8.<arch>.rpm. The Release number
+# (currently 1) is the only part controlled by this project's packaging.
+Name:           smartmontools
+Version:        7.4
 Release:        1%{?dist}
 Summary:        smartctl extended with PS3STOR device support (based on smartmontools 7.4)
 
@@ -92,6 +95,10 @@ fi
 /usr/bin/systemctl daemon-reload >/dev/null 2>&1 || :
 
 %changelog
+* Thu Aug 27 2026 smartctl-ps3stor maintainer <maintainer@example.com> - 7.4-1
+- Rename package to smartmontools and pin the version to the upstream 7.4
+  release; the Release number (1) now tracks this project's packaging only.
+
 * Mon Aug 24 2026 smartctl-ps3stor maintainer <maintainer@example.com> - 1.0.0-1
 - Add smartd daemon, drivedb.h, update-smart-drivedb and a systemd unit that
   is enabled and started on package install.
