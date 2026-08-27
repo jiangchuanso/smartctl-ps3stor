@@ -1,130 +1,222 @@
 # smartctl-ps3stor
 
-基于 [smartmontools 7.4](https://www.smartmontools.org/) 的 `smartctl`，增加了自定义的 **`ps3stor`** 设备类型，用于读取 PS3 存储控制器的 SMART 信息。
+> English README. 中文说明见 [README-ZH.md](README-ZH.md).
 
-本仓库提供：
+# README (English)
 
-- 完整可编译的 smartmontools 7.4 源码（已集成 `ps3stor` 设备支持）
-- `smartctl-ps3stor.spec`：用于打包 **CentOS 8（el8）** 的 RPM（包名 `smartmontools`，版本固定为上游 `7.4`）
-- `.github/workflows/build-centos8-rpm.yml`：通过 GitHub Actions 在每次发布 Release 时，自动构建并附加 **x86_64 / aarch64** 两个架构的 CentOS 8 RPM
+`smartctl-ps3stor` is `smartctl` built on
+[smartmontools 7.4](https://www.smartmontools.org/) with a custom **`ps3stor`**
+device type added, used to read SMART information from PS3 storage controllers.
 
----
+This repository provides:
 
-## 一、兼容性说明（重要）
+- Complete, compilable smartmontools 7.4 source tree (with `ps3stor` support integrated)
+- `smartctl-ps3stor.spec`: RPM spec for **CentOS 8 (el8)** — package name `smartmontools`, version pinned to upstream `7.4`
+- `.github/workflows/build-centos8-rpm.yml`: GitHub Actions workflow that builds and attaches **x86_64 / aarch64** CentOS 8 RPMs on every release
 
-对仓库中已编译好的二进制（`smartctl`，约 6.8 MB）做过 ELF 分析：
+## Upstream source
 
-| 检查项 | 结果 | 与 CentOS 8 的关系 |
-| --- | --- | --- |
-| 架构 | **x86_64** | ⚠️ 仅有 x86_64，**不含 aarch64** |
-| 最高 GLIBC 需求 | **GLIBC_2.17** | CentOS 8 自带 glibc **2.28** → 2.28 > 2.17，**兼容** |
-| 最高 libstdc++ 需求 | GLIBCXX_3.4.19 | CentOS 8 的 libstdc++ 提供 3.4.25 → **兼容** |
-| 动态链接 | libc / libm / libpthread / libstdc++ / libgcc_s | CentOS 8 均具备 |
+The `ps3stor` device support (including the `ps3lib/` vendor library and the
+`ps3stor` device backend in `os_linux.cpp` / `scsinvme.cpp`) originates from the
+upstream branch
+[smart_7.4_ps3stor](https://gitee.com/babyxong/smart_7.4_ps3stor), which is
+based on **smartmontools 7.4**. This repository adds native CentOS 8 (el8)
+x86_64 / aarch64 RPM packaging on top of it (RPM version pinned to upstream `7.4`).
 
-**结论：**
+## Compatibility
 
-- 现有 **x86_64** 二进制在动态链接层面**兼容 CentOS 8**（大概构建于 CentOS 7 / RHEL 7 环境，比 CentOS 8 更保守，可运行）。
-- 但它**仅 x86_64**；CentOS 8 上的 **aarch64** 必须源码重编——这正是本仓库 CI 要解决的。
-- 本仓库发布的 RPM 是在 **CentOS 8 容器内** 从源码 `rpmbuild` 的，因此二进制链接的是 CentOS 8 的 glibc，**保证两个架构的原生兼容**。
+This repository ships **no prebuilt binaries**. The CentOS 8 (el8) RPMs are
+built from source inside a **CentOS 8 container**, so the binaries link against
+CentOS 8 glibc / libstdc++ and are natively compatible with both **x86_64** and
+**aarch64**.
 
-> 注意：仓库中已通过 `.gitignore` 排除该 6.8 MB 预编译二进制及所有构建产物，GitHub 上的源码从零构建，更干净。
-
----
-
-## 二、支持的命令
-
-来自 `smartctl_ps3stor_README`：
+## Supported commands
 
 ```bash
-# 1. 扫描设备
+# 1. Scan devices
 smartctl --scan
 
-# 2. 查看指定 PS3 存储控制器的详细信息
-#    smartctl -x -d ps3stor,<设备ID> /dev/ctrl/<控制器ID>
+# 2. Inspect a PS3 storage controller
+#    smartctl -x -d ps3stor,<Device ID> /dev/ctrl/<Controller ID>
 smartctl -x -d ps3stor,16 /dev/ctrl/1
 
-# 3. 以 JSON 格式输出（便于程序解析）
+# 3. JSON output (for programmatic parsing)
 smartctl -x -d ps3stor,16 /dev/ctrl/1 -j
 ```
 
-参数含义：
+Argument meaning:
 
 ```
 smartctl -x -d ps3stor,16 /dev/ctrl/1
                      ^      ^           ^
-                     |      |           |------ Controller ID（控制器编号）
-                     |      |------ Device ID（设备编号）
-                     |------ ps3stor 设备类型
+                     |      |           |------ Controller ID
+                     |      |------ Device ID
+                     |------ ps3stor device type
 ```
 
----
+## Build from source
 
-## 三、本地从源码构建
-
-参考 [smartmontools 官方下载与编译说明](https://www.smartmontools.org/wiki/Download)。
+See the [smartmontools download & build instructions](https://www.smartmontools.org/wiki/Download).
 
 ```bash
-# 1. 解压源码（本仓库即是解压后的目录）
-#    git clone https://github.com/jiangchuanso/smartctl-ps3stor.git
-#    cd smartctl-ps3stor
-
-# 2. 配置并编译
+# Option A: use this repository (recommended)
+git clone https://github.com/jiangchuanso/smartctl-ps3stor.git
+cd smartctl-ps3stor
 ./configure
 make
+# produces ./smartctl
 
-# 3. 生成可执行文件 ./smartctl
+# Option B: use the upstream tarball (historical)
+tar zxvf smartctl_ps3_1_0_0.tar.gz
+cd smartctl_ps3_1_0_0
+./configure
+make
 ```
 
----
+## Build CentOS 8 RPM via GitHub Actions
 
-## 四、通过 GitHub Actions 构建 CentOS 8 RPM
+Workflow: `.github/workflows/build-centos8-rpm.yml`
 
-工作流文件：`.github/workflows/build-centos8-rpm.yml`
+- **Trigger 1 (recommended):** draft & publish a GitHub Release (tag e.g. `v1.0.0`).
+  The workflow matrix-builds x86_64 / aarch64 (aarch64 via QEMU + `centos:8`
+  container) and attaches both RPMs to the release.
+- **Trigger 2 (testing):** run manually via `Actions → Build CentOS 8 RPMs → Run workflow`.
 
-- **触发方式一（推荐，直接拿到 RPM 附件）**：在 GitHub 上 **Draft a new release** 并打 tag（如 `v1.0.0`）后 **Publish**。Actions 会自动矩阵构建 x86_64 / aarch64（aarch64 通过 QEMU + `centos:8` 容器模拟），完成后两个 RPM 自动附加到该 Release。
-- **触发方式二（仅测试）**：在 **Actions → Build CentOS 8 RPMs → Run workflow** 手动触发，产物以 Artifact 形式提供下载。
+Build notes:
 
-构建特征：
-
-- 在 **CentOS 8 容器** 内 `dnf install gcc-c++ make rpm-build` 后 `rpmbuild`，保证链接平台 glibc。
-- 已修复 CentOS 8 EOL 后的软件源（重定向到 `vault.centos.org`）。
-- **RPM 版本固定为上游 `7.4`，与 Release 的 tag/版本无关**；Release 号（`*`）仅由 spec 的 `Release:` 字段控制（当前为 `1`，即 `1%{?dist}` → `.el8`）。
-- 产物命名（包名 `smartmontools`，版本 `7.4`，Release `1`，架构 x86_64 / aarch64）：
+- Built inside a **CentOS 8 container** (`dnf install gcc-c++ make rpm-build`) so it links the platform glibc.
+- CentOS 8 EOL repos are redirected to `vault.centos.org`.
+- **RPM version is pinned to upstream `7.4`** and is independent of the release tag; the Release number (`*`) is controlled solely by the spec's `Release:` field (currently `1`, i.e. `1%{?dist}` → `.el8`).
+- Artifacts:
   - `smartmontools-7.4-1.el8.x86_64.rpm`
   - `smartmontools-7.4-1.el8.aarch64.rpm`
 
-> 提示：若 `centos:8` 多架构镜像日后被下架，可将工作流中 aarch64 对应的镜像改为 `arm64v8/centos:8`。
-
----
-
-## 五、安装与使用（CentOS 8）
+## Install & usage (CentOS 8)
 
 ```bash
-# 安装 RPM（aarch64 机器换成对应的 .aarch64.rpm 文件）
+# Install the RPM (on aarch64 use the .aarch64.rpm)
 sudo rpm -ivh smartmontools-7.4-1.el8.x86_64.rpm
 
-# 验证
+# Verify
 which smartctl
 smartctl --version
 
-# 使用 ps3stor 设备类型读取 PS3 存储控制器信息
+# Read PS3 storage controller info via the ps3stor device type
 sudo smartctl -x -d ps3stor,16 /dev/ctrl/1
-sudo smartctl -x -d ps3stor,16 /dev/ctrl/1 -j   # JSON 输出
+sudo smartctl -x -d ps3stor,16 /dev/ctrl/1 -j   # JSON output
 ```
 
----
+## Email alert (SMART monitoring)
 
-## 六、文件说明
+A ready-to-use SMART email-alert toolkit lives in `packaging/email/`:
 
-| 文件 | 说明 |
+- `smartctl-email-alert` — Python 3 script. It runs `smartctl` on every disk,
+  compares SMART attributes / overall-health against threshold templates, and
+  sends an **SMTP email alert** when any metric violates a threshold. Email is
+  sent via `curl(1)`'s built-in SMTP (same idea as smartmontools.spec's
+  `smart_curl_mail` plugin) — **no Python smtplib, no local MTA required**.
+  Requires `curl >= 7.20` (built with SMTP support).
+- `email.conf.example` — config template; copy to `/etc/smartctl/email.conf`.
+- `smartctl-email.service` / `smartctl-email.timer` — systemd units that run the
+  check every 15 minutes (first run 2 min after boot).
+
+Quick start:
+
+```bash
+# 1. Install the script and config
+sudo cp packaging/email/smartctl-email-alert /usr/local/bin/
+sudo chmod +x /usr/local/bin/smartctl-email-alert
+sudo mkdir -p /etc/smartctl
+sudo cp packaging/email/email.conf.example /etc/smartctl/email.conf
+sudo chmod 600 /etc/smartctl/email.conf
+
+# 2. Edit /etc/smartctl/email.conf: set [smtp] url/from/to, and [thresholds]
+#    (path = smartctl uses the smartctl in PATH; override with [smartctl] path)
+
+# 3. Dry run (prints what would be sent, sends nothing)
+sudo smartctl-email-alert --dry-run
+
+# 4. Enable the systemd timer (every 15 min)
+sudo cp packaging/email/smartctl-email.service /etc/systemd/system/
+sudo cp packaging/email/smartctl-email.timer   /etc/systemd/system/
+sudo systemctl daemon-reload
+sudo systemctl enable --now smartctl-email.timer
+```
+
+Key configuration (`/etc/smartctl/email.conf`, INI):
+
+- `[smtp]`: `url` (recommended, e.g. `smtp://host:25`, `smtps://host:465`,
+  `smtp://host:587` with `curl_opts = --ssl-reqd`), `from`, `to`
+  (comma-separated), `subject_prefix`, optional `user`/`password`.
+- `[alert]`: `mode` (`alert` = only on threshold breach; `daily` = full report
+  every run), `health_check`, `temp_max` (°C), `cooldown_minutes` (de-dupe
+  window), `scan_all` (auto-discover disks) / `disks` list.
+- `[thresholds]`: per-attribute templates, e.g.
+  `Reallocated_Sector_Ct = value:below:90, raw:above:0`.
+
+For PS3 storage controllers, the disks are auto-discovered via `smartctl --scan`
+(which enumerates `ps3stor` devices); if needed, set `[smartctl] extra_args =
+-d ps3stor,16` or list the device in `[alert].disks`.
+
+## File layout
+
+| File | Purpose |
 | --- | --- |
-| `smartctl-ps3stor.spec` | CentOS 8 RPM 打包 spec（包名 `smartmontools`，版本固定 `7.4`，Release 由打包设置控制，当前 `1`） |
-| `.github/workflows/build-centos8-rpm.yml` | 发布时自动构建 x86_64 / aarch64 两个 el8 RPM 的工作流 |
-| `smartctl_ps3stor_README` | 原始英文编译与使用说明 |
-| 其余文件 | smartmontools 7.4 完整源码（含 `ps3stor` 设备支持） |
+| `smartctl-ps3stor.spec` | CentOS 8 RPM spec (name `smartmontools`, version `7.4`, Release `1`) |
+| `.github/workflows/build-centos8-rpm.yml` | builds x86_64 / aarch64 el8 RPMs on release |
+| `packaging/email/` | SMART email-alert toolkit |
+| rest | full smartmontools 7.4 source (with `ps3stor` support) |
 
----
+## License
 
-## 七、许可证
+smartmontools upstream license **GPLv2+** (see `COPYING`).
 
-遵循 smartmontools 上游许可 **GPLv2+**（见 `COPYING`）。
+## About smartmontools (upstream)
+
+> `$Id: README 4986 2019-12-01 22:04:31Z samm2 $`
+
+**HOME**
+
+The home for smartmontools is located at:
+
+    http://www.smartmontools.org/
+
+Mailing list for support and other questions:
+
+    https://listi.jpberlin.de/mailman/listinfo/smartmontools-support
+
+**OVERVIEW**
+
+smartmontools contains utilities that control and monitor storage devices using
+the Self-Monitoring, Analysis and Reporting Technology (SMART) system built into
+ATA/SATA and SCSI/SAS hard drives and solid-state drives. This is used to check
+the reliability of the drive and to predict drive failures.
+
+**CONTENTS**
+
+The suite contains two utilities:
+
+- `smartctl` — command line utility designed to perform S.M.A.R.T. tasks such as disk self-checks, and to report the S.M.A.R.T. status of the disk.
+- `smartd` — daemon that periodically monitors S.M.A.R.T. status and reports errors and changes in S.M.A.R.T. attributes to syslog.
+
+**GETTING STARTED**
+
+To examine SMART data from a disk, try:
+
+    smartctl -a /dev/sda
+
+See the manual page `man smartctl` for more information.
+
+To start automatic monitoring of your disks with the smartd daemon:
+
+    smartd -d     # foreground (debug) mode
+    smartd         # background mode (logs to SYSLOG)
+
+To receive email warnings, configure `smartd.conf` with the `-m` mail warning
+directive. See `man smartd` for more information.
+
+**OBTAINING / BUILDING / INSTALLING**
+
+- Source tarballs: http://sourceforge.net/projects/smartmontools/files/
+- SVN: `svn co http://svn.code.sf.net/p/smartmontools/code/trunk/smartmontools smartmontools`
+- Detailed installation instructions: see the `INSTALL` file.
