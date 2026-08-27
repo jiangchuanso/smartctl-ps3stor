@@ -3,21 +3,30 @@
 # 通过 cron / systemd timer 定期执行 smartctl-email-alert
 
 [smtp]
-# SMTP 服务器
+# 发送方式: 直接调用 curl(1) 内置的 SMTP 协议(与 smartmontools.spec 中
+# smart_curl_mail 插件同一思路), 不再使用 Python smtplib, 也无需本机 MTA。
+# 依赖 curl >= 7.20(需编译 SMTP 支持)。
+#
+# SMTP URL 优先(推荐)。示例:
+#   明文:      smtp://smtp.example.com:25
+#   隐式TLS:   smtps://smtp.example.com:465
+#   STARTTLS:  smtp://smtp.example.com:587   (并设置 curl_opts = --ssl-reqd)
+url = smtp://smtp.example.com:25
+# 若 url 留空, 则由以下旧配置项自动推导(默认即 smtp://localhost:25):
 host = smtp.example.com
-# 默认 25 端口明文 SMTP(非加密); 若服务器要求加密:
-#   use_ssl=true 走 SMTPS(465),  use_tls=true 走 STARTTLS(587)
 port = 25
-# 登录凭据(留空表示匿名/本机中继)
-user =
-password =
-# 加密方式: 默认均关闭, 即 25 端口明文传输
 use_ssl = false
 use_tls = false
-# 收发件人
+# 登录凭据(留空表示匿名/本机中继; 对应 curl --login/--password)
+user =
+password =
+# 收发件人(信封与 From 头)
 from = smartctl@yourhost.local
 to = admin@example.com, oncall@example.com
 subject_prefix = [SMART Alert]
+# 额外传给 curl 的选项(空格分隔), 例如:
+# curl_opts = --ssl-reqd --connect-timeout 10 --max-time 60
+curl_opts =
 
 [alert]
 # 模式: alert = 仅超阈值时发送邮件; daily = 每次运行都发送完整报告

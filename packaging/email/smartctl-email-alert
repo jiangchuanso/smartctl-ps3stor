@@ -7,8 +7,13 @@ smartctl-email-alert — 基于 smartctl 的硬盘 SMART 邮件预警
 按「模板值」(阈值) 逐项比对：任一指标低于(below)或高于(above)模板值即触发
 SMTP 邮件告警。支持对持续相同的告警做冷却，避免邮件轰炸。
 
+邮件发送直接调用 curl(1) 内置的 SMTP 协议(与 smartmontools.spec 中的
+smart_curl_mail 插件同一思路), 不再依赖 Python smtplib, 也无需本机 MTA。
+
 配置文件: /etc/smartctl/email.conf  (INI 格式, 见 email.conf.example)
 也可用环境变量 SMARTCTL_EMAIL_CONF 指定其它路径。
+
+依赖: smartctl 与 curl(>= 7.20, 需编译 SMTP 支持)
 
 用法:
     smartctl-email-alert                 # 按配置执行告警检查
@@ -19,13 +24,12 @@ import hashlib
 import json
 import os
 import re
-import smtplib
-import ssl
 import subprocess
 import sys
+import tempfile
 from datetime import datetime, timezone
 from email.message import EmailMessage
-from email.utils import formatdate
+from email.utils import formatdate, parseaddr
 
 DEFAULT_CONF = "/etc/smartctl/email.conf"
 SMARTCTL = "smartctl"
@@ -45,6 +49,8 @@ def load_config(path):
     cp["smtp"] = {
         "host": "localhost",
         "port": "25",
+        "url": "",                # 推荐直接写 SMTP URL(如 smtps://host:465);
+                                  # 留空则由 host/port/use_ssl/use_tls 推导
         "user": "",
         "password": "",
         "use_tls": "false",
@@ -52,6 +58,7 @@ def load_config(path):
         "from": "smartctl@localhost",
         "to": "root@localhost",
         "subject_prefix": "[SMART Alert]",
+        "curl_opts": "",          # 额外传给 curl 的参数(空格分隔), 如 --ssl-reqd
     }
     cp["alert"] = {
         "mode": "alert",              # alert = 超阈值才发; daily = 每次运行都发完整报告
@@ -383,8 +390,25 @@ def mark_alert_sent(violations, cfg):
 
 
 # --------------------------------------------------------------------------
-# 发送
+# 发送(调用 curl 的 SMTP 协议, 参考 smartmontools.spec 的 smart_curl_mail 插件)
 # --------------------------------------------------------------------------
+def _smtp_url(s):
+    """推导 curl 使用的 SMTP URL。显式 url 优先, 否则由 host/port/use_ssl/use_tls 推导。"""
+    url = s.get("url", "").strip()
+    curl_opts = s.get("curl_opts", "").strip()
+    if url:
+        return url, curl_opts
+    host, port = s["host"], int(s["port"])
+    if s.getboolean("use_ssl"):
+        # 隐式 TLS(SMTPS, 通常 465)
+        return "smtps://%s:%d" % (host, port), curl_opts
+    if s.getboolean("use_tls"):
+        # STARTTLS(通常 587): smtp:// + --ssl-reqd(未显式指定时自动追加)
+        if "--ssl-reqd" not in curl_opts.split():
+            curl_opts = (curl_opts + " --ssl-reqd").strip()
+    return "smtp://%s:%d" % (host, port), curl_opts
+
+
 def send_email(cfg, subject, text_body, html_body=None):
     s = cfg["smtp"]
     to_addrs = [a.strip() for a in s["to"].split(",") if a.strip()]
@@ -392,7 +416,8 @@ def send_email(cfg, subject, text_body, html_body=None):
         print("未配置收件人 (smtp.to)", file=sys.stderr)
         return False
 
-    # 用 EmailMessage 构建, 自动完成 RFC2047 主题编码与 UTF-8 正文
+    # 用 EmailMessage 构建消息(自动完成 RFC2047 主题编码与 UTF-8 正文),
+    # 序列化到临时文件后由 curl --upload-file 作为 DATA 发送。
     msg = EmailMessage()
     msg["From"] = s["from"]
     msg["To"] = ", ".join(to_addrs)
@@ -402,27 +427,45 @@ def send_email(cfg, subject, text_body, html_body=None):
     if html_body:
         msg.add_alternative(html_body, subtype="html")
 
-    host, port = s["host"], int(s["port"])
+    url, curl_opts = _smtp_url(s)
+    # 信封发件人取 From 头中的纯地址("Name <a@b>" -> a@b)
+    _, mail_from = parseaddr(msg["From"])
+    if not mail_from:
+        mail_from = msg["From"]
 
-    def auth(srv):
-        if s["user"]:
-            srv.login(s["user"], s["password"])
-
+    tmp = None
     try:
-        if s.getboolean("use_ssl"):
-            with smtplib.SMTP_SSL(host, port, context=ssl.create_default_context()) as srv:
-                auth(srv)
-                srv.send_message(msg)
-        else:
-            with smtplib.SMTP(host, port) as srv:
-                if s.getboolean("use_tls"):
-                    srv.starttls(context=ssl.create_default_context())
-                auth(srv)
-                srv.send_message(msg)
+        fd, tmp = tempfile.mkstemp(prefix="smartctl-email-", suffix=".eml")
+        with os.fdopen(fd, "wb") as f:
+            f.write(msg.as_bytes())
+
+        cmd = ["curl", "--silent", "--show-error",
+               "--url", url, "--mail-from", mail_from]
+        for a in to_addrs:
+            cmd += ["--mail-rcpt", a]
+        if s.get("user", "").strip():
+            cmd += ["--login", s["user"], "--password", s["password"]]
+        # curl_opts 按空白拆分(如 --ssl-reqd --connect-timeout 10)
+        cmd += curl_opts.split()
+        cmd += ["--upload-file", tmp]
+
+        res = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                             timeout=120, text=True)
+        if res.returncode != 0:
+            err = (res.stderr or res.stdout).strip()
+            print("邮件发送失败 (curl 退出码 %d): %s" % (res.returncode, err),
+                  file=sys.stderr)
+            return False
         return True
     except Exception as exc:  # noqa: BLE001
         print("邮件发送失败: %s" % exc, file=sys.stderr)
         return False
+    finally:
+        if tmp and os.path.exists(tmp):
+            try:
+                os.unlink(tmp)
+            except Exception:  # noqa: BLE001
+                pass
 
 
 # --------------------------------------------------------------------------
