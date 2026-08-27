@@ -1,0 +1,21 @@
+smartctl-ps3stor
+===============
+
+smartctl-ps3stor is smartctl built on smartmontools 7.4 with a custom
+"ps3stor" device type added, used to read SMART information from PS3
+storage controllers.  It is based on the upstream branch smart_7.4_ps3stor.
+
+Full documentation:
+    README.md     - English README
+    README-ZH.md  - 中文说明
+
+Quick usage:
+    smartctl --scan
+    smartctl -x -d ps3stor,16 /dev/ctrl/1
+    smartctl -x -d ps3stor,16 /dev/ctrl/1 -j
+
+CentOS 8 (el8) RPMs for x86_64 / aarch64 are built inside a CentOS 8
+container by the GitHub Actions workflow .github/workflows/build-centos8-rpm.yml;
+the packaging is defined in smartctl-ps3stor.spec.
+
+License: GPLv2+ (see COPYING)

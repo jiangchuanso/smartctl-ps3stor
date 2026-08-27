@@ -67,7 +67,7 @@ EOF
 %files
 %license COPYING
 %doc AUTHORS
-%doc smartctl_ps3stor_README
+%doc README README.md README-ZH.md
 %{_sbindir}/smartctl
 %{_sbindir}/smartd
 %{_sbindir}/update-smart-drivedb
