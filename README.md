@@ -90,16 +90,16 @@ Build notes:
 
 - Built inside a **CentOS 8 container** (`dnf install gcc-c++ make rpm-build`) so it links the platform glibc.
 - CentOS 8 EOL repos are redirected to `vault.centos.org`.
-- **RPM version is pinned to upstream `7.4`** and is independent of the release tag; the Release number (`*`) is controlled solely by the spec's `Release:` field (currently `2`, i.e. `2%{?dist}` → `.el8`).
+- **RPM version is pinned to upstream `7.4`** and is independent of the release tag; the Release number (`*`) is controlled solely by the spec's `Release:` field (currently `3`, i.e. `3%{?dist}` → `.el8`).
 - Artifacts:
-  - `smartmontools-7.4-2.el8.x86_64.rpm`
-  - `smartmontools-7.4-2.el8.aarch64.rpm`
+  - `smartmontools-7.4-3.el8.x86_64.rpm`
+  - `smartmontools-7.4-3.el8.aarch64.rpm`
 
 ## Install & usage (CentOS 8)
 
 ```bash
 # Install the RPM (on aarch64 use the .aarch64.rpm)
-sudo rpm -ivh smartmontools-7.4-2.el8.x86_64.rpm
+sudo rpm -ivh smartmontools-7.4-3.el8.x86_64.rpm
 
 # Verify
 which smartctl
@@ -177,7 +177,7 @@ sudo systemctl restart smartd
 
 | File | Purpose |
 | --- | --- |
-| `smartctl-ps3stor.spec` | CentOS 8 RPM spec (name `smartmontools`, version `7.4`, Release `2`) |
+| `smartctl-ps3stor.spec` | CentOS 8 RPM spec (name `smartmontools`, version `7.4`, Release `3`) |
 | `.github/workflows/build-centos8-rpm.yml` | builds x86_64 / aarch64 el8 RPMs on release |
 | `smartd_warning.d` | `smart_curl_mail` curl SMTP alert plugin shipped by the RPM (script + conf) |
 | rest | full smartmontools 7.4 source (with `ps3stor` support) |

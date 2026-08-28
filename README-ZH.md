@@ -100,10 +100,10 @@ make
 
 - 在 **CentOS 8 容器** 内 `dnf install gcc-c++ make rpm-build` 后 `rpmbuild`，保证链接平台 glibc。
 - 已修复 CentOS 8 EOL 后的软件源（重定向到 `vault.centos.org`）。
-- **RPM 版本固定为上游 `7.4`，与 Release 的 tag/版本无关**；Release 号（`*`）仅由 spec 的 `Release:` 字段控制（当前为 `2`，即 `2%{?dist}` → `.el8`）。
-- 产物命名（包名 `smartmontools`，版本 `7.4`，Release `2`，架构 x86_64 / aarch64）：
-  - `smartmontools-7.4-2.el8.x86_64.rpm`
-  - `smartmontools-7.4-2.el8.aarch64.rpm`
+- **RPM 版本固定为上游 `7.4`，与 Release 的 tag/版本无关**；Release 号（`*`）仅由 spec 的 `Release:` 字段控制（当前为 `3`，即 `3%{?dist}` → `.el8`）。
+- 产物命名（包名 `smartmontools`，版本 `7.4`，Release `3`，架构 x86_64 / aarch64）：
+  - `smartmontools-7.4-3.el8.x86_64.rpm`
+  - `smartmontools-7.4-3.el8.aarch64.rpm`
 
 > 提示：若 `centos:8` 多架构镜像日后被下架，可将工作流中 aarch64 对应的镜像改为 `arm64v8/centos:8`。
 
@@ -111,7 +111,7 @@ make
 
 ```bash
 # 安装 RPM（aarch64 机器换成对应的 .aarch64.rpm 文件）
-sudo rpm -ivh smartmontools-7.4-2.el8.x86_64.rpm
+sudo rpm -ivh smartmontools-7.4-3.el8.x86_64.rpm
 
 # 验证
 which smartctl
@@ -170,7 +170,7 @@ sudo systemctl restart smartd
 
 | 文件 | 说明 |
 | --- | --- |
-| `smartctl-ps3stor.spec` | CentOS 8 RPM 打包 spec（包名 `smartmontools`，版本固定 `7.4`，Release 由打包设置控制，当前 `2`） |
+| `smartctl-ps3stor.spec` | CentOS 8 RPM 打包 spec（包名 `smartmontools`，版本固定 `7.4`，Release 由打包设置控制，当前 `3`） |
 | `.github/workflows/build-centos8-rpm.yml` | 发布时自动构建 x86_64 / aarch64 两个 el8 RPM 的工作流 |
 | `smartd_warning.d` | RPM 内置的 `smart_curl_mail` curl SMTP 告警插件（脚本 + 独立 conf，见「邮件通知用法说明」） |
 | 其余文件 | smartmontools 7.4 完整源码（含 `ps3stor` 设备支持） |

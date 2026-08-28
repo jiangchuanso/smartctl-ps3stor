@@ -9,6 +9,10 @@
 #ifndef __PS3LIB_SMP_H__
 #define __PS3LIB_SMP_H__
 
+#if defined(__cplusplus)
+extern "C" {
+#endif
+
 #pragma pack(1)
 
 #define PS3LIB_SMP_MAX_RESPONSE_BUFFER_LEN (1032)
@@ -354,4 +358,9 @@ typedef struct Ps3LibSMPResponsePhyControl {
 } Ps3LibSMPResponsePhyControl_t;
 
 #pragma pack()
+
+#if defined(__cplusplus)
+}
+#endif
+
 #endif

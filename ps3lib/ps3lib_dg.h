@@ -9,6 +9,12 @@
 #ifndef __PS3LIB_DG_H__
 #define __PS3LIB_DG_H__
 
+#if defined(__cplusplus)
+extern "C" {
+#endif
+
+#include "ps3lib_pd.h"
+
 #define PS3LIB_WWN_LEN                (24)      ///< WWN长度
 #define PS3LIB_SPAN_PER_DG            (8)       ///< 每个dg中的最大span个数
 #define PS3LIB_MAX_DEDICATED_SPARE_PER_DG (8)   ///< dg中的最大局部热备盘数量
@@ -112,7 +118,7 @@ typedef struct Ps3LibRaidDisk{
 
 typedef struct Ps3LibVdBrifeInfo {
     U64             vdSize;                     ///< vd大小, 单位512B
-    U8              vdName[PS3LIB_VD_NAME_LEN]; ///< vd名称
+    U8              vdName[PS3LIB_VD_NAME_LEN]; ///< vd名称(字符串可能不包含终止符'\0')
     U16             vdId;                       ///< vdId
     U8              pad[2];
     U32             attr;                       ///< 保存meta中的vd属性
@@ -269,7 +275,7 @@ typedef struct Ps3LibForeignVdInfo{
     U64     sectorNum;              ///< VD大小(单位sector)
     U8      raidLevel;              ///< raidLevel
     U8      pad2[7];                ///< 保留字段
-    U8      vdName[PS3LIB_VD_NAME_LEN];    ///< VD名称
+    U8      vdName[PS3LIB_VD_NAME_LEN];    ///< VD名称(字符串可能不包含终止符'\0')
 }Ps3LibForeignVdInfo_t;
 
 /**
@@ -364,9 +370,10 @@ Ps3Errno ps3libMigrateProgInfoGet(CtrlId_t ctrlId, DgId_t dgId, Ps3LibDgProgress
  * @param[in]   ctrlId: 控制卡标识符
  * @param[in]   dgList: 磁盘组列表
  * @param[out]  dgInfo: 磁盘组信息
+ * @param[out]  pErrList:   批量查询时上报的dg错误码列表
  * @return      PS3_ERRNO_SUCCESS: 成功
  */
-Ps3Errno ps3libDgInfoGetByDgList(CtrlId_t ctrlId, Ps3LibDgList_s *dgList, Ps3LibDgInfo_t *dgInfo);
+Ps3Errno ps3libDgInfoGetByDgList(CtrlId_t ctrlId, Ps3LibDgList_s *dgList, Ps3LibDgInfo_t *dgInfo, Ps3Errno *pErrList);
 
 /**
  * @brief       设置指定磁盘组是否对操作系统隐藏
@@ -425,5 +432,9 @@ Ps3Errno ps3libDgAllowedOpsGet(CtrlId_t ctrlId, const DgId_t dgId, Ps3LibDgAllow
  * @return      PS3_ERRNO_SUCCESS: 成功
  */
 Ps3Errno ps3libGlobalSparesGet(CtrlId_t ctrlId, Ps3LibGlobalSpares_t *globalSpares);
+
+#if defined(__cplusplus)
+}
+#endif
 
 #endif

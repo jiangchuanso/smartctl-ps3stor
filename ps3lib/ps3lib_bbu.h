@@ -8,6 +8,10 @@
 #ifndef __PS3LIB_BBU_H__
 #define __PS3LIB_BBU_H__
 
+#if defined(__cplusplus)
+extern "C" {
+#endif
+
 #define PS3LIB_MFG_NAME_LEN                (12)    ///< 生产厂商名长度
 #define PS3LIB_DEVICE_NAME_LEN             (12)    ///< 设备名称长度
 #define PS3LIB_DEVICE_CHEMISTRY_LEN        (5)     ///< 设备化学成分名称长度
@@ -15,9 +19,11 @@
 #define PS3LIB_MODULE_VERSION_LEN          (4)     ///< 模块版本名称长度
 #define PS3LIB_BAT_VERSION_LEN             (8)     ///< 电池版本号名称长度
 #define PS3LIB_PCB_VERSION_LEN             (10)    ///< PCB版本长度
+#define PS3LIB_FULL_SN_LEN                 (16)    ///< 完整SN号长度
 #define PS3LIB_A_WEEKLY_HOURS              (168)   ///< 一周小时数
 #define PS3LIB_DAY_TIME_CONVERTION         (24*60*60*1000)
 #define PS3LIB_TIME_CONVERTION             (60*60*1000)
+#define PS3LIB_SCAP_MIN_MF                 (1000)  
 
 /**
  * @brief   BBU电池错误状态结构体
@@ -128,8 +134,8 @@ typedef struct Ps3LibBbuStatus {
 typedef struct Ps3LibBbuCapacityInfo{
     U16     relativeStateOfCharge;      ///< 相对容量
     U16     absoluteStateOfCharge;      ///< 绝对容量
-    U16     remainingCapacity;          ///< 剩余容量
-    U16     fullChargeCapacity;         ///< 充满电的容量
+    U16     remainingCapacity;          ///< 剩余容量(大于等于1000单位为mF，小于1000单位为J)
+    U16     fullChargeCapacity;         ///< 充满电的容量(大于等于1000单位为mF，小于1000单位为J)
     U16     runTimeToEmpty;             ///< 剩余可用时间（MIN）
     U16     averageTimeToEmpty;         ///< 平均放空电时间（MIN）
     U16     averageTimeToFull;          ///< 平均充满电时间（MIN）
@@ -137,16 +143,18 @@ typedef struct Ps3LibBbuCapacityInfo{
     U16     maxError;                   ///< 最大错误数
     U16     remainingCapacityAlarm;     ///< 剩余容量报警阈值
     U16     remainingTimeAlarm;         ///< 剩余时间报警阈值
-    U8      reserved[26];               ///< 保留字段
+    U8      fullSn[PS3LIB_FULL_SN_LEN]; ///< 完整sn，复用原reserve字段
+    U8      reserved[10];               ///< 保留字段
 } Ps3LibBbuCapacityInfo_t;
 
 /**
  * @brief   BBU设计信息结构体
+ * @note    字符串可能不包含终止符'\0'
  */
 typedef struct Ps3LibBbuDesignInfo {
     U64          cacheVaultFlashSize;                          ///< Cache大小(bytes)
     Ps3LibBbuDate_t mgrBbuDate;                                ///< 生产日期
-    U16          designCapacity;                               ///< 设计容量
+    U16          designCapacity;                               ///< 设计容量(大于等于1000单位为mF，小于1000单位为J)
     U16          designVoltage;                                ///< 设计电压
     U16          specificationInfo;                            ///< 规格信息
     U16          serialNumber;                                 ///< 序列号
@@ -339,5 +347,9 @@ Ps3Errno ps3libBbuStateGet(CtrlId_t ctrlId, Ps3LibBbuState_e *bbuState);
  * @return       PS3_ERRNO_SUCCESS: 成功
  */
 Ps3Errno ps3libBbuLearnInfoGet(CtrlId_t ctrlId, Ps3LibBbuLearnStatus_t *bbuLearnsSatus);
+
+#if defined(__cplusplus)
+}
+#endif
 
 #endif

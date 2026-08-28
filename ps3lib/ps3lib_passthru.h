@@ -15,11 +15,6 @@ extern "C" {
 
 #include "ps3lib_smp.h"
 
-#define PS3LIB_DWARD_LEN                    4       ///< dword长度 4字节
-
-#define PS3LIB_SCSI_MAX_SENSE_LENGTH        32      ///< scsi sense data 最大长度
-#define PS3LIB_SCSI_MAX_CDB_LENGTH          16      ///< scsi cdb 最大长度
-
 #define PS3LIB_NVME_MAX_MPT_ERROR_REPLY     48      ///< nvme 厂商自定义数据长度
 #define PS3LIB_NVME_MAX_ERR_RSP_LENGTH      32      ///< nvme cq长度 预留一部分
 #define PS3LIB_NVME_MAX_CMD_LENGTH          128     ///< nvme sq长度 预留一部分
@@ -176,6 +171,117 @@ typedef struct Ps3LibATAPassThru16 {
 } __attribute__((packed)) Ps3LibATAPassThru16_s;
 
 /**
+ * @brief   硬盘上的log E4 信息
+ */
+typedef struct Ps3LibPdLogE4Info {
+    U16  revisonId;
+    S8   signature[5];
+    U8   type;
+    U8   healthLevel;
+    ///< Device  Info
+    U8   plpCapacitance;
+    U16  plpCapacitorVolt;
+    U32  ddrCeErrCount;
+    U32  ddrUceErrCount;
+    U32  sramCeErrCount;
+    U32  sramUceErrCount;
+    U32  sensorErrCount;
+    ///< Temperature Info
+    U8   compositeTemp;
+    U8   unc;
+    U16  uncCnt;
+    U8   uc;
+    U16  ucCnt;
+    U8   minTemp;
+    U8   maxTemp;
+    U8   socTemp;
+    U8   nandTemp;
+    ///< Media Info 
+    U32  eraseErrCnt;
+    U32  programErrCnt;
+    U32  ardErrGoodCnt;
+    U32  mrdErrGoodCnt;
+    U32  totalBadBlkCnt;
+    U32  nandMediaErrCnt;
+    U32  ardErrFailCnt;
+    U32  mrdErrFailCnt;
+    U32  raidFailCnt;
+    U32  raidGoodCnt;
+    U32  reallocSectorCnt;
+    U32  curPendingSectorCnt;
+    ///< Inf  Info
+    U32  sataPhyErrCnt;
+    U64  fisCrcErrCnt;
+    U32  linkSpeedDownGrade;
+    ///< Software Info
+    U32  unsafeShutdownCnt;
+    U32  availableSpareCnt;
+    U32  highLatRcmdttlCnt;
+    U32  highLatWcmdttlCnt;
+    U32  fatalRst;
+    U32  readOnlyMode;
+    U32  hsCrcErrCnt;
+    ///< Reerved Info
+    U32  powerOnHours;
+    U32  powerCycleCnt;
+    U32  lifetimeUsed;
+} __attribute__((packed)) Ps3LibPdLogE4Info_t;
+
+/**
+ * @brief   硬盘上的log E5 信息
+ */
+typedef struct Ps3LibPdLogE5LevelInfo {
+    U8  healthLevel;
+    ///< Device Info
+    U8  plpCapErrLevel; ///<  PLP电容健康 error level
+    U8  plpCapVoltErrLevel; ///< PLP电容电压 error level
+    U8  ddrCeErrLevel;
+    U8  ddrUceErrLevel;
+    U8  sramCeErrLevel;
+    U8  sramUceErrLevel;
+    U8  sensorErrLevel;
+    ///< Temperature Info
+    U8  compTempErrLevel;    ///< 综合温度 error level
+    U8  criticalCompErrLevel;///< 综合温度超出值的次数
+    U8  warningCompErrLevel;
+    U8  minTempErrLevel;
+    U8  maxTempErrLevel;
+    U8  socTempErrLevel;
+    U8  nandTempErrLevel;
+    ///< Media    Info
+    U8  eraseErrLevel;
+    U8  programErrLevel;
+    U8  ardErrGoodLevel;
+    U8  mrdErrGoodLevel;
+    U8  totalBadBlkLevel;
+    U8  nandMediaErrLevel;
+    U8  ardErrFailLevel;
+    U8  mrdErrFailLevel;
+    U8  raidFailLevel;
+    U8  raidGoodLevel;
+    U8  reallocSectorLevel;
+    U8  curPendingSectorLevel;
+    ///< Inf Info
+    U8  sataPhyErrLevel;
+    U8  fisCrcErrLevel;
+    U8  linkSpeedDownGradeLv; ///< 降级 level
+    ///< Software Info
+    U8  unsafeShutdownLv;
+    U8  availableSpareLv;
+    U8  highLatRcmdttlLv;
+    U8  highLatwcmdttlLv;
+    U8  fatalRstLevel;
+    U8  readOnlyModeLv;
+    U8  hsCrcErrLevel;
+    U8  norCritialLogFullErrLv;
+    U8  numErrLogEntryErrLv;
+    ///< Reerved Info
+    U8  powerOnHoursErrLevel; ///< 仅监控
+    U8  powerCycleErrLevel;   ///< 仅监控
+    U8  lifetimeUsedErrlevel; ///< 95 为等级4,99 为level 2,100为Lv1
+} __attribute__((packed)) Ps3LibPdLogE5LevelInfo_t; 
+
+/**
  * @brief           对指定物理盘下发scsi直通命令
  * @param[in]       ctrlId: 控制卡标识符
  * @param[in/out]   pScsiPassthru: 指向scsi直通命令结构体的指针
@@ -206,6 +312,24 @@ Ps3Errno ps3libNVMePassthru(CtrlId_t ctrlId, Ps3LibNVMeEncapsulationReq_t *pNVMe
  */
 Ps3Errno ps3libSMPPassthru(CtrlId_t ctrlId, Ps3LibSMPPassthruReq_t *pSmpReq, U32 smpReqSize,
         Ps3LibSMPPassthruRsp_t *pSmpRsp, U32 smpRspSize);
+
+/**
+ * @brief       获取PD的log E4信息
+ * @param[in]   ctrlId:    控制卡标识符
+ * @param[in]   deviceId:  物理盘Id
+ * @param[in]   pE4log: 获取PD的log E4信息
+ * @return      PS3_ERRNO_SUCCESS: 成功
+ */
+Ps3Errno ps3libPdLogE4Get(CtrlId_t ctrlId, U16 deviceId, Ps3LibPdLogE4Info_t *pE4log);
+
+/**
+ * @brief       获取PD的log E5信息
+ * @param[in]   ctrlId:    控制卡标识符
+ * @param[in]   deviceId:  物理盘Id
+ * @param[in]   pE5log: 获取PD的log E5信息
+ * @return      PS3_ERRNO_SUCCESS: 成功
+ */
+Ps3Errno ps3libPdLogE5Get(CtrlId_t ctrlId, U16 deviceId, Ps3LibPdLogE5LevelInfo_t *pE5log);
 
 #if defined(__cplusplus)
 }

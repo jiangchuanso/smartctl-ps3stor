@@ -9,10 +9,14 @@
 #ifndef __PS3LIB_PD_H__
 #define __PS3LIB_PD_H__
 
+#if defined(__cplusplus)
+extern "C" {
+#endif
+
+#include "ps3lib_ctrl.h"
+
 #define PS3LIB_MAX_PD_PER_CONTROLLER_HBA   (1024 + 2)   ///< HBA的最大物理盘控制卡数量
 #define PS3LIB_MAX_PD_PER_CONTROLLER       (PS3LIB_MAX_PD_PER_CONTROLLER_HBA)  ///< 最大物理盘控制卡数量
-#define PS3LIB_MAX_VD_PER_CTRL_RAID        (128 + 4)   ///< RAID的最大虚拟盘控制卡数量
-#define PS3LIB_MAX_PD_NUM                  (1026)      ///< ctrl支持的最大pd数量
 #define PS3LIB_MAX_DG_PER_DEDICATED_SPARE  (8)         ///< 单个DG中允许的最大局部热备数
 #define PS3LIB_BGT_FGI_MODE_DATA_MAX_LEN   (16)        ///< pd前台初始化数据最大长度
 #define PS3LIB_MANUFACTURE_ID_LEN          (16)  ///< 硬盘生产商ID的最大长度
@@ -29,21 +33,12 @@
 #define PS3LIB_SCSI_CDB_LEN                (32)     ///< 透传scis CDB长度
 #define PS3LIB_SCSI_SENSE_BUFFER_LEN       (96)     ///< 透传scis sense buffer长度
 #define PS3LIB_SCSI_WR_CODE                (0x3b)   ///< 透传scsi wr code 值
-#define PS3LIB_SECTOR_SZIE_512             (512)    ///< sectorsize为512B
-#define PS3LIB_SECTOR_SZIE_4K              (4096)   ///< sectorsize为4096B
+#define PS3LIB_SECTOR_SIZE_512             (512)    ///< sectorsize为512B
+#define PS3LIB_SECTOR_SIZE_4K              (4096)   ///< sectorsize为4096B
 #define PS3LIB_PD_PORT_NUM_SAS             (2)      ///< SAS盘port数量
 #define PS3LIB_PD_PORT_NUM_SATA            (1)      ///< SATA盘port数量
 #define PS3LIB_PD_PORT_NUM_NVME            (1)      ///< NVME盘port数量
 #define PS3LIB_MAX_PROFILE_COUNT           (24)     ///< 最大profile个数
-
-/**
- * @brief       pd位置信息结构体
- */
-typedef struct Ps3LibPdPosition {
-    U8  enclId;    ///< 背板标识符
-    U8  pad;       ///< 保留字段
-    U16 slotId;    ///< 槽位标识符
-} Ps3LibPdPosition_t;
 
 /**
  * @brief       pd position列表结构体
@@ -60,14 +55,6 @@ typedef struct Ps3LibPdDevIdList{
     U32     pdCount;    ///< pd数量
     U16     pdDevId[PS3LIB_MAX_PD_NUM];    ///< pd devId列表
 } Ps3LibPdDevIdList_s;
-
-/**
- * @brief   硬盘后台任务进度信息
- */
-typedef struct Ps3libProgress{
-    U32     progressPercent;    ///< 进度百分比
-    U32     remainSecs;         ///< 预计剩余时间
-}Ps3LibProgress_t;
 
 /**
  * @brief   connectId结构体
@@ -98,7 +85,7 @@ typedef struct Ps3LibPdPortInfo{
 typedef struct Ps3LibPdPathInfo {
     U8      isPathBroken    : 4;                            ///< not_support
     U8      pad             : 3;                            ///< 预留
-    U8      widePortCapable : 1;                            ///< not_support
+    U8      widePortCapable : 1;                            ///< 具备宽端口能力
     U8      connectorType;                                  ///< not_support
     U8      connectedPortBitmap[PS3LIB_MAX_CONNECTOR_NUM];  ///< not_support
     U8      connectorIndex[PS3LIB_MAX_CONNECTOR_NUM];       ///< not_support
@@ -113,12 +100,12 @@ typedef struct Ps3LibPdPathInfo {
  * @brief   设置pd状态信息结构体
  */
 typedef struct Ps3LibPdSetState{
-    U8     state;       ///< 硬盘状态
-    U8     forceFlag;   ///< 强制标记
+    U8     state;       ///< 硬盘状态(enum Ps3LibPdState)
+    U8     forceFlag;   ///< 强制标记(1:强制, 0:非强制)
 }Ps3LibPdSetState_t;
 
 /**
- * @brief   
+ * @brief   硬盘位置
  */
 typedef struct Ps3LibIdGroupState {
     union {
@@ -159,7 +146,7 @@ typedef struct Ps3LibPdProgressInfo{
     U8      erase;      ///< 擦除
     U8      locate;     ///< 定位(enum Ps3LibProgressStatus_e 运行|未运行)
     U8      sanitize;   ///< sanitize
-    U8      pad;
+    U8      pad;        ///< 预留字段
     U16     moveBackPartnerId;  ///< not_support    回拷时对端硬盘ID
     U8      pad1[2];
     Ps3LibProgress_t   rbldProgress;       ///< 重建状态
@@ -179,7 +166,7 @@ typedef struct Ps3LibPdProgressInfo{
  * @brief   pd init 结构体
  */
 typedef struct Ps3LibPdInitInfo{
-    U8  modeDataLen;    ///< 模式数据长度, 不超过BGT_FGI_MODE_DATA_MAX_LEN, 且为2的n次幂
+    U8  modeDataLen;    ///< 模式数据长度, 不超过PS3LIB_BGT_FGI_MODE_DATA_MAX_LEN, 且为2的n次幂
     U8  modeData[PS3LIB_BGT_FGI_MODE_DATA_MAX_LEN];    ///< 模式数据
 }Ps3LibPdInitInfo_s;
 
@@ -201,24 +188,24 @@ typedef struct Ps3LibPdHotSpareInfo{
  * @brief   硬盘SMART信息
  */
 typedef struct Ps3LibPdSmartInfo{
-    U32     powerOnTime;                    ///< 开机时间(小时)
-    U32     bbmErrCountSupported    : 1;    ///< 是否支持坏块管理计数
-    U32     bbmErrCount             : 31;   ///< 坏块管理计数
-    U32     mediaErrCount;                  ///< 介质错误计数
-    U32     otherErrCount;                  ///< 其他错误计数
-    U32     predFailCount;                  ///< 预失败计数
-    U32     shieldCount;                    ///< 硬盘Failed之前的诊断次数 
+    U32     powerOnTime;                    ///< 开机时间(小时) Not Support
+    U32     bbmErrCountSupported    : 1;    ///< 是否支持坏块管理计数 Not Support
+    U32     bbmErrCount             : 31;   ///< 坏块管理计数 Not Support
+    U32     mediaErrCount;                  ///< 介质错误计数 OOB Not Support, OS Support
+    U32     otherErrCount;                  ///< 其他错误计数 HBA Not Support, RAID Support
+    U32     predFailCount;                  ///< 预失败计数 HBA Not Support, RAID Support
+    U32     shieldCount;                    ///< 硬盘Failed之前的诊断次数
     U8      temperature;                    ///< 温度(摄氏度)
     U8      pad[3];
-    U32     lastPredFailEventSeqNum;        ///< 上一个预失败事件日志序列号
-    U32     shieldDiagCompletionTime;       ///< 上一次诊断完成时间 已废弃
-    U8      badBlockTableFull;              ///< 坏块表
-    U8      ssdPercentUsed;                 ///< SSD使用百分比
-    U16     ssdLifeRemainingInDays;         ///< SSD剩余寿命(days)
-    U8      smartAlmFlaggedByDrive;         ///< 是否smart告警 已废弃
+    U32     lastPredFailEventSeqNum;        ///< 上一个预失败事件日志序列号 HBA Not Support, RAID Support
+    U32     shieldDiagCompletionTime;       ///< 上一次诊断完成时间 Not Support
+    U8      badBlockTableFull;              ///< 坏块表 Not Support
+    U8      ssdPercentUsed;                 ///< SSD使用百分比 Not Support
+    U16     ssdLifeRemainingInDays;         ///< SSD剩余寿命(days) Not Support
+    U8      smartAlmFlaggedByDrive;         ///< 是否smart告警 Not Support
     U8      pad1[3];
-    U16     driveErrCount;                  ///< 硬盘错误计数
-    U16     slotErrCount;                   ///< 槽位错误计数
+    U16     driveErrCount;                  ///< 硬盘错误计数 Not Support
+    U16     slotErrCount;                   ///< 槽位错误计数 Not Support
     U8      WCE;                            ///< 写缓存使能
     U8      pad2[3];
 } Ps3LibPdSmartInfo_t;
@@ -228,7 +215,7 @@ typedef struct Ps3LibPdSmartInfo{
  */
 typedef struct Ps3LibPdBaseInfo {
     U16     deviceId;               ///< 标识符
-    U16     scsiDevId :12;          ///< 暂时不用，与元数据对齐
+    U16     scsiDevId :12;          ///< SCSI TargetID
     U16     channelId :4;           ///< 所属通道ID
     U8      enclId;                 ///< 机箱号
     U8      piEligible;             ///< 是否支持PI
@@ -241,10 +228,10 @@ typedef struct Ps3LibPdBaseInfo {
     U8      pfaFlag;                ///< 预失败标记
     U8      pad2[2];
     U16     dgId[PS3LIB_MAX_DG_PER_DEDICATED_SPARE];           ///< 该热备盘所属磁盘组列表(仅在该盘为hot spare时生效)
-    U8      manufactureID[PS3LIB_MANUFACTURE_ID_LEN];      ///< 生产商
-    U8      serialNumber[PS3LIB_PD_SERIAL_NUMBER_LEN];     ///< 序列号
-    U8      modelNumber[PS3LIB_MODEL_NUMBER_LEN];          ///< 型号
-    U8      firmwareRevision[PS3LIB_FW_REVISION_LEN];      ///< 固件版本
+    U8      manufactureID[PS3LIB_MANUFACTURE_ID_LEN];      ///< 生产商(注意:可能不包含终止符'\0')
+    U8      serialNumber[PS3LIB_PD_SERIAL_NUMBER_LEN];     ///< 序列号(注意:可能不包含终止符'\0')
+    U8      modelNumber[PS3LIB_MODEL_NUMBER_LEN];          ///< 型号(注意:可能不包含终止符'\0')
+    U8      firmwareRevision[PS3LIB_FW_REVISION_LEN];      ///< 固件版本(注意:可能不包含终止符'\0')
     U8      pad3[8];
     U64     WWN;                    ///< 全球唯一名称
     U64     rawSize;                ///< 原始大小 逻辑扇区大小个数
@@ -275,14 +262,14 @@ typedef struct Ps3LibPdAllowedOps{   ///< 与Ps3LibCtrlGetAdapter中的部分可
     U32     makeReady               : 1;    ///< 支持设置为ready状态
     U32     makeSpare               : 1;    ///< 支持设置为spare状态
     U32     removeSpare             : 1;    ///< 支持移除热备盘
-    U32     replaceMissing          : 1;    ///< 支持热备替换
+    U32     replaceMissing          : 1;    ///< 支持热备替换pd
     U32     markMissing             : 1;    ///< 支持标记missing盘
-    U32     startRebuild            : 1;    ///< 支持重建
+    U32     startRebuild            : 1;    ///< 支持启动重建
     U32     stopRebuild             : 1;    ///< 支持停止重建
     U32     locate                  : 1;    ///< 支持硬盘定位
     U32     pdClear                 : 1;    ///< 支持硬盘初始化
     U32     foreignImportNotAllowed : 1;    ///< 不允许外部盘导入
-    U32     startCopyBack           : 1;    ///< 支持回拷
+    U32     startCopyBack           : 1;    ///< 支持启动回拷
     U32     stopCopyBack            : 1;    ///< 支持停止回拷
     U32     fwDownloadNotAllowed    : 1;    ///< 不允许固件下载
     U32     makeSystem              : 1;    ///< 支持设置为系统盘
@@ -294,27 +281,27 @@ typedef struct Ps3LibPdAllowedOps{   ///< 与Ps3LibCtrlGetAdapter中的部分可
     U32     startSecureErase        : 1;    ///< not_support    支持非SED盘的安全擦除
     U32     stopSecureErase         : 1;    ///< not_support    支持非SED盘的停止安全擦除
     U32     SMARTSupported          : 1;    ///< not_support    支持SMART
-    U32     prepareForRemoval       : 1;    ///< 支持硬盘待移除状态
+    U32     prepareForRemoval       : 1;    ///< 支持硬盘下电
     U32     supportFDE              : 1;    ///< not_support    支持FDE
     U32     supportSED              : 1;    ///< not_support    支持SED
     U32     supportPI               : 1;    ///< not_support    支持PI
     U32     supportSelfTest         : 1;    ///< not_support    支持自检
     U32     makeJbod                : 1;    ///< 支持设置jbod
-    U32     undoPrepareForRemoval   : 1;    ///< 支持撤销准备删除
+    U32     undoPrepareForRemoval   : 1;    ///< 支持硬盘上电
     U32     replaceDrive            : 1;    ///< 支持替换盘
     U32     jbodErase               : 1;    ///< 支持擦除jbod
     U32     assignGlobalHotspare    : 1;    ///< 支持设置为全局热备
     U32     removeGlobalHotspare    : 1;    ///< 支持移除全局热备
     U32     assignDedicatedHotspare : 1;    ///< 支持设置为局部热备
     U32     removeDedicatedHotspare : 1;    ///< 支持移除局部热备
-    U32     startInit               : 1;    ///< 支持硬盘开始初始化         ps3gui 显示clear drive
+    U32     startInit               : 1;    ///< 支持硬盘开始初始化
     U32     stopInit                : 1;    ///< 支持硬盘停止初始化
     U32     startErase              : 1;    ///< 支持开始擦除
     U32     stopErase               : 1;    ///< 支持停止擦除
-    U32     startPdm                : 1;    ///< 开始pdm
-    U32     abortPdm                : 1;    ///< 取消pdm
-    U32     pausePdm                : 1;    ///< 暂停pdm
-    U32     resumePdm               : 1;    ///< 恢复pdm
+    U32     startPdm                : 1;    ///< 支持开始pdm
+    U32     abortPdm                : 1;    ///< 支持取消pdm
+    U32     pausePdm                : 1;    ///< 支持暂停pdm
+    U32     resumePdm               : 1;    ///< 支持恢复pdm
     U32     sanitize                : 1;    ///< 是否支持sanitize
     U32     supportCreateVd         : 1;    ///< 该pd是否支持创建vd
     U32     isReplacementDrive      : 1;    ///< 是否可以作为被回拷的盘
@@ -330,14 +317,14 @@ typedef struct Ps3LibPdAllowedOps{   ///< 与Ps3LibCtrlGetAdapter中的部分可
     U32     makeReadyValid               : 1;    ///< 支持设置为ready状态
     U32     makeSpareValid               : 1;    ///< 支持设置为spare状态
     U32     removeSpareValid             : 1;    ///< 支持移除热备盘
-    U32     replaceMissingValid          : 1;    ///< 支持热备替换
+    U32     replaceMissingValid          : 1;    ///< 支持热备替换pd
     U32     markMissingValid             : 1;    ///< 支持标记missing盘
-    U32     startRebuildValid            : 1;    ///< 支持重建
+    U32     startRebuildValid            : 1;    ///< 支持启动重建
     U32     stopRebuildValid             : 1;    ///< 支持停止重建
     U32     locateValid                  : 1;    ///< 支持硬盘定位
     U32     pdClearValid                 : 1;    ///< 支持硬盘初始化
     U32     foreignImportNotAllowedValid : 1;    ///< 不允许外部盘导入
-    U32     startCopyBackValid           : 1;    ///< 支持回拷
+    U32     startCopyBackValid           : 1;    ///< 支持启动回拷
     U32     stopCopyBackValid            : 1;    ///< 支持停止回拷
     U32     fwDownloadNotAllowedValid    : 1;    ///< 不允许固件下载
     U32     makeSystemValid              : 1;    ///< 支持设置为系统盘
@@ -349,13 +336,13 @@ typedef struct Ps3LibPdAllowedOps{   ///< 与Ps3LibCtrlGetAdapter中的部分可
     U32     startSecureEraseValid        : 1;    ///< 支持非SED盘的安全擦除
     U32     stopSecureEraseValid         : 1;    ///< 支持非SED盘的停止安全擦除
     U32     SMARTSupportedValid          : 1;    ///< 支持SMART
-    U32     prepareForRemovalValid       : 1;    ///< 支持硬盘待移除状态
+    U32     prepareForRemovalValid       : 1;    ///< 支持硬盘下电
     U32     supportFDEValid              : 1;    ///< 支持FDE
     U32     supportSEDValid              : 1;    ///< 支持SED
     U32     supportPIValid               : 1;    ///< 支持PI
     U32     supportSelfTestValid         : 1;    ///< 支持自检
     U32     makeJbodValid                : 1;    ///< 支持设置jbod
-    U32     undoPrepareForRemovalValid   : 1;    ///< 支持撤销准备删除
+    U32     undoPrepareForRemovalValid   : 1;    ///< 支持硬盘上电
     U32     replaceDriveValid            : 1;    ///< 支持替换盘
     U32     jbodEraseValid               : 1;    ///< 支持擦除jbod
     U32     assignGlobalHotspareValid    : 1;    ///< 支持设置为全局热备
@@ -417,16 +404,16 @@ typedef struct Ps3LibPdExtInfo{
     U32     piFormatted         : 1;    ///< not_support    1=drive is formatted for PI information, 0=no PI data
     U32     piEligible          : 1;    ///< 1=drive can be used for PD Enable LD
     U32     NCQ                 : 1;    ///< SATA盘NCQ使能
-    U32     commissionedSpare   : 1;    ///< 产品确认删除  被使用的热备盘
-    U32     emergencySpare      : 1;    ///< 产品确认删除     是否允许此盘做为紧急热备盘
+    U32     commissionedSpare   : 1;    ///< not_support 被使用的热备盘
+    U32     emergencySpare      : 1;    ///< not_support 是否允许此盘做为紧急热备盘
     U32     ineligibleForSSCD   : 1;    ///< not_support
-    U32     fdeType             : 3;    ///< not_support    FDE类型(enum Ps3LibFdeType_t)
+    U32     fdeType             : 3;    ///< FDE类型(enum Ps3LibFdeType_t)
     U32     fdeCapable          : 1;    ///< not_support    支持FDE,full disk encryption
     U32     fdeEnabled          : 1;    ///< not_support    FDE使能
     U32     powerState          : 2;    ///< not_support    电源状态
     U32     readyForRemoval     : 1;    ///< not_support    可移除
-    U32     sedCapable          : 1;    ///< not_support    支持自加密
-    U32     sedEnable           : 1;    ///< not_support    自加密使能
+    U32     sedCapable          : 1;    ///< 支持自加密
+    U32     sedEnable           : 1;    ///< 自加密使能
     U32     multiPath           : 1;    ///< not_support    多路径寻址
     U32     sanitizeType        : 5;    ///< Bit 0 - CRYPTO ERASE; 1 - OVERWRITE; 2 - BLOCK_ERASE;
                                         ///< Bit 3 - FREEZE LOCK; 4 - ANTI-FREEZE LOCK; All 0 - not support sanitize
@@ -442,9 +429,9 @@ typedef struct Ps3LibPdExtInfo{
     U8      secureEraseCapable;                 ///< not_support    是否具有加密擦除能力
     U8      locked;                             ///< not_support    硬盘是否locked
     U8      needsEKM;                           ///< not_support    是否需要扩展密钥管理
-    U8      certified;                          ///< not_support    硬盘是否经过认证
+    U8      certified;                          ///< 硬盘是否经过认证
     U8      inquiryExt[PS3LIB_INQUIRY_DATAEXT_LEN];   ///< inquiryData 额外数据
-    U8      pad1[1];
+    U8      pad1[3];
 }Ps3LibPdExtInfo_t;
 
 /**
@@ -463,13 +450,12 @@ typedef struct Ps3LibPdInfo{
 } Ps3LibPdInfo_t;
 
 typedef struct Ps3LibPdDwldInfo {
-    CtrlId_t            ctrlId;                             ///< 控制卡id
     U8                  mode;                               ///< 升级模式
     U8                  parallel;                           ///< 串行/并行升级 只有mode7支持并行
     U8                  chunkSize;                          ///< 分片大小 单位KB 默认32K
     U8                  offline;                            ///< 是否离线模式
     U8                  activateNow;                        ///< 是否立即激活
-    U8                  pad[1];    
+    U8                  pad[3];
     U32                 imageSize;                          ///< 文件大小
     U32                 pdIdx;                              ///< 当前处理的盘序号
     U32                 pdCnt;                              ///< 要升级的盘个数
@@ -477,33 +463,6 @@ typedef struct Ps3LibPdDwldInfo {
     PdId_t              devIdList[PS3LIB_MAX_PD_NUM_EXT];   ///< devId列表
     U8                  devTypeList[PS3LIB_MAX_PD_NUM_EXT]; ///< devType列表
 } Ps3LibPdDwldInfo_t;
-
-/**
- * @brief 存放机箱号等信息
- */
-typedef struct Ps3LibPhyPosition {
-    U64 enclSasAddr;     ///< phy所属机框sas地址
-    U64 phySasAddr;      ///< phy的sas地址,
-    U8  enclId;          ///< 机箱号
-    U8  phyId;           ///< phy唯一ID
-    U8  pad[6];
-} Ps3LibPhyPosition_t;
-
-/**
- * @brief 存放盘信息
- */
-typedef struct Ps3LibIdGroup {
-    U8      type;                      ///< 盘标识(物理盘、虚拟盘等)
-    U8      pad[7];
-    union{
-      U16                 deviceId;    ///< 包括/ex/sx /ex /sx
-      Ps3LibPdPosition_t  pdPosition;  ///< 存放背板ID和slotId
-      U16                 vdId;        ///< vd ID
-      U16                 dgId;        ///< dg ID
-      Ps3LibPhyPosition_t phyPosition; ///< 存放机箱号phy信息
-      U16                 laneId;      ///< lane ID
-    };
-} Ps3LibIdGroup_t;
 
 /**
  * @brief scsi请求cdb信息
@@ -609,19 +568,6 @@ typedef enum Ps3LibPdWceType{
     PS3LIB_PD_WCE_TYPE_NA,
 }Ps3LibPdWceType_e;
 
-typedef enum Ps3LibIdGroupType{
-    PS3LIB_ID_GROUP_TYPE_UNKNOWN       = 0,
-    PS3LIB_ID_GROUP_TYPE_DEVICE_ID        ,
-    PS3LIB_ID_GROUP_TYPE_PD_POSITION      ,
-    PS3LIB_ID_GROUP_TYPE_VD_ID            ,
-    PS3LIB_ID_GROUP_TYPE_BBU_ID           ,
-    PS3LIB_ID_GROUP_TYPE_DG_ID            ,
-    PS3LIB_ID_GROUP_TYPE_PHY_ID           ,
-    PS3LIB_ID_GROUP_TYPE_LANE_ID          ,
-    PS3LIB_ID_GROUP_TYPE_ASO_ID           ,
-    PS3LIB_ID_GROUP_TYPE_ENCL_ID          ,
-}Ps3LibIdGroupType_e;
-
 /**
  * @brief   硬盘后台任务状态
  */
@@ -665,6 +611,8 @@ typedef enum Ps3LibPdDeviceSpeed{
     PS3LIB_PD_SPEED_PCIE_5GT           = 0x2,     ///< 5GT/s
     PS3LIB_PD_SPEED_PCIE_8GT           = 0x3,     ///< 8GT/s
     PS3LIB_PD_SPEED_PCIE_16GT          = 0x4,     ///< 16GT/s
+    PS3LIB_PD_SPEED_PCIE_32GT          = 0x5,     ///< 32GT/s
+    PS3LIB_PD_SPEED_PCIE_64GT          = 0x6,     ///< 64GT/s
 
     PS3LIB_PD_SPEED_1p5G               = 0x8,        ///< 1.5Gb/s - SATA 150
     PS3LIB_PD_SPEED_3G                 = 0x9,        ///< 3.0Gb/s
@@ -705,6 +653,7 @@ typedef enum Ps3LibPdTask {
     PS3LIB_PD_TASK_FORMATTING      = 2,    ///< 正在执行format
     PS3LIB_PD_TASK_FORMAT_FAILED   = 3,    ///< format失败
     PS3LIB_PD_TASK_SENDDIAG        = 4,    ///< 自检
+    PS3LIB_PD_TASK_PREPARE         = 5,    ///< 收到任务, 准备执行
 } Ps3LibPdTask_e;
 
 /**
@@ -738,6 +687,7 @@ typedef enum Ps3LibPropertiesAutoStatus{
  * @param[in]   ctrlId:    控制卡标识符
  * @param[in]   deviceId:  物理盘Id
  * @param[out]  smartInfo: 物理盘smart信息
+ * @note        该接口会读取盘smart信息, 会对盘IO性能造成一定影响, 请控制调用频率
  * @return      PS3_ERRNO_SUCCESS: 成功
  */
 Ps3Errno ps3libPdSmartInfoGet(CtrlId_t ctrlId, U16 deviceId, Ps3LibPdSmartInfo_t *smartInfo);
@@ -912,7 +862,7 @@ Ps3Errno ps3libPdInitAbort(CtrlId_t ctrlId, U16 deviceId);
 Ps3Errno ps3libPdHotSpareDelete(CtrlId_t ctrlId, U16 deviceId);
 
 /**
- * @brief       指定物理盘下电
+ * @brief       指定物理盘上电
  * @param[in]   ctrlId: 控制卡标识符
  * @param[in]   deviceId: 物理盘Id
  * @return      PS3_ERRNO_SUCCESS: 成功
@@ -965,6 +915,7 @@ Ps3Errno ps3libPdMovebackResume(CtrlId_t ctrlId, U16 deviceId);
  * @param[in]   ctrlId: 控制卡标识符
  * @param[in]   deviceId: 物理盘Id
  * @param[out]  info: 物理盘基本信息
+ * @note        该接口会读取盘smart信息, 会对盘IO性能造成一定影响, 请控制调用频率
  * @return      PS3_ERRNO_SUCCESS: 成功
  */
 Ps3Errno ps3libPdInfoGetByDeviceId(CtrlId_t ctrlId, U16 deviceId, Ps3LibPdInfo_t *info);
@@ -1003,6 +954,7 @@ Ps3Errno ps3libPdSecureErase(CtrlId_t ctrlId, U16 deviceId, U8 isForceFlag);
  * @param[in]   enclId: 物理盘所属机框号
  * @param[in]   slotId: 物理盘槽位号
  * @param[out]  info: 指向接收存放物理盘信息的指针
+ * @note        该接口会读取盘smart信息, 会对盘IO性能造成一定影响, 请控制调用频率
  * @return      PS3_ERRNO_SUCCESS: 成功
  */
 Ps3Errno ps3libPdInfoGetByPosition(CtrlId_t ctrlId, EnclId_t enclId, SlotId_t slotId, Ps3LibPdInfo_t *info);
@@ -1012,10 +964,11 @@ Ps3Errno ps3libPdInfoGetByPosition(CtrlId_t ctrlId, EnclId_t enclId, SlotId_t sl
  * @param[in]   ctrlId:     控制卡标识符
  * @param[in]   pdList:     pd列表信息
  * @param[out]  pdInfo:     用户接受回复的批量pd信息
- * @note        无
+ * @param[out]  pErrList:   批量查询时上报的pd错误码列表
+ * @note        该接口会读取盘smart信息, 会对盘IO性能造成一定影响, 请控制调用频率
  * @return      PS3_ERRNO_SUCCESS: 成功
  */
-Ps3Errno ps3libPdInfoGetByPdList(CtrlId_t ctrlId, Ps3LibPdList_s *pdList, Ps3LibPdInfo_t *pdInfo);
+Ps3Errno ps3libPdInfoGetByPdList(CtrlId_t ctrlId, Ps3LibPdList_s *pdList, Ps3LibPdInfo_t *pdInfo, Ps3Errno *pErrList);
 
 /**
  * @brief        获取指定的物理盘的基本信息
@@ -1032,7 +985,7 @@ Ps3Errno ps3libPdBaseInfoGet(CtrlId_t ctrlId, EnclId_t enclId, SlotId_t slotId, 
  * @param[in]  pdDwldInfo: 硬盘升级信息
  * @return     PS3_ERRNO_SUCCESS: 成功
  */
-Ps3Errno ps3libIsCtrlAndParallelAllowUpdate(Ps3LibPdDwldInfo_t *pdDwldInfo);
+Ps3Errno ps3libIsCtrlAndParallelAllowUpdate(CtrlId_t ctrlId, Ps3LibPdDwldInfo_t *pdDwldInfo);
 
 /**
  * @brief       针对pd盘下发scsi协议，目前只封装了写命令
@@ -1060,7 +1013,7 @@ Ps3Errno ps3libPdFwDwldEnable(CtrlId_t ctrlId, U8 enable);
  * @param    pdDwldInfo, 硬盘升级内容
  * @return   Ps3Errno
  */
-Ps3Errno ps3libPdAllowUpdate(Ps3LibPdDwldInfo_t *pdDwldInfo);
+Ps3Errno ps3libPdAllowUpdate(CtrlId_t ctrlId, Ps3LibPdDwldInfo_t *pdDwldInfo);
 
 /**
  * @brief       硬盘升级准备命令
@@ -1084,11 +1037,12 @@ Ps3Errno ps3libPdLocateStartByPosition(CtrlId_t ctrlId, EnclId_t enclId, SlotId_
  * @param[in]   ctrlId:     控制卡标识符
  * @param[in]   pdList:     pd列表信息
  * @param[out]  pdInfo:     用户接受回复的批量pd信息
- * @note        无
+ * @param[out]  pErrList:   批量查询时上报的pd错误码列表
+ * @note        该接口会读取盘smart信息, 会对盘IO性能造成一定影响, 请控制调用频率
  * @return      PS3_ERRNO_SUCCESS: 成功
  */
-Ps3Errno ps3libPdInfoGetByDevIdList(CtrlId_t ctrlId, Ps3LibPdDevIdList_s *pdDevIdList, Ps3LibPdInfo_t *pdInfo);
-
+Ps3Errno ps3libPdInfoGetByDevIdList(CtrlId_t ctrlId, Ps3LibPdDevIdList_s *pdDevIdList,
+    Ps3LibPdInfo_t *pdInfo, Ps3Errno *pErrList);
 /**
  * @brief       设置物理盘 write cache status
  * @param[in]   ctrlId: 控制卡标识符
@@ -1098,5 +1052,9 @@ Ps3Errno ps3libPdInfoGetByDevIdList(CtrlId_t ctrlId, Ps3LibPdDevIdList_s *pdDevI
  */
 Ps3Errno ps3libPdWriteCacheStatusSet(CtrlId_t ctrlId, 
         Ps3LibIdGroup_t *idGroup, Ps3LibPdWriteCache_t *pWriteCacheStatus);
+        
+#if defined(__cplusplus)
+}
+#endif
 
 #endif

@@ -8,6 +8,10 @@
 #ifndef __PS3LIB_UPDATE_H__
 #define __PS3LIB_UPDATE_H__
 
+#if defined(__cplusplus)
+extern "C" {
+#endif
+
 #define PS3LIB_FILE_PATH_NAME              (1024)              ///< 文件路径字符长度
 
 /**
@@ -79,7 +83,12 @@ typedef enum Ps3LibUpdateFwType{
     PS3LIB_UPDATE_FWTYPE_BOOTROM_BACKUP,       ///< preos备份
     PS3LIB_UPDATE_FWTYPE_PUBLICKEY,            ///< publickey
     PS3LIB_UPDATE_FWTYPE_DIAGTOOL,             ///< diagtool
-    PS3LIB_UPDATE_FWTYPE_OTHER_NR = 58,
+
+    PS3LIB_UPDATE_FWTYPE_SBR1,                 ///< SBR1 
+    PS3LIB_UPDATE_FWTYPE_SBR2,                 ///< SBR2 
+    PS3LIB_UPDATE_FWTYPE_SBR3,                 ///< SBR3 
+    
+    PS3LIB_UPDATE_FWTYPE_OTHER_NR = 61,
 
     PS3LIB_UPDATE_FWTYPE_ALL,
     PS3LIB_UPDATE_FWTYPE_MAX
@@ -88,7 +97,7 @@ typedef enum Ps3LibUpdateFwType{
 /**
  * @brief   固件升级设备类型
  */
-enum {
+typedef enum Ps3LibUpdateDevType {
     PS3LIB_UPDATE_DEVTYPE_INVALID        = 0,
     PS3LIB_UPDATE_DEVTYPE_CONTROLLER    = 1,   ///< 控制器
     PS3LIB_UPDATE_DEVTYPE_EXPANDER      = 2,   ///< expander
@@ -107,7 +116,7 @@ enum {
     PS3LIB_UPDATE_DEVTYPE_CONFIG        = 15,  ///< 配置
     PS3LIB_UPDATE_DEVTYPE_DIAGTOOL      = 16,  ///< diagtool
     PS3LIB_UPDATE_DEVTYPE_MAX,
-};
+} Ps3LibUpdateDevType_e;
 
 /**
  * @brief   固件升级open阶段参数结构体
@@ -155,7 +164,7 @@ typedef struct Ps3LibDownloadInfo {
  * @param[in]   downloadInfo: 固件升级结构体
  * @return      PS3_ERRNO_SUCCESS: 成功
  */
-Ps3Errno ps3libEpUpdate(U16 devId, Ps3LibDownloadInfo_t *downloadInfo);
+Ps3Errno ps3libEpUpdate(CtrlId_t devId, Ps3LibDownloadInfo_t *downloadInfo);
 
 /**
  * @brief       Switch 带外升级命令
@@ -163,7 +172,7 @@ Ps3Errno ps3libEpUpdate(U16 devId, Ps3LibDownloadInfo_t *downloadInfo);
  * @param[in]   downloadInfo: 固件升级结构体
  * @return      PS3_ERRNO_SUCCESS: 成功
  */
-Ps3Errno ps3libSWUpdate(U16 devId, Ps3LibDownloadInfo_t *downloadInfo);
+Ps3Errno ps3libSWUpdate(CtrlId_t devId, Ps3LibDownloadInfo_t *downloadInfo);
 
 /**
  * @brief      Ctrl 升级命令
@@ -176,5 +185,9 @@ Ps3Errno ps3libSWUpdate(U16 devId, Ps3LibDownloadInfo_t *downloadInfo);
  * @return     PS3_ERRNO_SUCCESS: 成功
  */
 Ps3Errno ps3libCtrlUpdateDownLoad(CtrlId_t ctrlId, Ps3LibDownloadInfo_t *downloadInfo);
+
+#if defined(__cplusplus)
+}
+#endif
 
 #endif

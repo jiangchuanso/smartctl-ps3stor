@@ -12,12 +12,13 @@
 extern "C" {
 #endif
 
-#include "ps3lib_pd.h"
 #include "ps3lib_system.h"
-#include "ps3lib_vd.h"
 #include "ps3lib_bbu.h"
 #include "ps3lib_phy.h"
 
+#define PS3LIB_MAX_PD_NUM                  (1026)   ///< ctrl支持的最大pd数量
+#define PS3LIB_MAX_VD_PER_CTRL_RAID      (128 + 4)  ///< 最大虚拟盘数量
+#define PS3LIB_VPD_PAGE_LEN                   (64)  ///< vpd page 长度
 #define PS3LIB_MAX_SECURITY_KEY_LEN           (32)  ///< 最大秘钥长度
 #define PS3LIB_MAX_SECURITY_PASSPHRASE_LEN    (32)  ///< 最大口令长度
 #define PS3LIB_SECURITY_PASSPHRASE_ENCODE_LEN (32)  ///< 口令长度
@@ -29,7 +30,7 @@ extern "C" {
 #define PS3LIB_PRODUCT_NAME_LEN               (80)  ///< 产品名长度
 #define PS3LIB_CTRL_SAS_COUNT                 (3 + 13)    ///< 预留
 #define PS3LIB_BIOS_VERSION_LEN               (32)  ///< BIOS版本长度
-#define PS3LIB_MAX_CTRL_COUNT                 (32)  ///< 最大控制卡数量
+#define PS3LIB_MAX_CTRL_COUNT                 (128)  ///< 最大控制卡数量由32变更为256
 #define PS3LIB_ECC_TYPE                       (2)   ///< ECC类型
 #define PS3LIB_ECC_TYPE_EX                    (3)   ///< ECC类型
 #define PS3LIB_BATTERY_FRU                    (17)  ///< 不同配置组的最大个数
@@ -38,11 +39,71 @@ extern "C" {
 #define PS3LIB_ECC_OCM                        (0)   ///< ocm ecc计数索引值
 #define PS3LIB_ECC_DDR                        (1)   ///< ocm ddr cpu计数索引值
 #define PS3LIB_ECC_CPU                        (2)   ///< ocm ddr cpu计数索引值
-#define PS3LIB_CTRL_CC_PR_PAD_LEN             (15)  ///< 一致性校验下发mode结构体占位符占位符
+#define PS3LIB_CTRL_CC_PR_PAD_LEN             (15)  ///< 一致性校验下发mode结构体占位符
 #define PS3LIB_TOPOLOGY_BUFFER_SIZE           (32 * 1024) ///< 32K
 #define PS3LIB_EXP_FRAG_LEN                   (4096)  ///< exp升级单包最大长度
 #define PS3LIB_TERMLOG_INFO_MAX_LEN           (1024 * 16) ///< 单次请求最大数据长度
 #define PS3LIB_MAX_ENCL_PER_CONTROLLER        (255)   ///< exp最多64个
+#define PS3LIB_CTRL_TEMPSENSOR_COUNT_MAX      (10)    ///< 控制卡的温度传感器的最大个数
+#define PS3LIB_CTRL_PERM_RULES_COUNT          (32)    ///< 权限规则个数
+
+/**
+ * @brief   后台任务进度信息
+ */
+typedef struct Ps3libProgress{
+    U32     progressPercent;    ///< 进度百分比
+    U32     remainSecs;         ///< 预计剩余时间
+} Ps3LibProgress_t;
+
+typedef enum Ps3LibIdGroupType {
+    PS3LIB_ID_GROUP_TYPE_UNKNOWN    = 0,  ///< 无效的类型
+    PS3LIB_ID_GROUP_TYPE_DEVICE_ID,       ///< Device Id
+    PS3LIB_ID_GROUP_TYPE_PD_POSITION,     ///< Enclosure Id + slot Id
+    PS3LIB_ID_GROUP_TYPE_VD_ID,           ///< VD Id
+    PS3LIB_ID_GROUP_TYPE_BBU_ID,          ///< BBU Id
+    PS3LIB_ID_GROUP_TYPE_DG_ID,           ///< Disk Droup Id
+    PS3LIB_ID_GROUP_TYPE_PHY_ID,          ///< Phy Id
+    PS3LIB_ID_GROUP_TYPE_LANE_ID,         ///< Lane Id
+    PS3LIB_ID_GROUP_TYPE_ASO_ID,          ///< ASO Id
+    PS3LIB_ID_GROUP_TYPE_ENCL_ID,         ///< Enclosure Id
+    PS3LIB_ID_GROUP_TYPE_FRGN_ID,         ///< Foreign configuration Id
+} Ps3LibIdGroupType_e;
+
+/**
+ * @brief pd位置信息结构体
+ */
+typedef struct Ps3LibPdPosition {
+    U8  enclId;    ///< 背板标识符
+    U8  pad;       ///< 保留字段
+    U16 slotId;    ///< 槽位标识符
+} Ps3LibPdPosition_t;
+
+/**
+ * @brief phy位置的结构体
+ */
+typedef struct Ps3LibPhyPosition {
+    U64 enclSasAddr;     ///< phy所属机框sas地址
+    U64 phySasAddr;      ///< phy的sas地址,
+    U8  enclId;          ///< 机箱号
+    U8  phyId;           ///< phy唯一ID
+    U8  pad[6];
+} Ps3LibPhyPosition_t;
+
+/**
+ * @brief 存放盘信息
+ */
+typedef struct Ps3LibIdGroup {
+    U8      type;                      ///< 盘标识(物理盘、虚拟盘等) Ps3LibIdGroupType_e
+    U8      pad[7];
+    union {
+      U16                 deviceId;    ///< 包括encl slot
+      Ps3LibPdPosition_t  pdPosition;  ///< 存放背板ID和slotId
+      U16                 vdId;        ///< vd ID
+      U16                 dgId;        ///< dg ID
+      Ps3LibPhyPosition_t phyPosition; ///< 存放机箱号phy信息
+      U16                 laneId;      ///< lane ID
+    };
+} Ps3LibIdGroup_t;
 
 /**
  * @brief    控制卡口令模式
@@ -97,14 +158,38 @@ typedef enum Ps3LibRunningMode {
 /**
  * @brief   带外信息
  */
-typedef struct Ps3LibOobCl{        ///< I2C,例如BMC访问lib就是走I2C协议
-        U8 channel;                ///< channel where controller is connected
-        U8 deviceAddress;          ///< device address where controller is connected
-        U8 reDiscover       :1;
-        U8 funcType         :3;    ///< funcType类型(0:单func,1:双func)
-        U8 reserved         :4;    ///< 保留字段
-        U8 libType;                ///< lib库类型
+typedef struct Ps3LibOobCl{        ///< I2C
+    U8 channel;                ///< channel where controller is connected
+    U8 deviceAddress;          ///< device address where controller is connected
+    U8 reDiscover       :1;    ///< 保留字段
+    U8 funcType         :3;    ///< funcType类型(0:单func,1:双func)
+    U8 reserved         :4;    ///< 保留字段
+    U8 libType;                ///< lib库类型
 }Ps3LibOobCl_t;
+
+/**
+ * @brief   带外信息
+ */
+typedef struct Ps3LibOobMctpCtrl_t{    ///< MCTP BDF手动填充形式
+    U8 device;                ///< channel where controller is connected
+    U8 bus;                   ///< device address where controller is connected
+    U8 reDiscover       :1;   ///< 保留字段
+    U8 func             :3;   ///< funcType类型(0:单func,1:双func)
+    U8 reserved         :4;   ///< 保留字段
+    U8 libType;               ///< lib库类型
+} Ps3LibOobMctpCtrl_t;
+
+/**
+ * @brief   带外信息
+ */
+typedef struct Ps3LibOobMctpCtrlEID{    ///< MCTP EID主动上报形式
+    U8 EID;                   ///< EID
+    U8 reserved1;             ///< 保留字段1
+    U8 reDiscover       :1;   ///< 保留字段
+    U8 func             :3;   ///< funcType类型(0:单func,1:双func)
+    U8 reserved2        :4;   ///< 保留字段
+    U8 libType;               ///< lib库类型
+} Ps3LibOobMctpCtrlEID_t;
 
 /**
  * @brief   控制卡清单
@@ -115,10 +200,50 @@ typedef struct Ps3LibCtrlList{
     U8      reserved;
     union
     {
-        U32     ctrlId[PS3LIB_MAX_CTRL_COUNT];         ///< 控制卡Id
-        Ps3LibOobCl_t oobClist[PS3LIB_MAX_CTRL_COUNT]; ///< 未使用
+        U32     ctrlId[PS3LIB_MAX_CTRL_COUNT];                   ///< OS下使用
+        Ps3LibOobCl_t oobClist[PS3LIB_MAX_CTRL_COUNT];           ///< OOB模式下I2C或I2C_MCTP使用
+        Ps3LibOobMctpCtrl_t oobClistMctp[PS3LIB_MAX_CTRL_COUNT]; ///< OOB模式下MCTP_PCIE, BDF手动填充下发使用
+        Ps3LibOobMctpCtrlEID_t oobClistMctpEID[PS3LIB_MAX_CTRL_COUNT]; ///< OOB模式下MCTP_PCIE, EID主动上报
     };
 }Ps3LibCtrlList_t;
+
+/**
+ * @brief   Endpoint List
+ */
+typedef enum Ps3LibMpciDisCFmt
+{
+    PS3LIB_MPCI_DISCFMT_PCI_CONFIG_SPACE = 0x00,
+    PS3LIB_MPCI_DISCFMT_NONE = 0xFF,
+} Ps3LibMpciDisCFmt_e;
+
+/**
+ * @brief   MPCI EID Info
+ * @warning 除保留字段,禁止修改内存排布
+ * @note    如有需要, 可使用union
+ * @note    与驱动库交互结构体, 1字节对齐, 禁止修改
+ */
+typedef struct Ps3LibMpciEIDInfo{
+    U8                  EID;
+    U8                  status;    ///< 用于控制卡状态标记, 当前不支持
+    U16                 pciAddr;   ///< b/d/f
+    Ps3LibMpciDisCFmt_e format;    ///< union指代
+    U8                  reserved[2];
+    union {
+        struct {
+            U16 deviceID;
+            U16 vendorID;
+            U16 subDeviceID;
+            U16 subVendorID;
+            U32 reserved2;
+        } pciConfigSpace;
+    };
+}__attribute__((packed))Ps3LibMpciEIDInfo_t; ///< 1字节对齐, 22字节
+
+typedef struct Ps3LibMpciEIDInfoList{
+    U16                  count;
+    U16                  reserved;
+    Ps3LibMpciEIDInfo_t  EIDInfo[PS3LIB_MAX_CTRL_COUNT];
+}__attribute__((packed))Ps3LibMpciEIDInfoList_s; ///< 16+16+22*128
 
 /**
  * @brief   巡读状态枚举
@@ -343,7 +468,8 @@ typedef struct Ps3LibCtrlPropInfo {
     U8  prCorrectUnconfiguredAreas;
 
     U8  spinDownReady;       ///< 仅支持查询, 不支持批量属性设置,可通过ps3libCtrlSetPsState进行设置
-    U8  pad2[11];            ///< 保留字段
+    U8  deviceReportingOrder; ///< 上报盘顺序，0-VD后在JBOD之后，1-JBOD在VD之前
+    U8  pad2[10];            ///< 保留字段
 } Ps3LibCtrlPropInfo_t;
 
 /**
@@ -470,32 +596,36 @@ enum {
  * @note   补充ctrl show相关结构体
  */
 typedef struct Ps3LibCtrlGetInfo{
-    U32  mgfDate;                               ///< 生产制造日期
+    U32  mgfDate;                                  ///< 生产制造日期
     U8   pad[4];
-    S8   fwVersion[PS3LIB_FW_VERSION_LEN];         ///< 固件包版本
-    S8   packageBuild[PS3LIB_FW_VERSION_LEN];      ///< 固件包编译版本
-    S8   buildDate[PS3LIB_FW_VERSION_LEN];         ///< 固件包编译时间
-    U64  controllerTime;                        ///< 当前控制器时间戳
-    S8   biosVersion[PS3LIB_BIOS_VERSION_LEN];     ///< BIOS版本
-    S8   nvVersion[PS3LIB_FW_VERSION_LEN];         ///< nvdata版本
-    U32  domainID;                              ///< domainID        ///< 放在pci信息里了，此字段没用
-    U8   pad2[4];
-    S8   productName[PS3LIB_PRODUCT_NAME_LEN];     ///< 产品名称
-    U8   serialNo[PS3LIB_MFG_PART_NUMBER_LEN]; 
+    S8   fwVersion[PS3LIB_FW_VERSION_LEN];         ///< 固件包版本(注意:可能不包含终止符'\0')
+    S8   packageBuild[PS3LIB_FW_VERSION_LEN];      ///< 固件包编译版本(注意:可能不包含终止符'\0')
+    S8   buildDate[PS3LIB_FW_VERSION_LEN];         ///< 固件包编译时间(注意:可能不包含终止符'\0')
+    U64  controllerTime;                           ///< 当前控制器时间戳
+    S8   biosVersion[PS3LIB_BIOS_VERSION_LEN];     ///< BIOS版本(注意:可能不包含终止符'\0')
+    S8   nvVersion[PS3LIB_FW_VERSION_LEN];         ///< nvdata版本(注意:可能不包含终止符'\0')
+    U32  domainID;                                 ///< 保留字段
+    U8   operationMode;                            ///< MglCtrlOperationMode_e 盘的接入模式
+    U8   powerMode;                                ///< Ps3LibCtrlInPowerMode_e 芯片当前运行的功耗模式
+    U8   pad2[2];                                  ///< 保留字段
+    S8   productName[PS3LIB_PRODUCT_NAME_LEN];     ///< 产品名称(注意:可能不包含终止符'\0')
+    U8   serialNo[PS3LIB_MFG_PART_NUMBER_LEN];     ///< 序列号(注意:可能不包含终止符'\0')
     U64  sasAddr[PS3LIB_CTRL_SAS_COUNT];           ///< sas地址
     U32  sasActiveMap : PS3LIB_CTRL_SAS_COUNT;     ///< sas接口是否active的bitmap
-                                                ///< ((sasActiveMap >> i) & 1)表示第i个sas接口是否active
+                                                   ///< ((sasActiveMap >> i) & 1)表示第i个sas接口是否active
     U32  pad3 : (32 - PS3LIB_CTRL_SAS_COUNT);
-    U32  reworkdate;                            ///< 反工时间
-    U8   reworkNo[PS3LIB_MFG_REVISION_LEN];        ///< 反工版本号
-    U32  controllerId;                          ///< 控制器id, oob模式下不支持获取
-    S8   boardName[PS3LIB_PRODUCT_NAME_LEN];       ///< 板卡名称
-    S8   boardAssembly[PS3LIB_PRODUCT_NAME_LEN];   ///< 板卡制造商
-    S8   boardTraceNumber[PS3LIB_PRODUCT_NAME_LEN];///< 板卡追踪码
-    U16  vendorId;                              ///< PCI设备厂商ID
-    U16  deviceId;                              ///< PCI设备设备ID
-    U16  subVendorId;                           ///< PCI设备子系统厂商ID
-    U16  subDeviceId;                           ///< PCI设备子系统设备ID
+    U32  reworkdate;                               ///< 反工时间
+    U8   reworkNo[PS3LIB_MFG_REVISION_LEN];        ///< 反工版本号(注意:可能不包含终止符'\0')
+    U32  controllerId;                             ///< 控制器id, oob模式下不支持获取
+    S8   boardName[PS3LIB_PRODUCT_NAME_LEN];       ///< 板卡名称(注意:可能不包含终止符'\0')
+    S8   boardAssembly[PS3LIB_PRODUCT_NAME_LEN];   ///< 板卡制造商(注意:可能不包含终止符'\0')
+    S8   boardTraceNumber[PS3LIB_PRODUCT_NAME_LEN-16-16];///< 板卡追踪码(注意:可能不包含终止符'\0')
+    S8   brandName[16];                            ///< 品牌名称 (注意:可能不包含终止符'\0')
+    S8   chipName[16];                             ///< chipName (注意:可能不包含终止符'\0')
+    U16  vendorId;                                 ///< PCI设备厂商ID
+    U16  deviceId;                                 ///< PCI设备设备ID
+    U16  subVendorId;                              ///< PCI设备子系统厂商ID
+    U16  subDeviceId;                              ///< PCI设备子系统设备ID
 }Ps3LibCtrlGetInfo_t;
 
 /**
@@ -536,7 +666,7 @@ typedef struct Ps3LibCtrlOverview {
     U32                 vdDegCnt;       ///< vd 降级个数
     U32                 vdParDegCnt;    ///< vd部分降级个数
     U32                 asoCnts;        ///< 高级功能个数
-    S8                  model[PS3LIB_PRODUCT_NAME_LEN];     ///< 产品名称
+    S8                  model[PS3LIB_PRODUCT_NAME_LEN];     ///< 产品名称(注意:可能不包含终止符'\0')
     Ps3LibPdPosition_t  pdNotOpt[PS3LIB_MAX_PD_NUM];   ///< pd not optimal
     U8                  pad2[4];
     U32                 pdPreFailCnt;      ///< pd预测失败个数
@@ -566,63 +696,6 @@ typedef struct Ps3LibProfileParam {
     U32   isCmp:1;
     U32   reserved1:25;
 }__attribute__((packed))Ps3LibProfileParam_t;
-
-/**
- * @brief   启动模式
- */
-typedef struct Ps3LibPerfTuners {
-        U8      mode        : 2;            ///< 启动模式
-        U8      reserved0   : 6;
-} Ps3LibPerfTuners_t;
-
-/**
- * @brief   Tuner值
- */
-typedef struct Ps3LibPerfTunerValues {
-        U8  maxFlushLines;  ///< 控制卡擦除比例
-        union {
-            U8  numOrderIOs;    ///< 原始实现, 用于选定版本
-            U8  maxPdLatencyMsBeforeIssuingOrderedTag;  ///< 物理盘升级最大延时时间
-        };
-} Ps3LibPerfTunerValues_t;
-
-/**
- * @brief   Nvsram控制信息
- */
-typedef struct Ps3LibNvsramCtrlInfo {
-    U16     seqNum;                     ///< 序列号
-    U16     predFailPollInterval;       ///< 预处理失败时间间隔
-    U16     intThrottleCount;           ///< 中断激活次数
-    U16     intThrottleTimeUs;          ///< 中断完成时间
-
-    U8      cacheFlushInterval;         ///< 高速缓存刷新时间
-    U8      spinupDriveCount;           ///< 刷新驱动次数
-    U8      spinupDelay;                ///< 刷新驱动时间间隔
-    U8      clusterEnable;              ///< 集群功能使能
-    U8      coercionMode;               ///< 驱动容量强制模式
-    U8      alarmEnable;                ///< 使能alarm
-    U8      disableAutoRebuild;         ///< 禁用重构和热备
-    U8      disableBatteryWarning;      ///< 禁用电源使能告警
-    U8      restoreHotSpareOnInsertion; ///< 在插入同一插槽时启用HS数据块自动恢复
-    U8      exposeEnclosureDevices;     ///< 暴露背板设备
-    U8      maintainPdFailHistory;      ///< 保留坏的硬盘历史记录
-    U8      disallowHostRequestReordering;  ///< 启用共享区域锁定
-    U8      loadBalanceMode;            ///< 负载平衡模式
-    U8      disableAutoDetectBackplane; ///< 启用自动检测背板
-    U8      snapVDSpace;                ///< 打开虚拟盘空间
-    U8      pad;
-
-    U16     spinDownTime;               ///< 设备停机时间间隔
-    U8      defaultLdPSPolicy;          ///< 默认逻辑盘节能策略
-    U8      disableLdPSInterval;        ///< 逻辑盘节能禁用时间
-    U16     disableLdPSTime;            ///< 禁用逻辑盘节能
-    U8      spinupEnclDriveCount;       ///< 运行的背板驱动数量
-    U8      spinupEnclDelay;            ///< 背板启动延时秒数
-
-    U8      defaultCtrlPowerPolicy;     ///< 默认控制卡电源模式
-    Ps3LibPerfTuners_t CtrlInfoPerfTuners;              ///< 启动模式
-    Ps3LibPerfTunerValues_t CtrlInfoPerfTunerValues[4]; ///< Tuner值
-} Ps3LibNvsramCtrlInfo_t;
 
 /**
  * @brief   开关特性2
@@ -682,12 +755,24 @@ typedef struct Ps3LibOnOffProperties {
     U8 pad[2];
 } Ps3LibOnOffProperties_t;
 
+/**
+ * @brief   请求下载的termlog日志占最大容量的百分比
+ */
+typedef enum Ps3LibCtrlGetTermlogCapMaxQtr {
+    PS3LIB_CTRL_GET_TERMLOG_QTR_ONE       = 1,  ///< 最大容量的1/4
+    PS3LIB_CTRL_GET_TERMLOG_QTR_TWO       = 2,  ///< 最大容量的2/4,即1/2
+    PS3LIB_CTRL_GET_TERMLOG_QTR_THREE     = 3,  ///< 最大容量的3/4
+    PS3LIB_CTRL_GET_TERMLOG_QTR_FOUR      = 4,  ///< 最大容量的4/4，即最大容量
+    PS3LIB_CTRL_GET_TERMLOG_QTR_NR,
+}Ps3LibCtrlGetTermlogCapMaxQtr_e;
+
 /*
  * brief termlog get请求结构体
  */
 typedef struct Ps3LibCtrlTermLogReq {
     U8  beginFlag;   ///< 日志开始标志
-    U8  pad[3];
+    U8  capMax;   ///< 请求下载的termlog占最大容量的百分比 枚举Ps3LibCtrlGetTermlogCapMaxQtr; 0和全F，片内按照默认值
+    U8  pad[2];
     S32 sessionId;   ///< 会话ID
     U32 dmaLength;   ///< 申请大小
 } Ps3LibCtrlTermLogReq_t;
@@ -742,9 +827,9 @@ typedef struct Ps3LibCtrlCapability {
     U8  enableScsi;            ///< 使能SCSI
     U8  fdeDrive;              ///< FDE驱动
     U8  pad2;
-    U32 minStripsize;          ///< 最小去除量
-    U32 maxStripSize;          ///< 最大去除量
-    U32 maxChainedEnclNum;     ///< 最大通达背板数量
+    U32 minStripsize;          ///< 最小条带大小
+    U32 maxStripSize;          ///< 最大条带大小
+    U32 maxChainedEnclNum;     ///< 最大通道背板数量
     U32 maxChainedEnclDep;     ///< 最大通道背板深度
     U32 maxDataSize;           ///< 最大数据容量
 } Ps3LibCtrlCapability_t;
@@ -753,7 +838,7 @@ typedef struct Ps3LibCtrlCapability {
 * 硬件配置信息结构体
 */
 typedef struct Ps3LibCtrlHwCfg {
-    U8  batteryFRU[PS3LIB_MFG_DATA_LEN];   ///< FRU电池状态
+    U8  batteryFRU[PS3LIB_MFG_DATA_LEN];   ///< FRU电池状态(注意:可能不包含终止符'\0')
     U8  pad[3];
     U32 frontPort;        ///< not support
     U32 backPort;         ///< not support
@@ -761,7 +846,7 @@ typedef struct Ps3LibCtrlHwCfg {
     U8  alarm;            ///< 告警
     U8  serail;           ///< serail
     U8  pad2;
-    S8  chipRevision[PS3LIB_MFG_DATA_LEN]; ///< 芯片版本
+    S8  chipRevision[PS3LIB_MFG_DATA_LEN]; ///< 芯片版本(注意:可能不包含终止符'\0')
     S8  pad3;
     U16 nvramsize;        ///< nvram大小
     U16 flashsize;        ///< 内存大小
@@ -784,7 +869,7 @@ typedef struct Ps3LibCtrlHwCfg {
  * @brief   固件镜像名字
  */
 typedef struct Ps3LibCtrlGetImages {
-    S8  pendingImages[PS3LIB_FW_VERSION_LEN];
+    S8  pendingImages[PS3LIB_FW_VERSION_LEN]; ///< 镜像名称(注意:可能不包含终止符'\0')
 } Ps3LibCtrlGetImages_t;
 
 /**
@@ -846,6 +931,7 @@ typedef struct Ps3LibBootdriveInfo {
 
 /**
  * @brief  从控制器获取的版本号信息
+ * @note   字符串可能不包含终止符'\0'
  */
 typedef struct Ps3LibCtrlGetVersion {
     S8  packageBuild[PS3LIB_FW_VERSION_LEN];   ///< 固件包编译版本
@@ -1090,7 +1176,7 @@ typedef enum Ps3LibCtrlBbuHw {
  */
 typedef struct Ps3LibCtrlPolicy {
     U8  pad0[4];
-    U32 inthroActive;        ///< not support
+    U32 preFailPollIntDefault; ///< 预失败轮询间隔默认值 单位:分钟
     U32 inthroCom;           ///< not support
     U32 rebuildRate;         ///< 重建率
     U32 rebuildRateDefault;  ///< 默认重建率
@@ -1122,7 +1208,7 @@ typedef struct Ps3LibCtrlPolicy {
     U8  bootAgent;            ///< not support
     U8  configured;           ///< not support
     U8  pad2;
-    U32 preFailPollInt;      ///< 预失败轮询间隔 单位:小时
+    U32 preFailPollInt;      ///< 预失败轮询间隔 单位:分钟
 } Ps3LibCtrlPolicy_t;
 
 /*
@@ -1277,12 +1363,12 @@ typedef enum Ps3LibUkeyCliSecureMode {
 /*
  * brief Ukey Aso 上下文信息
  */
-typedef struct Ps3LibUkeyCliAsoContxt {
+typedef struct Ps3LibUkeyAsoContxt {
     U32                         keyStatus;         ///< Ps3LibUkeyCliStatus_e
     Ps3LibUkeyAsoBitTable_s     asoCfg;            ///< ukey可支持的高级功能表
     U32                         timeRemain;        ///< Ps3LibUkeyCliTimeRemain_e
     U32                         secureMode;        ///< Ps3LibUkeyCliSecureMode_e
-} Ps3LibUkeyCliAsoContxt_s;
+} Ps3LibUkeyAsoContxt_s;
 
 /**
  * @brief   get snapshot命令参数结构体
@@ -1317,8 +1403,9 @@ typedef enum Ps3LibSnapshotDataFormat {
 
 /**
  * @brief   厂商分区保存的生产字段
+ * @note    字符串可能不包含终止符'\0'
  */
-typedef struct ps3libMfgInfo {
+typedef struct Ps3LibMfgInfo {
     U8  partNumber[PS3LIB_MFG_PART_NUMBER_LEN];     ///< part number 16-byte ASCII string
     U8  serialNumber[PS3LIB_MFG_PART_NUMBER_LEN];   ///< 序列号
     U64 sasAddrBase;                                ///< sas地址
@@ -1329,7 +1416,7 @@ typedef struct ps3libMfgInfo {
     U8  pad[4];
     U8  extra1[PS3LIB_MFG_OEM_STR_LEN];             ///< oem字段
     U8  extra2[PS3LIB_MFG_OEM_STR_LEN];             ///< oem字段
-} ps3libMfgInfo_t;
+} Ps3LibMfgInfo_t;
 
 /**
  * @brief   autoconfig配置信息
@@ -1352,6 +1439,25 @@ typedef struct Ps3LibAutoConfigShow {
     U8 supportedR0Immediate;    ///< 0:不支持;1:支持
     U8 pad;                     ///< 字节对齐
 } Ps3LibAutoConfigShow_t;
+
+typedef enum Ps3LibCacheStatus{
+    PS3LIB_CACHETEST_RANDOM             = 1,        ///< 随机数
+    PS3LIB_CACHETEST_CHECKERBOARD       = 2,
+    PS3LIB_CACHETEST_BITFLIP            = 3,
+    PS3LIB_CACHETEST_WALKBITS1          = 4,
+    PS3LIB_CACHETEST_WALKBITS0          = 5,
+    PS3LIB_CACHETEST_NR                 = 0xFF,     ///< 无效模式
+}Ps3LibCacheStatus_e;
+
+typedef struct Ps3LibCacheTestType{
+    U8  cacheTestType;
+    U8  pad[3];
+}Ps3LibCacheTestType_t;
+
+typedef struct Ps3LibCacheTestRspSize {
+    U32 cacheSize;
+    U32 memorySize;
+}Ps3LibCacheTestRspSize_t;
 
 /**
  * @brief autoconfig模式枚举
@@ -1451,9 +1557,9 @@ typedef struct Ps3LibCtrlPrMode
 /**
  * @brief   lib库版本
  */
-typedef struct ps3libVersion {
-    S8 libVersion[PS3LIB_VERSION_LEN]; ///< lib库版本
-} ps3libVersion_s;
+typedef struct Ps3LibVersion {
+    S8 libVersion[PS3LIB_VERSION_LEN]; ///< lib库版本(注意:字符串可能不包含终止符'\0')
+} Ps3LibVersion_s;
 
 /**
  * @brief ps设置结构体
@@ -1645,6 +1751,31 @@ typedef struct Ps3LibRealtimePower {
     U8    pad[68];     ///< 占位8字节对齐
 } Ps3LibRealtimePower_s;
 
+///< 温度传感器温度类型
+enum {
+    PS3LIB_CTRL_TEMPSENSOR_TUNE_TYPE = 0,           ///<  板卡整体虚拟温度类型
+    PS3LIB_CTRL_TEMPSENSOR_BOARD_TYPE,              ///<  Board温度类型
+    PS3LIB_CTRL_TEMPSENSOR_CHIP_TYPE,               ///<  芯片温度类型
+    PS3LIB_CTRL_TEMPSENSOR_ONF_TYPE,                ///<  ONF温度类型
+    PS3LIB_CTRL_TEMPSENSOR_BBU_TYPE,                ///<  BBU温度类型
+    PS3LIB_CTRL_TEMPSENSOR_MAX_TYPE,                ///<  板卡上温度sensor最大类型数量
+};
+
+///< 板卡上调温温度信息和所有温度sensor的信息
+typedef struct Ps3LibCtrlHwTempSensorInfo {
+    S16 tuneTempCur;                ///<  板卡整体温度,单位:摄氏度
+    S16 tuneTempThreshold;          ///<  板卡整体调节阈值,单位:摄氏度
+    U8  tuneTempType;               ///<  当前整体温度信息来自的器件类型 参考 PS3LIB_CTRL_TEMPSENSOR_MAX_TYPE
+    U8  pad;
+    U16 sensorNum;                ///< 温度传感器数量，表示下面的tempSensor的前几个为有效信息
+    struct {
+        S16 temperature;                        ///< 温度传感器当前温度,单位:摄氏度
+        S16 temperatureThreshold;               ///< 器件温度阈值,单位:摄氏度
+        U8  temperatureSensorType;              ///< 器件类型，无效值为0xFF
+        U8  pad[3];
+    } tempSensor[PS3LIB_CTRL_TEMPSENSOR_COUNT_MAX];  ///< 温度sensor提供的温度信息
+} Ps3LibCtrlHwTempSensorInfo_t;
+
 /**
  * @brief  powersave相关属性
  */
@@ -1654,6 +1785,46 @@ typedef struct Ps3LibPsInfo {
     U16       psSpinDownTime;
     U8        reserved[4];
 } Ps3LibPsInfo_t;
+
+/**
+ * brief 控制卡接入盘的模式
+*/
+typedef enum Ps3LibCtrlOperationMode {
+    PS3LIB_CTRL_OPERATION_MODE_RAID   = 0x00,   ///< 0:RAID模式(有RAID配置的盘按VD规则接入)
+    PS3LIB_CTRL_OPERATION_MODE_PTH    = 0x01,   ///< 1:PTH模式(直通接入)
+    PS3LIB_CTRL_OPERATION_MODE_NR,
+} Ps3LibCtrlOperationMode_e;
+
+/**
+ * brief 权限规则结构体
+*/
+typedef struct Ps3LibCtrlPermRulesList {
+    U8    count;        ///< 权限规则个数
+    U8    pad[3];       ///< 保留字段
+    U32   ruleList[PS3LIB_CTRL_PERM_RULES_COUNT]; ///< 权限规则列表
+} Ps3LibCtrlPermiRulesList_t;
+
+/**
+ *@brief 权限规则枚举
+ *@note  权限管理命令下发时, 将枚举填充至规则列表, 即可恢复或禁用(OS)对应功能权限
+ *@note  权限管理命令查询时, 可查询当前权限管理情况
+ */
+typedef enum Ps3LibCtrlPermRules {
+    PS3LIB_CTRL_PERM_DOWNLOAD_IOC_ENABLE  = 0x0B0A0000, ///< 恢复IOC默认升级权限/当前IOC升级权限不受限制
+    PS3LIB_CTRL_PERM_DOWNLOAD_IOC_DISABLE = 0x0B0A00FF, ///< 禁用IOC升级权限
+    PS3LIB_CTRL_PERM_DOWNLOAD_EXP_ENABLE  = 0x040A0000, ///< 恢复EXP默认升级权限/当前EXP升级权限不受限制
+    PS3LIB_CTRL_PERM_DOWNLOAD_EXP_DISABLE = 0x040A00FF, ///< 禁用EXP升级权限
+} Ps3LibCtrlPermRules_e;
+
+/**
+ * brief 权限规则设置接口
+*/
+Ps3Errno ps3libCtrlPermRulesSet(CtrlId_t ctrlId, Ps3LibCtrlPermiRulesList_t *pRules);
+
+/**
+ * brief 权限规则获取接口
+*/
+Ps3Errno ps3libCtrlPermRulesGet(CtrlId_t ctrlId, Ps3LibCtrlPermiRulesList_t *pRules);
 
 /**
  * @brief        设置控制卡Securitykey
@@ -1836,7 +2007,7 @@ Ps3Errno ps3libCtrlTopologyInfoGet(CtrlId_t ctrlId, Ps3LibTopologyRootNode_s *pT
  * @param[out]  libVersion : lib库版本号
  * @return      PS3_ERRNO_SUCCESS: 成功
  */
-Ps3Errno ps3libVersionGet(ps3libVersion_s *libVersion);
+Ps3Errno ps3libVersionGet(Ps3LibVersion_s *libVersion);
 
 /**
  * @brief       获取控制卡信息
@@ -2125,7 +2296,7 @@ Ps3Errno ps3libCtrlSecureBootGet(CtrlId_t ctrlId, Ps3LibCtrlSecureBoot_t *secure
  * @param[out]  ukeyAsoInfo: Ukey Aso 上下文信息
  * @return      PS3_ERRNO_SUCCESS: 成功
  */
-Ps3Errno ps3libAsoInfoGet(CtrlId_t ctrlId, Ps3LibUkeyCliAsoContxt_s *ukeyAsoInfo);
+Ps3Errno ps3libAsoInfoGet(CtrlId_t ctrlId, Ps3LibUkeyAsoContxt_s *ukeyAsoInfo);
 
 /**
  * @brief        控制卡默认配置信息获取
@@ -2245,7 +2416,7 @@ Ps3Errno ps3libCtrlSnapshotPorpSet(CtrlId_t ctrlId, Ps3LibSnapShotProp_t *pSnaps
  * @param[out]  pMfgData: 所有mfgdata配置信息
  * @return      Ps3Errno
  */
-Ps3Errno ps3libMfgInfoCfgGet(CtrlId_t ctrlId, ps3libMfgInfo_t *pMfgInfo);
+Ps3Errno ps3libMfgInfoCfgGet(CtrlId_t ctrlId, Ps3LibMfgInfo_t *pMfgInfo);
 
 /**
  * @brief        查询autoconfig相关属性
@@ -2349,7 +2520,7 @@ Ps3Errno ps3libCtrlRealtimePowerGet(CtrlId_t ctrlId, Ps3LibRealtimePower_s *real
  * @brief 获取控制卡接口信息
  * @param[in]  ctrlId:        控制卡Id
  * @param[out] interfaceInfo: 接口信息
- * @return     Ps3Errno
+ * @return     Ps3Errno 
  */
 Ps3Errno ps3libCtrlInterfaceInfoGet(CtrlId_t ctrlId, Ps3LibCtrlInterfaceInfo_t *interfaceInfo);
 
@@ -2367,6 +2538,54 @@ void ps3libThreadAbortProcess(CtrlId_t ctrlId);
  * @return      PS3_ERRNO_SUCCESS: 成功 
  */
 Ps3Errno ps3libCtrlPsInfoGet(CtrlId_t ctrlId, Ps3LibPsInfo_t *pPsInfo);
+
+/**
+ * @brief 获取控制卡上所有温度点位的温度信息
+ * @param[in]  ctrlId:        控制卡Id
+ * @param[out] pSensorInfo:   控制卡上温度sensor的信息
+ * @return     Ps3Errno
+ */
+Ps3Errno ps3libCtrlHwTempSensorInfoGet(CtrlId_t ctrlId,  Ps3LibCtrlHwTempSensorInfo_t *pSensorInfo);
+
+/**
+ * @brief        设置上报盘优先策略
+ * @param[in]    ctrlId: 控制卡标识符
+ * @param[in]    deviceReportingOrder 0-逻辑盘在JBOD之后,1-逻辑盘先于JBOD盘之前                
+ * @return       PS3_ERRNO_SUCCESS: 成功
+ */
+Ps3Errno ps3libCtrlDeviceReportingOrderSet(CtrlId_t ctrlId, U8 deviceReportingOrder);
+
+/**
+ * @brief        获取上报盘优先策略
+ * @param[in]    ctrlId: 控制卡标识符
+ * @param[out]    deviceReportingOrder 0-逻辑盘在JBOD之后,1-逻辑盘先于JBOD盘之前                
+ * @return       PS3_ERRNO_SUCCESS: 成功
+ */
+Ps3Errno ps3libCtrlDeviceReportingOrderGet(CtrlId_t ctrlId, U8 *deviceReportingOrder);
+
+/**
+ * @brief        设置 slotNumSource
+ * @param[in]    ctrlId: 控制卡标识符
+ * @param[in]    slotNumSource 0-Use the connector element index, 1-Use the device slot number
+ * @return       PS3_ERRNO_SUCCESS: 成功
+ */
+Ps3Errno ps3libCtrlSlotNumSourceSet(CtrlId_t ctrlId, U8 slotNumSource);
+
+/**
+ * @brief        获取 slotNumSource
+ * @param[in]    ctrlId: 控制卡标识符
+ * @param[out]   slotNumSource 0-Use the connector element index, 1-Use the device slot number
+ * @return       PS3_ERRNO_SUCCESS: 成功
+ */
+Ps3Errno ps3libCtrlSlotNumSourceGet(CtrlId_t ctrlId, U8 *slotNumSource);
+
+/**
+ * @brief      通过 MCTP Over PCIe发现PCIe设备列表
+ * @param[in]  vendorId:     唯一标识,用于确定产品类型
+ * @param[out] pCtrlList:    该vendorId下的控制卡列表
+ * @return     Ps3Errno
+ */
+Ps3Errno ps3libDiscoverMCTPCtrlList(U16 vendorId, Ps3LibCtrlList_t *pCtrlList);
 
 #if defined(__cplusplus)
 }

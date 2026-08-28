@@ -8,6 +8,10 @@
 #ifndef __PS3LIB_TYPE_H__
 #define __PS3LIB_TYPE_H__
 
+#if defined(__cplusplus)
+extern "C" {
+#endif
+
 typedef unsigned char       U8;
 typedef unsigned short      U16;
 typedef unsigned int        U32;
@@ -18,7 +22,7 @@ typedef short               S16;
 typedef int                 S32;
 typedef long long           S64;
 
-typedef U16 CtrlId_t;
+typedef U32 CtrlId_t;
 typedef S32 Ps3Errno;
 typedef U8 EnclId_t;
 typedef U16 VdId_t;
@@ -39,5 +43,9 @@ typedef U8  FuncId_t;
 #define PS3LIB_INVALID_CODE_S32    0X7FFFFFFF
 #define PS3LIB_INVALID_CODE_S64    0X7FFFFFFFFFFFFFFF
 #define PS3LIB_INVALID_CODE_PTR    (NULL)
+
+#if defined(__cplusplus)
+}
+#endif
 
 #endif

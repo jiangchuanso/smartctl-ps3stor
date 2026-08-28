@@ -1,9 +1,9 @@
 # Package name and version follow the upstream smartmontools release so the
 # RPM is named smartmontools-7.4-<Release>.el8.<arch>.rpm. The Release number
-# (currently 2) is the only part controlled by this project's packaging.
+# (currently 3) is the only part controlled by this project's packaging.
 Name:           smartmontools
 Version:        7.4
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        smartctl extended with PS3STOR device support (based on smartmontools 7.4)
 
 License:        GPLv2+
@@ -266,6 +266,11 @@ fi
 /usr/bin/systemctl daemon-reload >/dev/null 2>&1 || :
 
 %changelog
+* Fri Aug 28 2026 smartctl-ps3stor maintainer <maintainer@example.com> - 7.4-3
+- Upgrade bundled vendor ps3lib from 2.2.0.14 to 2.9.0.12 (new static libs
+  libps3.a / libps3_aarch64.a and updated headers under ps3lib/, including the
+  new ps3lib_pcieswitch_host.h). No smartctl/smartd source changes.
+
 * Fri Aug 28 2026 smartctl-ps3stor maintainer <maintainer@example.com> - 7.4-2
 - Replace the packaging/email Python alert toolkit with a smartd_warning.d
   plugin 'smart_curl_mail' that sends smartd alert emails directly via SMTP

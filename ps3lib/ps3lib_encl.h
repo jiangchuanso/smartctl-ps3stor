@@ -8,6 +8,10 @@
 #ifndef __PS3LIB_ENCL_H__
 #define __PS3LIB_ENCL_H__
 
+#if defined(__cplusplus)
+extern "C" {
+#endif
+
 #include "ps3lib_ctrl.h"
 #include "ps3lib_phy.h"
 
@@ -116,8 +120,8 @@ typedef enum Ps3LibEnclDeviceType{
  * @brief   encl列表
  */
 typedef struct Ps3LibEnclList{
-    U8       count;                               ///< encl个数
-    U8      enclId[PS3LIB_MAX_ENCL_NUM];          ///< encl设备号柔性数组
+    U16     count;                              ///< encl个数
+    U8      enclId[PS3LIB_MAX_ENCL_NUM];        ///< encl设备号柔性数组
 }Ps3LibEnclList_t;
 
 typedef struct Ps3LibElmtTypeHeader{
@@ -188,6 +192,7 @@ typedef struct Ps3LibEnclBasicInfo {
 
 /**
  * @brief   背板数据
+ * @note    字符串可能不包含终止符'\0'
  */
 typedef struct Ps3LibEnclInquiryData {
     S8      serialNumber[PS3LIB_ENCL_SERIAL_NUM_LEN];          ///< 序列号
@@ -206,7 +211,7 @@ typedef struct Ps3LibEnclConnector {
     U8      location;                                       ///< 连接的位置(1:unknown,2:internal,3:external)
     U8      phyCnts;                                        ///< phy的个数
     U8      phyId[PS3LIB_ENCL_MAX_PHY_NUM];                 ///< phyId数组
-    U8      connectName[PS3LIB_ENCL_CONNECTOR_NAME_LEN];    ///< 连接器名称
+    U8      connectName[PS3LIB_ENCL_CONNECTOR_NAME_LEN];    ///< 连接器名称(注意:字符串可能不包含终止符'\0')
 } Ps3LibEnclConnector_t;
 
 /**
@@ -329,5 +334,9 @@ Ps3Errno ps3libPdListGetByEnclId(CtrlId_t ctrlId, EnclId_t enclId, const Ps3LibI
  */
 Ps3Errno ps3libEnclInfoGetByEnclList(CtrlId_t ctrlId, EnclId_t *idList, U32 idCount, Ps3LibEnclInfoEx_t *info,
         Ps3Errno *errList);
+        
+#if defined(__cplusplus)
+}
+#endif
 
 #endif
