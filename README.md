@@ -90,16 +90,16 @@ Build notes:
 
 - Built inside a **CentOS 8 container** (`dnf install gcc-c++ make rpm-build`) so it links the platform glibc.
 - CentOS 8 EOL repos are redirected to `vault.centos.org`.
-- **RPM version is pinned to upstream `7.4`** and is independent of the release tag; the Release number (`*`) is controlled solely by the spec's `Release:` field (currently `1`, i.e. `1%{?dist}` → `.el8`).
+- **RPM version is pinned to upstream `7.4`** and is independent of the release tag; the Release number (`*`) is controlled solely by the spec's `Release:` field (currently `2`, i.e. `2%{?dist}` → `.el8`).
 - Artifacts:
-  - `smartmontools-7.4-1.el8.x86_64.rpm`
-  - `smartmontools-7.4-1.el8.aarch64.rpm`
+  - `smartmontools-7.4-2.el8.x86_64.rpm`
+  - `smartmontools-7.4-2.el8.aarch64.rpm`
 
 ## Install & usage (CentOS 8)
 
 ```bash
 # Install the RPM (on aarch64 use the .aarch64.rpm)
-sudo rpm -ivh smartmontools-7.4-1.el8.x86_64.rpm
+sudo rpm -ivh smartmontools-7.4-2.el8.x86_64.rpm
 
 # Verify
 which smartctl
@@ -112,63 +112,74 @@ sudo smartctl -x -d ps3stor,16 /dev/ctrl/1 -j   # JSON output
 
 ## Email alert (SMART monitoring)
 
-A ready-to-use SMART email-alert toolkit lives in `packaging/email/`:
+The RPM ships a `smartd_warning.d` plugin, `smart_curl_mail`, which sends smartd
+alert emails directly via the SMTP protocol built into `curl(1)` (same
+implementation as smartmontools.spec's `smart_curl_mail` plugin) — **no Python,
+no local MTA required**. Requires `curl >= 7.20` (with SMTP support), declared
+in the spec's `Requires`.
 
-- `smartctl-email-alert` — Python 3 script. It runs `smartctl` on every disk,
-  compares SMART attributes / overall-health against threshold templates, and
-  sends an **SMTP email alert** when any metric violates a threshold. Email is
-  sent via `curl(1)`'s built-in SMTP (same idea as smartmontools.spec's
-  `smart_curl_mail` plugin) — **no Python smtplib, no local MTA required**.
-  Requires `curl >= 7.20` (built with SMTP support).
-- `email.conf.example` — config template; copy to `/etc/smartctl/email.conf`.
-- `smartctl-email.service` / `smartctl-email.timer` — systemd units that run the
-  check every 15 minutes (first run 2 min after boot).
+Script and config are split:
 
-Quick start:
+- `/etc/smartd_warning.d/smart_curl_mail` — the plugin script (installed 755),
+  invoked by `/etc/smartd_warning.sh`;
+- `/etc/smartd_warning.d/smart_curl_mail.conf` — a separate config template
+  (installed mode 600, since it may hold SMTP credentials); all values commented
+  out mean defaults (`smtp://localhost:25`, plain, no auth).
 
-```bash
-# 1. Install the script and config
-sudo cp packaging/email/smartctl-email-alert /usr/local/bin/
-sudo chmod +x /usr/local/bin/smartctl-email-alert
-sudo mkdir -p /etc/smartctl
-sudo cp packaging/email/email.conf.example /etc/smartctl/email.conf
-sudo chmod 600 /etc/smartctl/email.conf
+Use the official smartd mechanism: add `@smart_curl_mail` to the `-m` recipient
+list in `/etc/smartd.conf` and trigger with `-M exec /etc/smartd_warning.sh`:
 
-# 2. Edit /etc/smartctl/email.conf: set [smtp] url/from/to, and [thresholds]
-#    (path = smartctl uses the smartctl in PATH; override with [smartctl] path)
-
-# 3. Dry run (prints what would be sent, sends nothing)
-sudo smartctl-email-alert --dry-run
-
-# 4. Enable the systemd timer (every 15 min)
-sudo cp packaging/email/smartctl-email.service /etc/systemd/system/
-sudo cp packaging/email/smartctl-email.timer   /etc/systemd/system/
-sudo systemctl daemon-reload
-sudo systemctl enable --now smartctl-email.timer
+```
+# /etc/smartd.conf
+/dev/sda -m @smart_curl_mail,admin@example.com -M exec /etc/smartd_warning.sh
 ```
 
-Key configuration (`/etc/smartctl/email.conf`, INI):
+Configuration (edit `/etc/smartd_warning.d/smart_curl_mail.conf`, same variable
+names as in the script):
 
-- `[smtp]`: `url` (recommended, e.g. `smtp://host:25`, `smtps://host:465`,
-  `smtp://host:587` with `curl_opts = --ssl-reqd`), `from`, `to`
-  (comma-separated), `subject_prefix`, optional `user`/`password`.
-- `[alert]`: `mode` (`alert` = only on threshold breach; `daily` = full report
-  every run), `health_check`, `temp_max` (°C), `cooldown_minutes` (de-dupe
-  window), `scan_all` (auto-discover disks) / `disks` list.
-- `[thresholds]`: per-attribute templates, e.g.
-  `Reallocated_Sector_Ct = value:below:90, raw:above:0`.
+- `SMARTD_SMTP_URL`: SMTP server, e.g. `smtp://host:25`, `smtps://host:465`, or
+  `smtp://host:587` with `SMARTD_CURL_OPTS='--ssl-reqd'` for STARTTLS.
+- `SMARTD_MAIL_FROM`: envelope/From address, default `smartd@localhost`.
+- `SMARTD_SMTP_AUTH_USER` / `SMARTD_SMTP_AUTH_PASS`: SMTP AUTH credentials
+  (optional; if set, consider `chmod 600` on the .conf file).
+- `SMARTD_CURL_OPTS`: extra curl options, e.g. `--connect-timeout 10 --max-time 60`.
 
-For PS3 storage controllers, the disks are auto-discovered via `smartctl --scan`
-(which enumerates `ps3stor` devices); if needed, set `[smartctl] extra_args =
--d ps3stor,16` or list the device in `[alert].disks`.
+For PS3 storage controllers, add device lines such as `-d ps3stor,16` to
+`/etc/smartd.conf` (`smartctl --scan` enumerates `ps3stor` devices).
+
+### Sending a test email (official smartd way)
+
+smartd has a built-in test mechanism: add `-M test` to a device line in
+`/etc/smartd.conf`, and smartd sends a test email on startup using the same
+configuration — no need to invoke the plugin manually:
+
+```
+# /etc/smartd.conf
+/dev/sda -m @smart_curl_mail,admin@example.com -M exec /etc/smartd_warning.sh -M test
+```
+
+```bash
+# Reload the config and trigger the test email
+sudo systemctl restart smartd
+```
+
+- `-M test` reuses the same line's `-m @smart_curl_mail` recipient and
+  `-M exec /etc/smartd_warning.sh`, and reads SMTP settings from
+  `smart_curl_mail.conf`.
+- On failure smartd logs the error (`journalctl -u smartd`); adjust
+  `smart_curl_mail.conf` accordingly.
+- Make sure the target SMTP server is reachable (e.g. `smtp://localhost:25`
+  requires a listening SMTP service, or point it at a real mail server).
+- Remove `-M test` after testing so smartd does not send a test email on every
+  startup.
 
 ## File layout
 
 | File | Purpose |
 | --- | --- |
-| `smartctl-ps3stor.spec` | CentOS 8 RPM spec (name `smartmontools`, version `7.4`, Release `1`) |
+| `smartctl-ps3stor.spec` | CentOS 8 RPM spec (name `smartmontools`, version `7.4`, Release `2`) |
 | `.github/workflows/build-centos8-rpm.yml` | builds x86_64 / aarch64 el8 RPMs on release |
-| `packaging/email/` | SMART email-alert toolkit |
+| `smartd_warning.d` | `smart_curl_mail` curl SMTP alert plugin shipped by the RPM (script + conf) |
 | rest | full smartmontools 7.4 source (with `ps3stor` support) |
 
 ## License

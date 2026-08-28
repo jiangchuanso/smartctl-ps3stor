@@ -100,10 +100,10 @@ make
 
 - 在 **CentOS 8 容器** 内 `dnf install gcc-c++ make rpm-build` 后 `rpmbuild`，保证链接平台 glibc。
 - 已修复 CentOS 8 EOL 后的软件源（重定向到 `vault.centos.org`）。
-- **RPM 版本固定为上游 `7.4`，与 Release 的 tag/版本无关**；Release 号（`*`）仅由 spec 的 `Release:` 字段控制（当前为 `1`，即 `1%{?dist}` → `.el8`）。
-- 产物命名（包名 `smartmontools`，版本 `7.4`，Release `1`，架构 x86_64 / aarch64）：
-  - `smartmontools-7.4-1.el8.x86_64.rpm`
-  - `smartmontools-7.4-1.el8.aarch64.rpm`
+- **RPM 版本固定为上游 `7.4`，与 Release 的 tag/版本无关**；Release 号（`*`）仅由 spec 的 `Release:` 字段控制（当前为 `2`，即 `2%{?dist}` → `.el8`）。
+- 产物命名（包名 `smartmontools`，版本 `7.4`，Release `2`，架构 x86_64 / aarch64）：
+  - `smartmontools-7.4-2.el8.x86_64.rpm`
+  - `smartmontools-7.4-2.el8.aarch64.rpm`
 
 > 提示：若 `centos:8` 多架构镜像日后被下架，可将工作流中 aarch64 对应的镜像改为 `arm64v8/centos:8`。
 
@@ -111,7 +111,7 @@ make
 
 ```bash
 # 安装 RPM（aarch64 机器换成对应的 .aarch64.rpm 文件）
-sudo rpm -ivh smartmontools-7.4-1.el8.x86_64.rpm
+sudo rpm -ivh smartmontools-7.4-2.el8.x86_64.rpm
 
 # 验证
 which smartctl
@@ -124,50 +124,55 @@ sudo smartctl -x -d ps3stor,16 /dev/ctrl/1 -j   # JSON 输出
 
 ## 六、邮件通知用法说明
 
-本仓库在 `packaging/email/` 下提供了一个开箱即用的 SMART 邮件预警工具集：
+RPM 内置 `smartd_warning.d` 插件 `smart_curl_mail`，用 `curl(1)` 内置的 SMTP 协议直发告警邮件（与 smartmontools.spec 的 `smart_curl_mail` 插件同一实现），**不依赖 Python、不依赖本地 MTA**。依赖 `curl >= 7.20`（需编译 SMTP 支持），已写入 spec 的 `Requires`。
 
-- `smartctl-email-alert` —— Python 3 脚本。运行 `smartctl` 采集每块磁盘的 SMART 属性与整体健康自检结果，按「阈值模板」逐项比对：任一指标低于（below）或高于（above）模板值即触发 **SMTP 邮件告警**。邮件直接调用 `curl(1)` 内置的 SMTP 协议发送（与 smartmontools.spec 的 `smart_curl_mail` 插件同一思路），**不依赖 Python smtplib，也无需本机 MTA**。依赖 `curl >= 7.20`（需编译 SMTP 支持）。
-- `email.conf.example` —— 配置模板，复制为 `/etc/smartctl/email.conf` 后修改。
-- `smartctl-email.service` / `smartctl-email.timer` —— systemd 单元，每 15 分钟检查一次（开机 2 分钟后首次运行）。
+插件与配置分离：
 
-快速开始：
+- `/etc/smartd_warning.d/smart_curl_mail` —— 插件脚本（安装后 755），被 `/etc/smartd_warning.sh` 调用；
+- `/etc/smartd_warning.d/smart_curl_mail.conf` —— 独立配置模板（安装后 600，因可能含 SMTP 凭据），全部项注释掉即用默认值（`smtp://localhost:25` 明文、无认证）。
 
-```bash
-# 1. 安装脚本与配置
-sudo cp packaging/email/smartctl-email-alert /usr/local/bin/
-sudo chmod +x /usr/local/bin/smartctl-email-alert
-sudo mkdir -p /etc/smartctl
-sudo cp packaging/email/email.conf.example /etc/smartctl/email.conf
-sudo chmod 600 /etc/smartctl/email.conf
+使用官方 smartd 调用方式，在 `/etc/smartd.conf` 的 `-m` 收件人列表中加上 `@smart_curl_mail`，并用 `-M exec /etc/smartd_warning.sh` 触发：
 
-# 2. 编辑 /etc/smartctl/email.conf：设置 [smtp] 的 url/from/to，以及 [thresholds]
-#    （[smartctl] path = smartctl 使用 PATH 中的 smartctl，可用该键覆盖路径）
-
-# 3. 试运行（仅打印将要发送的告警，不真正发邮件）
-sudo smartctl-email-alert --dry-run
-
-# 4. 启用 systemd 定时任务（每 15 分钟）
-sudo cp packaging/email/smartctl-email.service /etc/systemd/system/
-sudo cp packaging/email/smartctl-email.timer   /etc/systemd/system/
-sudo systemctl daemon-reload
-sudo systemctl enable --now smartctl-email.timer
+```
+# /etc/smartd.conf
+/dev/sda -m @smart_curl_mail,admin@example.com -M exec /etc/smartd_warning.sh
 ```
 
-主要配置项（`/etc/smartctl/email.conf`，INI 格式）：
+配置（编辑 `/etc/smartd_warning.d/smart_curl_mail.conf`，变量与脚本内一致）：
 
-- `[smtp]`：`url`（推荐，如 `smtp://host:25`、`smtps://host:465`、`smtp://host:587` 并设 `curl_opts = --ssl-reqd`）、`from`、`to`（逗号分隔多人）、`subject_prefix`，可选 `user` / `password`。
-- `[alert]`：`mode`（`alert` = 仅超阈值时发送；`daily` = 每次运行都发完整报告）、`health_check`、`temp_max`（温度上限 ℃）、`cooldown_minutes`（同一告警冷却，避免邮件轰炸）、`scan_all`（自动发现磁盘）/ `disks` 列表。
-- `[thresholds]`：逐属性的阈值模板，例如 `Reallocated_Sector_Ct = value:below:90, raw:above:0`。
+- `SMARTD_SMTP_URL`：SMTP 服务器，如 `smtp://host:25`、`smtps://host:465`、`smtp://host:587`（配合 `SMARTD_CURL_OPTS='--ssl-reqd'` 走 STARTTLS）。
+- `SMARTD_MAIL_FROM`：发件地址，默认 `smartd@localhost`。
+- `SMARTD_SMTP_AUTH_USER` / `SMARTD_SMTP_AUTH_PASS`：SMTP AUTH 凭据（可选，写入后建议 `chmod 600`）。
+- `SMARTD_CURL_OPTS`：附加 curl 选项，如 `--connect-timeout 10 --max-time 60`。
 
-对于 PS3 存储控制器，磁盘会通过 `smartctl --scan`（可枚举 `ps3stor` 设备）自动发现；必要时可在 `[smartctl]` 设置 `extra_args = -d ps3stor,16`，或在 `[alert].disks` 中显式列出设备。
+对于 PS3 存储控制器，可在 `/etc/smartd.conf` 中直接用 `-d ps3stor,16` 等设备行加入监控（`smartctl --scan` 可枚举 `ps3stor` 设备）。
+
+### 发送测试邮件（官方 smartd 方式）
+
+smartd 自带测试机制：在 `/etc/smartd.conf` 的设备行加上 `-M test`，smartd 启动时会按配置发送一封测试邮件，无需手动调用插件。
+
+```
+# /etc/smartd.conf
+/dev/sda -m @smart_curl_mail,admin@example.com -M exec /etc/smartd_warning.sh -M test
+```
+
+```bash
+# 重新加载配置并触发测试邮件
+sudo systemctl restart smartd
+```
+
+- `-M test` 复用同一行已有的 `-m @smart_curl_mail` 收件人与 `-M exec /etc/smartd_warning.sh`，并读取 `smart_curl_mail.conf` 的 SMTP 配置；
+- 发送失败会在 smartd 日志（`journalctl -u smartd`）中报错，据此调整 `smart_curl_mail.conf`；
+- 需确保目标 SMTP 服务器可达（如 `smtp://localhost:25` 需本机有监听的 SMTP 服务，或改为真实邮件服务器地址）；
+- 测试完成后移除 `-M test`，避免每次启动都发测试邮件。
 
 ## 七、文件说明
 
 | 文件 | 说明 |
 | --- | --- |
-| `smartctl-ps3stor.spec` | CentOS 8 RPM 打包 spec（包名 `smartmontools`，版本固定 `7.4`，Release 由打包设置控制，当前 `1`） |
+| `smartctl-ps3stor.spec` | CentOS 8 RPM 打包 spec（包名 `smartmontools`，版本固定 `7.4`，Release 由打包设置控制，当前 `2`） |
 | `.github/workflows/build-centos8-rpm.yml` | 发布时自动构建 x86_64 / aarch64 两个 el8 RPM 的工作流 |
-| `packaging/email/` | SMART 邮件预警工具集（脚本 + 配置示例 + systemd 单元） |
+| `smartd_warning.d` | RPM 内置的 `smart_curl_mail` curl SMTP 告警插件（脚本 + 独立 conf，见「邮件通知用法说明」） |
 | 其余文件 | smartmontools 7.4 完整源码（含 `ps3stor` 设备支持） |
 
 ## 八、许可证
