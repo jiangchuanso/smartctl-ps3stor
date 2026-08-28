@@ -12,6 +12,7 @@
 #include "ps3lib_type.h"
 #include "ps3lib_ctrl.h" //todo : create ps3stor.h
 #include "ps3lib_passthru.h"
+#include "ps3lib_pd.h"   // Ps3LibPdBaseInfo_t/Ps3LibPdDevIdList_s/Ps3LibPdInterface_e (ps3lib_ctrl.h no longer pulls ps3lib_pd.h since 2.9.0.12)
 
 #define PS3STOR_ERRNO_SUCCESS           (0)
 #define PS3STOR_MIN(x,y)                ((x) < (y) ? (x) : (y))
