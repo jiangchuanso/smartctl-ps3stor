@@ -9,6 +9,10 @@
 #ifndef __PS3LIB_EVENT_H__
 #define __PS3LIB_EVENT_H__
 
+#if defined(__cplusplus)
+extern "C" {
+#endif
+
 #define PS3LIB_MAX_VD_NAME_BYTES             (16)   ///< 最大允许VD名称长度
 #define PS3LIB_CTRL_AUTOCONFIG_EVTDATA_SIZE  (8)    ///< 事件数据大小
 #define PS3LIB_BBM_ERRTBL_NAME_LEN           (6)    ///< 坏块表类型名称长度
@@ -16,7 +20,7 @@
 #define PS3LIB_FGI_MODE_LEN                  (5)
 #define PS3LIB_EVT_LOG_INFO_MAX_SIZE         (116)
 #define PS3LIB_EXP_EVENT_DATA_COLLECT_MAX_NUM (256) ///< 补充收集信息数量
-#define PS3LIB_MAX_EVENT_REG_CNT              (32)   ///< 最大允许订阅数
+#define PS3LIB_MAX_EVENT_REG_CNT              (128)   ///< 最大允许订阅数
 
 /**
  * @brief   事件日志读取位置
@@ -128,10 +132,11 @@ typedef struct Ps3LibPdAttrInfo {
     U16 softChan    : 4;         ///< 通道号
     U16 devID       : 12;        ///< 设备编号
     U16 slotId;                  ///< 槽位号
-    U16 oldState    : 4;         ///< 盘prev状态
-    U16 newState    : 4;         ///< 盘当前状态
+    U16 oldState    : 4;         ///< 盘prev状态 (起停转失败事件：记录当前盘的起转状态)
+    U16 newState    : 4;         ///< 盘当前状态 (起停转失败事件：记录目标起转状态)
     U16 isEnclPd    : 1;         ///< 是否enclusorePD
-    U16 pad1        : 7;         ///< 预留
+    U16 longFault   : 1;         ///< 是否常亮LED(只针对PD out事件)
+    U16 reason      : 6;         ///< 上报事件的原因
     U16 arrayId     : 8;         ///< 盘子组ID
     U16 rowId       : 8;         ///< 子组内序号
     U16 prevState   : 8;         ///< 盘prev状态
@@ -188,8 +193,9 @@ typedef struct Ps3LibVdBaseSetting {
         cbMode                  :3,  ///< 0:intelligent, 1:standard, 2:custom1, 3:custom2, 4:custom3, 7:disable
         encryption              :1,  ///< 加密
         rebootNoVerify          :1,  ///< 本卡加密VD重启时认证(0:需要(默认), 1:不需要)
-        rsv                     :10; ///< 保留字段
-    U8  vdName[PS3LIB_MAX_VD_NAME_BYTES]; ///< VD名称
+        maxIoSizeCfg            :3,  ///< 0:无效,1:64KB,2:128KB,3:256KB,4:512KB,5:1024KB,6:保留,7:保留
+        rsv                     :7;  ///< 保留字段
+    U8  vdName[PS3LIB_MAX_VD_NAME_BYTES]; ///< VD名称 (注意:字符串可能不包含终止符'\0')
     U64 size;                        ///< VD容量(单位sector)
 }Ps3LibVdBaseSetting_s;
 
@@ -258,7 +264,7 @@ typedef struct Ps3LibCtrlRebootInfo {
                            ///< 2:进程退出exit(驱动下发软复位)
                            ///< 3:进程退出 驱动下发硬复位
                            ///< 4:iocReboot
-    U32 ctrlBootCount;     ///< 控制卡重启计数(控制卡退出填退出前的重启计数)
+    U32 regBootValue; ///< 控制卡boot模式
 }Ps3LibCtrlRebootInfo_s;
 
 /**
@@ -274,7 +280,8 @@ typedef struct Ps3LibDgAttrInfo {
  */
 typedef struct Ps3LibExpanderInfo {
     U8 EnclId;   ///< expander 槽位id
-    U8 reserved[7];
+    U8 port;
+    U8 reserved[6];
 }Ps3LibExpanderInfo_s;
 
 /**
@@ -286,8 +293,13 @@ typedef struct Ps3LibCfgAttrInfo {
 }Ps3LibCfgAttrInfo_s;
 
 typedef struct Ps3LibCfgAutoConfig {
-    S8   cfgName[PS3LIB_CTRL_AUTOCONFIG_EVTDATA_SIZE];
+    S8   cfgName[PS3LIB_CTRL_AUTOCONFIG_EVTDATA_SIZE]; ///< (注意:字符串可能不包含终止符'\0')
 }Ps3LibCfgAutoConfig_s;
+
+typedef struct Ps3LibCtrlPowerMode {
+    U8   mode;
+    U8   rsv[3];
+}Ps3LibCtrlPowerMode_s;
 
 /**
  * @brief 后台任务rebuild/moveback事件发布信息
@@ -387,7 +399,7 @@ typedef struct Ps3LibPhyEvtInfo {
     U32 enclosureId:8,   ///< encl ID
         slotId:8,        ///< 槽位号
         phyId:8,         ///< phyId
-        reserved:8;
+        reason:8;
 } Ps3LibPhyEvtInfo_s;
 
 /**
@@ -401,7 +413,7 @@ typedef struct Ps3LibVdBbmEvtInfo {
     U16 virtDiskId;     ///< VD ID
     U16 percentErrTbl;  ///< 坏块表已占用百分比
     U16 devId;          ///< 设备ID
-    S8  errTblName[PS3LIB_BBM_ERRTBL_NAME_LEN]; ///< 坏块表类型名称
+    S8  errTblName[PS3LIB_BBM_ERRTBL_NAME_LEN]; ///< 坏块表类型名称(注意:字符串可能不包含终止符'\0')
     U16 pdFlatId;       ///< PD ID
     U16 enclosureId;    ///< PD enc ID
     U16 slotId;         ///< 槽位号
@@ -579,6 +591,21 @@ typedef struct Ps3LibSenseDataEvtInfo {
     U64 path;
 } Ps3LibSenseDataEvtInfo_s;
 
+typedef struct Ps3LibErrSenseEvtInfo {
+    U16 enclosureId;   ///< enc ID
+    U16 slotId;        ///< 槽位号
+    U16 phyDiskID;     ///< 物理盘标识ID
+    U8 CDBLen;
+    U8 senseLen;
+    U8 cdb[32];        ///< CMD_FORMAT_MAXSIZE, 发布6-32个字节, 可变
+    U8 senseData[56];   ///<  发布56个字节
+    U8 sk;
+    U8 asc;
+    U8 ascq;
+    U8 resv;
+    U64 path;
+} Ps3LibErrSenseEvtInfo_s;
+
 typedef struct Ps3LibPdDownloadInfo {
     U32 downloadMode; ///< MODE_E MODE_F MODE_7
     S32 isSuccess;
@@ -622,7 +649,7 @@ typedef struct Ps3LibPdPreFailInfo {
     U32 historyErrBitMap;     ///< 每个bit表示一类错误，dmSataSmartType_e,dmSasSmartType_e,dmNvmeSmartType_e
     U32 errBitMap;     ///< 每个bit表示一类错误，dmSataSmartType_e,dmSasSmartType_e,dmNvmeSmartType_e
     S8  vendor[8];
-    S8  diskSerialNum[24];
+    S8  diskSerialNum[24];      ///< (注意:字符串可能不包含终止符'\0')
 }Ps3LibPdPreFailInfo_s;
 
 typedef struct Ps3LibNvDataInvaildInfo {
@@ -630,6 +657,21 @@ typedef struct Ps3LibNvDataInvaildInfo {
     U16  bitmapSize;            ///< bitmap的大小
     U16  invaildCount;          ///< 无效的nvData个数
 } Ps3LibNvDataInvaildInfo_s;
+
+typedef struct Ps3LibSpeedNegoInfo {
+    U16 enclosureId;    ///< 框编号
+    U16 slotId;         ///< 槽位编号
+    S8 isPcie;
+    S8 speed;           ///< 速率
+    U8 width;           ///< 带宽
+    U8 type;            ///< 盘接入失败类型
+}Ps3LibSpeedNegoInfo_s;
+
+typedef struct Ps3LibInitFailInfo {
+    U64 errCode;
+    U8  initFailCnt;
+    U8  pad[3];
+} Ps3LibInitFailInfo_s;
 
 /**
  * @brief pcie oem事件信息
@@ -644,6 +686,107 @@ typedef struct Ps3LibOemInfo {
 typedef struct Ps3LibBplaneEvtInfo {
     S8  bplaneData[PS3LIB_EVT_LOG_INFO_MAX_SIZE];
 } Ps3LibBplaneEvtInfo_s;
+
+/**
+ * @brief 记录三模切换信息
+ */
+typedef struct Ps3LibTriModeInfo {
+    U8 connectorId;
+    U8 subConnectorId;
+    U8 curMode;
+    U8 rev;
+} Ps3LibTriModeInfo_s;
+
+/**
+ * @brief 记录phychange信息
+ */
+typedef struct Ps3LibPhyChgInfo {
+    U8 portId;
+    U8 phyId;
+    U8 reason;
+    U8 rev;
+} Ps3LibPhyChgInfo_s;
+
+/**
+ * @brief 记录Phy inquiry 信息
+ */
+typedef struct Ps3LibPhyInquiryInfo {
+    U32 pdId;
+    U16 slotId;   ///< 槽位号
+    U16 enclosureId;    ///< 框编号
+    S8  vendor[9];      ///< 多预留一个存放结束符
+    S8  diskModelNum[41];
+    S8  diskSerialNum[25];
+    U8  isEnclPd:1;
+    U8  rev:7;
+    U16 sectorSize;
+    U16 res;
+    U64 physicalSize;   ///< 硬盘物理容量，逻辑扇区LBA
+} Ps3LibPhyInquiryInfo_s;
+
+/**
+ * @brief 记录smp失败信息
+ */
+typedef struct Ps3LibSmpFailInfo {
+    U8 enclId;
+    U8 function;   ///< 槽位号
+    U8 rev[2];
+    U32 code;    ///< 框编号
+} Ps3LibSmpFailInfo_s;
+
+/**
+* @brief NVMe相关事件发布信息
+* @note 该结构体需要4字节对齐
+*/
+typedef union Ps3LibNvmeEvtInfo {
+    struct {
+        U8 sqe[64];
+        U64 path;
+        U16 enclosureId;   ///< enc ID
+        U16 slotId;        ///< 槽位号
+        U16 phyDiskId;     ///< 物理盘标识ID
+        U16 sf;
+        U32 cmdSpecfic;
+        U32 type:8;
+        U32 isAdminCmd:1;
+        U32 rsvd:23;
+    };      ///< NVMe 命令相关
+} Ps3LibNvmeEvtInfo_u;
+ 
+/**
+ * @brief sas link speed not match 信息
+ */
+typedef struct Ps3LibSasSataLinkSpeedMatchInfo {
+    U8   channelId;  ///< channel id
+    U8   lPhyId;     ///< 逻辑phy id
+    U8   linkSpeed;  ///< 当前协商速率
+    U8   pad1;        ///< 预留字段
+    U32  pad2;        ///< 预留字段
+} Ps3LibSasSataLinkSpeedMatchInfo_s;
+
+/**
+ * @brief sas link negotiation exception 信息
+ */
+typedef struct Ps3LibSasSataLNExceptionInfo {
+    U8   channelId;  ///< channel id
+    U8   lPhyId;     ///< 逻辑phy id
+    U16  pad1;        ///< 预留字段
+    U32  type;
+    U32  status;
+    U32  pad2;        ///< 预留字段
+} Ps3LibSasSataLNExceptionInfo_s;
+
+/**
+ * @brief sas driver 通用信息
+ */
+typedef struct Ps3LibSasSataDriverInfo {
+    U8   channelId;  ///< channel id
+    U8   lPhyId;     ///< 逻辑phy id
+    U16  pad1;        ///< 预留字段
+    U32  type;
+    U32  status;
+    U32  pad2;        ///< 预留字段
+} Ps3LibSasSataDriverInfo_s;
 
 typedef union Ps3LibReportEvtData
 {
@@ -691,6 +834,7 @@ typedef union Ps3LibReportEvtData
     Ps3LibTempEvtInfo_s       tempEvtInfo;
     Ps3LibDeviceResetEvtInfo_s deviceResetEvtInfo;
     Ps3LibSenseDataEvtInfo_s  senseDataEvtInfo;
+    Ps3LibErrSenseEvtInfo_s   errSenseEvtInfo;
     Ps3LibPdDownloadInfo_s    pdDldEvtInfo;
     Ps3LibSanitizeEvtInfo_s   sanitizeInfo;
     Ps3LibFormatEvtInfo_s     formatInfo;
@@ -698,6 +842,17 @@ typedef union Ps3LibReportEvtData
     Ps3LibPdPreFailInfo_s     pdPrefailInfo;
     Ps3LibDiskPFCfgModifyEvtInfo_s  diskPFCfgModifyEvtInfo;
     Ps3LibNvDataInvaildInfo_s nvDataInvaildInfo;
+    Ps3LibCtrlPowerMode_s   powerMode;
+    Ps3LibSpeedNegoInfo_s     speedNegoInfo;
+    Ps3LibInitFailInfo_s      initFailInfo;
+    Ps3LibTriModeInfo_s       triModeInfo;
+    Ps3LibPhyChgInfo_s        phyChgInfo;
+    Ps3LibPhyInquiryInfo_s    phyInquiryInfo;
+    Ps3LibSmpFailInfo_s       smpFailInfo;
+    Ps3LibNvmeEvtInfo_u     nvmeInfo;
+    Ps3LibSasSataLinkSpeedMatchInfo_s sasSataLinkSpeedNoMatchInfo;
+    Ps3LibSasSataLNExceptionInfo_s  sasSataLNExceptionInfo;
+    Ps3LibSasSataDriverInfo_s  sasSataDriverInfo;
 
     ///< 用来计算 device ID 联合低64位
     U64 value;
@@ -715,9 +870,9 @@ typedef struct Ps3LibEvtLogEntry {
     Ps3LibEvtLogHeader_s  head;    ///< 日志消息头
     Ps3LibReportEvtData_u evtInfo; ///< 日志消息体,事件描述信息
     CtrlId_t           ctrlId;     ///< 事件所属控制卡id 非控制卡事件时为全F
-    U8                 pad[4];
     CtrlId_t           regCtrlId;  ///< 订阅的控制卡id 只在事件上报时关注
     U32                registerId; ///< 订阅的uniqueId 只在事件上报时关注
+    U32                pad;        ///< 增添保留字段
 } Ps3LibEvtLogEntry_s;
 
 /**
@@ -833,6 +988,12 @@ Ps3Errno ps3libCtrlEventLogsDelete(CtrlId_t ctrlId);
  * @param[in]   uniqueId: 已订阅Id
  * @return      ctrlId
  */
-U16 ps3libEventUinqueIdToCtrlId(U32 uniqueId);
+U32 ps3libEventUinqueIdToCtrlId(U32 uniqueId);
+
+///< ====================end of file====================
+
+#if defined(__cplusplus)
+}
+#endif
 
 #endif

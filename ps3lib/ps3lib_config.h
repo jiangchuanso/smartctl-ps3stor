@@ -8,4 +8,11 @@
 #ifndef __PS3LIB_CONFIG_H__
 #define __PS3LIB_CONFIG_H__
 
+#if defined(__cplusplus)
+extern "C" {
+#endif
+
+#if defined(__cplusplus)
+}
+#endif
 #endif

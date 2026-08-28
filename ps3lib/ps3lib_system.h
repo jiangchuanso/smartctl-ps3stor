@@ -9,11 +9,15 @@
 #ifndef __PS3LIB_SYSTEM_H__
 #define __PS3LIB_SYSTEM_H__
 
+#if defined(__cplusplus)
+extern "C" {
+#endif
+
 #include "ps3lib_phy.h"
 
 #define PS3LIB_OS_INFO_STRING_LEN   (128)           ///< 系统信息字符串长度
 #define PS3LIB_VERSION_LEN          (32)            ///< ps3lib库版本
-#define PS3LIB_MAX_EVENT_REG_CNT    (32)            ///< 事件日志最大注册数量
+#define PS3LIB_MAX_EVENT_REG_CNT    (128)            ///< 事件日志最大注册数量
 #define PS3LIB_ERRNO_LIST_MAX_COUNT (64)  ///< 错误码列表最大数量
 #define PS3LIB_BMC_DRIVER_MAX_LEN   (64)  ///< BMC驱动名称最大字符长度
 #define PS3LIB_BMC_ENV_I2C            "i2c"       ///< 环境变量 : i2c 通路
@@ -74,7 +78,7 @@ typedef struct Ps3LibPciInfo {
  * @brief 系统PCI设备结构体
  */
 typedef struct Ps3LibSystemPciInfo {
-    U32             hostId;     ///< 主机标识符
+    U64             hostId;     ///< 主机标识符
     Ps3LibPciInfo_t pciInfo;    ///< PCI设备结构体
 } Ps3LibSystemPciInfo_t;
 
@@ -93,6 +97,7 @@ typedef struct Ps3LibSystemTime {
 
 /**
  * @brief  操作系统信息
+ * @note   字符串可能不包含终止符'\0'
  */
 typedef struct Ps3LibOsInfo {
     S8 osName[PS3LIB_OS_INFO_STRING_LEN];        ///< 操作系统名字
@@ -105,6 +110,7 @@ typedef struct Ps3LibOsInfo {
 
 /**
  * @brief  系统信息
+ * @note   字符串可能不包含终止符'\0'
  */
 typedef struct Ps3LibSystemInfo {
     U8              libVersion[PS3LIB_VERSION_LEN]; ///< lib库版本
@@ -113,16 +119,18 @@ typedef struct Ps3LibSystemInfo {
 
 /**
  * @brief  主机信息
+ * @note   字符串可能不包含终止符'\0'
  */
 typedef struct Ps3LibHostInfo {
     U64  pciBus;
     U8   pciDev;
     U8   pciFunc;
-    U8   reserved1[PS3LIB_HOST_INFO_RESERVED_1_LEN];         ///< 保留字段1 54 bytes
+    U8   reserved1[PS3LIB_HOST_INFO_RESERVED_1_LEN - 4];         ///< 保留字段1 50 bytes
+    U32  domainID;                                           ///< domainID 4 bytes
     S8   driverName[PS3LIB_HOST_INFO_DRIVE_NAME_LEN];        ///< 驱动名称 128 bytes
     S8   driverVersion[PS3LIB_HOST_INFO_DRIVE_VERSION_LEN];  ///< 驱动版本 128 bytes
     S8   reserved2[PS3LIB_HOST_INFO_RESERVED_2_LEN];         ///< 保留字段2 192bytes
-} Ps3LibHostInfo_t; ///< 512[8+1+1+54+128+128+192]Btyes
+} Ps3LibHostInfo_t; ///< 512[8+1+1+50+4+128+128+192]Btyes
 
 typedef struct Ps3LibErrno{
     S8        key[32];    ///< 错误码字符串索引，如"ccrate"
@@ -183,7 +191,8 @@ typedef struct Ps3LibLogConfig {
     int             logRotateCount;
     int             logRotateSize;
     U8              logOverwrite; ///< 日志文件覆盖写，目前未实现，后续考虑删除
-    U8              pad[3];
+    U8              disableLog;
+    U8              pad[2];
 } Ps3LibLogConfig_t;
 
 typedef struct Ps3LibOobConfig {
@@ -194,6 +203,10 @@ typedef struct Ps3LibOobConfig {
     U32   getCmdTimeout;    ///< 获取命令超时时间,单位(s)
     U32   downloadTimeout;  ///< 升级命令超时时间,单位(s),设置为0时使用默认值
     U32   oobChannelType;   ///< oob驱动类型(enum Ps3LibOobChannelType_e)
+    U8    mctpCmdTimeout;   ///< mctp命令通用超时时间,单位(s)
+    U8    mctpMessageMode;  ///< mctp通路信息交互模式(0:EID, 1:BDF)
+    U8    mctpVdmhdrOffset; ///< message type长度偏移(单位byte, 范围0-255) 0-无偏移,3-偏移3字节（默认）
+    U8    reserved;
 } Ps3LibOobConfig_t;
 
 typedef struct Ps3LibConfigFile {
@@ -297,5 +310,15 @@ void ps3libLogModeSet(Ps3LogMode_t mode);
  * @param[out] mode: 当前lib库日志模式
  */
 void ps3libLogModeGet(Ps3LogMode_t* mode);
+
+/**
+ * @brief        获取配置文件内容
+ * @return       Ps3LibConfigFile_t ps3lib配置
+ */
+Ps3LibConfigFile_t *ps3libConfigParamGet();
+
+#if defined(__cplusplus)
+}
+#endif
 
 #endif

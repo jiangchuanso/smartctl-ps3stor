@@ -8,8 +8,12 @@
 #ifndef __PS3LIB_VD_H__
 #define __PS3LIB_VD_H__
 
-#include "ps3lib_pd.h"
+#if defined(__cplusplus)
+extern "C" {
+#endif
+
 #include "ps3lib_ctrl.h"
+#include "ps3lib_pd.h"
 #include "ps3lib_dg.h"
 #include "ps3lib_phy.h"
 
@@ -17,8 +21,6 @@
 #define PS3LIB_VD_NAAID_LEN                (16)     ///< NAAId(Network Address Authority)长度
 #define PS3LIB_MAX_VD_PASSWD_LEN           (32)     ///< vd密码最大长度
 #define PS3LIB_RAID1_MIN_PD_CNT            (2)
-
-#define PARTIAL_SETTING_FAILURE_PROMPT  "Some attribute settings failed, please check log file."
 
 /**
  * @brief   VD encryption枚举
@@ -53,7 +55,7 @@ typedef enum Ps3LibUnmapStatus {
 typedef struct Ps3LibVdBaseInfo{
     U16     vdId;                       ///< VD target ID
     U16     dgId;                       ///< 所属磁盘组ID
-    U16     devId :12;                  ///< 片外暂时不用，与元数据对齐
+    U16     devId :12;                  ///< 所属设备ID
     U16     channelId :4;               ///< 所属通道ID
     U8      raidLevel;                  ///< raid级别(enum Ps3LibRaidLevel_e)
     U8      vdstate;                    ///< VD状态
@@ -69,7 +71,7 @@ typedef struct Ps3LibVdBaseInfo{
     U8      currentIoPolicy;            ///< Not Support
     U8      pad[6];
     U64     vdSize;                     ///< VD 大小
-    U8      vdName[PS3LIB_VD_NAME_LEN]; ///< VD名称
+    U8      vdName[PS3LIB_VD_NAME_LEN]; ///< VD名称(字符串可能不包含终止符'\0')
     U8      isCcScheduled;              ///< 是否定期进行一致性检查
     U8      pad1[7];
     U32     logicalSectorSize;          ///< 逻辑扇区大小(B)
@@ -510,12 +512,24 @@ typedef enum Ps3LibStripSize{
 }Ps3LibStripSize_e;
 
 /**
+ * @brief   VD条最大的IO大小 单位：KB
+ */
+enum {
+    PS3LIB_VD_MAX_IO_SIZE_64   = 64,
+    PS3LIB_VD_MAX_IO_SIZE_128  = 128,
+    PS3LIB_VD_MAX_IO_SIZE_256  = 256,
+    PS3LIB_VD_MAX_IO_SIZE_512  = 512,
+    PS3LIB_VD_MAX_IO_SIZE_1024 = 1024,
+    PS3LIB_VD_MAX_IO_SIZE_NR,
+};
+
+/**
  * @brief   VD创建基本信息
  */
 typedef struct Ps3LibVdCreateInfo{
     U64             vdSize;                  ///< vd大小, 单位512B
-    U8              vdName[PS3LIB_VD_NAME_LEN];         ///< vd名称
-    S8              vdPasswd[PS3LIB_MAX_VD_PASSWD_LEN]; ///< vd密码
+    U8              vdName[PS3LIB_VD_NAME_LEN];         ///< vd名称(注意:字符串可能不包含终止符'\0')
+    S8              vdPasswd[PS3LIB_MAX_VD_PASSWD_LEN]; ///< vd密码(注意:字符串可能不包含终止符'\0')
     U8              certifyUpdate;
     U8              pad[7];
 }Ps3LibVdCreateInfo_t;     ///< 24Bytes
@@ -575,7 +589,7 @@ typedef struct Ps3LibVdBadBlockInfo {
     U16     vdUncorrectedNum;                   ///< 肯定不能被更正的坏块数量
     U16     pdInfoCount;                        ///< 对应VD有坏块的成员盘数量
     U8      pad[2];
-    U8      vdName[PS3LIB_VD_NAME_LEN];                ///< VD名称
+    U8      vdName[PS3LIB_VD_NAME_LEN];                ///< VD名称(注意:字符串可能不包含终止符'\0')
     Ps3LibPdErrTbl_t pdList[PS3LIB_MAX_PD_PER_VD_RAID];   ///< 坏块成员盘列表
 } Ps3LibVdBadBlockInfo_t;
 
@@ -682,10 +696,11 @@ Ps3Errno ps3libVdListGetByCtrlId(CtrlId_t ctrlId, Ps3LibVdList_s *vdList);
  * @param[in]   ctrlId: 控制卡标识符
  * @param[in]   vdList: vd列表
  * @param[out]  vdInfo: 用户接受回复的批量vd信息
+ * @param[out]  pErrList:   批量查询时上报的vd错误码列表
  * @note        vdInfo需由调用者根据vd的数量申请内存并释放
  * @return      PS3_ERRNO_SUCCESS: 成功
  */
-Ps3Errno ps3libVdInfoGetByVdList(CtrlId_t ctrlId, Ps3LibVdList_s *vdList, Ps3LibVdInfo_t *vdInfo);
+Ps3Errno ps3libVdInfoGetByVdList(CtrlId_t ctrlId, Ps3LibVdList_s *vdList, Ps3LibVdInfo_t *vdInfo, Ps3Errno *pErrList);
 
 /**
  * @brief        获取vd基本信息
@@ -1000,5 +1015,27 @@ Ps3Errno ps3libVdBbmtInfoGet(CtrlId_t ctrlId, VdId_t vdId, U8 *details, Ps3LibVd
  * @return      PS3_ERRNO_SUCCESS: 成功；其他: 失败
  */
 Ps3Errno ps3libVdBbmtDel(CtrlId_t ctrlId, VdId_t vdId);
+
+/**
+ * @brief       设置VD的最大IO SIZE
+ * @param[in]   ctrlId: 控制卡标识符
+ * @param[in]   vdId: vd标识符
+ * @param[in]   maxIOsize: 最大IO大小 64 128 256 512 1024
+ * @return      PS3_ERRNO_SUCCESS: 成功；其他: 失败
+ */
+Ps3Errno ps3libVdMaxIOSizeSet(CtrlId_t ctrlId, VdId_t vdId, U32 maxIOsize);
+
+/**
+ * @brief       获取VD的最大IO SIZE
+ * @param[in]   ctrlId: 控制卡标识符
+ * @param[in]   vdId: vd标识符
+ * @param[in]   maxIOsize: 最大IO大小 64 128 256 512 1024
+ * @return      PS3_ERRNO_SUCCESS: 成功；其他: 失败
+ */
+Ps3Errno ps3libVdMaxIOSizeGet(CtrlId_t ctrlId, VdId_t vdId, U32 *maxIoSize);
+
+#if defined(__cplusplus)
+}
+#endif
 
 #endif

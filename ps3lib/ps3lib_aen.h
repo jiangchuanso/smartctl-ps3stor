@@ -9,6 +9,10 @@
 #ifndef __PS3LIB_AEN_H__
 #define __PS3LIB_AEN_H__
 
+#if defined(__cplusplus)
+extern "C" {
+#endif
+
 /**
  * @brief   事件上报回调
  */
@@ -23,11 +27,11 @@ typedef int (*pAenBatchCbFunc)(Ps3LibEvtLogList_s *pEvtLogList);
  * @brief   事件日志注册信息
  */
 typedef struct Ps3LibRegAenInfo {
-    CtrlId_t ctrlId;    ///< 控制卡Id
-    U8       pad[2];
+    CtrlId_t ctrlId;    ///< ctrlId 由U16变更为U32, 占用下方2bit保留字段
     U32      level;     ///< 注册级别
     U32      locale;    ///< 注册模式
     U32      seqNum;    ///< 订阅序列号
+    U8       reserved[8];
 } Ps3LibRegAenInfo_s;
 
 /**
@@ -63,5 +67,9 @@ Ps3Errno ps3libRegAen(Ps3LibRegAenInput_s *input, Ps3LibRegAenOutput_s *output);
  * @param[in]   uniqueId:   注册唯一Id标识
  */
 Ps3Errno ps3libUnregAen(U32 uniqueId);
+
+#if defined(__cplusplus)
+}
+#endif
 
 #endif

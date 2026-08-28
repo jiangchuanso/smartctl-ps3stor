@@ -9,9 +9,13 @@
 #ifndef __PS3LIB_EXPANDER_H__
 #define __PS3LIB_EXPANDER_H__
 
+#if defined(__cplusplus)
+    extern "C" {
+#endif
+
 #include "ps3lib_event.h"
 
-#define PS3LIB_EXP_MAX_PHYSICAL_PHYS_NUM       (48)    ///< EXP最大phy个数
+#define PS3LIB_EXP_MAX_PHYSICAL_PHYS_NUM       (48)     ///< EXP最大phy个数
 
 #define PS3LIB_EXP_PDINFO_MAX_LEN (sizeof(Ps3LibExpBatchPdInfo_s) + \
     (PS3LIB_EXP_MAX_PHYSICAL_PHYS_NUM * PS3LIB_EXP_PD_INFO_SIZE)) 
@@ -102,6 +106,7 @@ typedef struct Ps3LibExpPhyInfo {
 
 /**
  *  @brief pd 基础信息
+ *  @note   字符串可能不包含终止符'\0'
  */
 typedef struct Ps3LibExpPdBaseInfo {
     U8      present;            ///< 硬盘在位
@@ -200,8 +205,7 @@ typedef struct Ps3LibEpCmdEventInfo {
  *  @brief Expander 事件订阅结构体
  */
 typedef struct Ps3LibEpEventSubscribe {
-    U16                     devlId;      ///< 设备地址 低八位为bus 高八位为address
-    U8                      pad[2];      ///< 保留字段
+    U32                     devlId;      ///< 设备地址 低八位为bus 高八位为address
     Ps3LibEpEventDevType_e  devType;     ///< 设备类型
     Ps3LibEpEventType_e     evtType;     ///< 事件类型 PS3LIB_EVT_MAX_TYPE_LOCAL 表示获取所有
     Ps3LibEpEventLevel_e    evtLevel;    ///< 事件级别 PS3LIB_EVT_CLASS_MAX 表示获取所有
@@ -220,6 +224,7 @@ enum {
 
 /**
  * @brief   厂商分区保存的生产字段
+ * @note    字符串可能不包含终止符'\0'
  */
 typedef struct Ps3LibExpMfgInfo {
     U8  partNumber[PS3LIB_EXP_MFG_PART_NUMBER_LEN];     ///< part number 16-byte ASCII string
@@ -241,7 +246,7 @@ typedef struct Ps3LibExpMfgInfo {
  * @param[out]  pRespLen: 用户接受回复信息的实际长度
  * @return      PS3_ERRNO_SUCCESS: 成功
  */
-Ps3Errno ps3libEpGetPdInfo(U16 devId, Ps3LibExpBatchPdInfo_s *pResp, U32 *pRespLen);
+Ps3Errno ps3libEpGetPdInfo(CtrlId_t devId, Ps3LibExpBatchPdInfo_s *pResp, U32 *pRespLen);
 
 /**
  * @brief       获取 Expander 基础信息
@@ -252,7 +257,7 @@ Ps3Errno ps3libEpGetPdInfo(U16 devId, Ps3LibExpBatchPdInfo_s *pResp, U32 *pRespL
  * @param[out]  pRespInfo: 用户接受回复信息结构体
  * @return      PS3_ERRNO_SUCCESS: 成功
  */
-Ps3Errno ps3libEpGetBaseInfo(U16 devId, U8 addr, Ps3LibBaseInfo_s *pRespInfo);
+Ps3Errno ps3libEpGetBaseInfo(CtrlId_t devId, U8 addr, Ps3LibBaseInfo_s *pRespInfo);
 
 /**
  * @brief       Expander事件日志订阅
@@ -274,6 +279,10 @@ Ps3Errno ps3libEpEventUnReg(U32 uniqueId);
  * @param[out]  pMfgInfo: 生产信息
  * @return      PS3_ERRNO_SUCCESS: 成功
  */
-Ps3Errno ps3libEpGetMfgInfo(U16 devId, Ps3LibExpMfgInfo_t *pMfgInfo);
+Ps3Errno ps3libEpGetMfgInfo(CtrlId_t devId, Ps3LibExpMfgInfo_t *pMfgInfo);
+
+#if defined(__cplusplus)
+}
+#endif
 
 #endif

@@ -8,6 +8,10 @@
 #ifndef __PS3LIB_PHY_H__
 #define __PS3LIB_PHY_H__
 
+#if defined(__cplusplus)
+extern "C" {
+#endif
+
 #define PS3LIB_CTRL_MAX_PHY_CNT            (18)
 #define PS3LIB_MAX_PD_PER_ENCL             (255)
 #define PS3LIB_PHY_DESCRIPTION_LEN         (16)
@@ -141,5 +145,9 @@ Ps3Errno ps3libPhyListFill(CtrlId_t ctrlId, Ps3LibIdList_t *phyIdListOut, const 
  * @return      PS3_ERRNO_SUCCESS: 成功
  */
 Ps3Errno ps3libPhyInfoGet(CtrlId_t ctrlId, PhyId_t phyId, EnclId_t enclId, U64 enclSasAddr, Ps3LibPhyInfo_t *pPhyInfo);
+
+#if defined(__cplusplus)
+}
+#endif
 
 #endif
