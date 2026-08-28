@@ -1666,7 +1666,7 @@ bool linux_ps3stor_device::open()
 {
   if(!m_open_flag) {
   
-    if (sscanf(get_dev_name(), "/dev/ctrl/%hu", &m_cid) == 0) {
+    if (sscanf(get_dev_name(), "/dev/ctrl/%u", &m_cid) == 0) {
       if (!linux_smart_device::open())
         return false;
       /* Get device HBA */

@@ -90,7 +90,7 @@ const char * packet_types[] = {
 // lines: 1: version only, 2: version+copyright, >=3: full information
 std::string format_version_info(const char * prog_name, int lines /* = 2 */)
 {
-    ps3libVersion_s ps3libVer;
+    Ps3LibVersion_s ps3libVer;
     memset(&ps3libVer, 0 , sizeof(ps3libVer));
     ps3libVersionGet(&ps3libVer);
 
