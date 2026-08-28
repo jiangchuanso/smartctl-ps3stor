@@ -1047,12 +1047,12 @@ clean-sbinPROGRAMS:
 
 smartctl$(EXEEXT): $(smartctl_OBJECTS) $(smartctl_DEPENDENCIES) $(EXTRA_smartctl_DEPENDENCIES) 
 	@rm -f smartctl$(EXEEXT)
-	$(AM_V_CXXLD)$(CXXLINK) $(smartctl_OBJECTS) $(smartctl_LDADD) $(LIBS)  -L ./ps3lib -l$(PS3LIB) -lpthread
+	$(AM_V_CXXLD)$(CXXLINK) $(smartctl_OBJECTS) $(smartctl_LDADD) $(LIBS)  -L ./ps3lib -l$(PS3LIB) -lpthread -ldl
 	@cp smartctl$(EXEEXT) smartctl_ps3stor_$(shell uname -m)$(EXEEXT)
 
 smartd$(EXEEXT): $(smartd_OBJECTS) $(smartd_DEPENDENCIES) $(EXTRA_smartd_DEPENDENCIES) 
 	@rm -f smartd$(EXEEXT)
-	$(AM_V_CXXLD)$(CXXLINK) $(smartd_OBJECTS) $(smartd_LDADD) $(LIBS)  -L ./ps3lib -l$(PS3LIB) -lpthread
+	$(AM_V_CXXLD)$(CXXLINK) $(smartd_OBJECTS) $(smartd_LDADD) $(LIBS)  -L ./ps3lib -l$(PS3LIB) -lpthread -ldl
 install-examplesSCRIPTS: $(examples_SCRIPTS)
 	@$(NORMAL_INSTALL)
 	@list='$(examples_SCRIPTS)'; test -n "$(examplesdir)" || list=; \
