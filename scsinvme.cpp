@@ -520,8 +520,10 @@ nvme_device * smart_interface::get_snt_device(const char * type, scsi_device * s
 
 nvme_device *smart_interface::get_ps3stor_nvme_device(scsi_device *scsidev, unsigned nsid, unsigned cid, unsigned did)
 {
-  if (!scsidev->is_open())
+  if (!scsidev->is_open()) {
+    set_err(EINVAL, "smart_interface: get_ps3stor_nvme_device() called with closed device");
     return 0;
+  }
   
   nvme_device_auto_ptr nvmedev( new ps3stornvme_device(this, scsidev, "", nsid, cid, did) , scsidev);
   return nvmedev.release();

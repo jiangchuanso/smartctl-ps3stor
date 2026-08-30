@@ -35,6 +35,26 @@ if NEED_REGEX
 AM_CPPFLAGS += -I$(srcdir)/regex -D_REGEX_STANDALONE
 endif
 
+# ps3lib: vendor library implementing the '-d ps3stor' device type.
+# Only static libs for x86_64 and aarch64 are shipped in ps3lib/.
+PS3LIB_ARCH = $(shell uname -m)
+ifeq ($(PS3LIB_ARCH),x86_64)
+  PS3LIB = ps3
+else ifeq ($(PS3LIB_ARCH),aarch64)
+  PS3LIB = ps3_aarch64
+else
+  PS3LIB =
+  $(warning ps3lib: no prebuilt library for architecture '$(PS3LIB_ARCH)', linking smartctl/smartd will fail)
+endif
+
+ifeq ($(PS3LIB),)
+  PS3LIB_LDADD =
+else
+  PS3LIB_LDADD = -L$(srcdir)/ps3lib -l$(PS3LIB) -lpthread -ldl
+endif
+
+AM_CPPFLAGS += -I$(srcdir)/ps3lib
+
 sbin_PROGRAMS = \
         smartctl \
         smartd
@@ -89,7 +109,7 @@ smartctl_SOURCES = \
         utility.h \
         sg_unaligned.h
 
-smartctl_LDADD = $(os_deps) $(os_libs)
+smartctl_LDADD = $(os_deps) $(os_libs) $(PS3LIB_LDADD)
 smartctl_DEPENDENCIES = $(os_deps)
 
 EXTRA_smartctl_SOURCES = \
@@ -161,7 +181,7 @@ smartd_SOURCES = \
         utility.h \
         sg_unaligned.h
 
-smartd_LDADD = $(os_deps) $(os_libs) $(CAPNG_LDADD) $(SYSTEMD_LDADD)
+smartd_LDADD = $(os_deps) $(os_libs) $(CAPNG_LDADD) $(SYSTEMD_LDADD) $(PS3LIB_LDADD)
 smartd_DEPENDENCIES = $(os_deps)
 
 EXTRA_smartd_SOURCES = \
@@ -399,6 +419,35 @@ uninstall-sysconfDATA:
 
 smartdscript_SCRIPTS = smartd_warning.sh
 
+# Sources of the '-d ps3stor' device type (see ps3lib/ above)
+ps3lib_sources = \
+        ps3stor.h \
+        inner.h \
+        ps3lib/README \
+        ps3lib/libps3.a \
+        ps3lib/libps3_aarch64.a \
+        ps3lib/ps3_ses.h \
+        ps3lib/ps3lib_aen.h \
+        ps3lib/ps3lib_bbu.h \
+        ps3lib/ps3lib_cfg.h \
+        ps3lib/ps3lib_config.h \
+        ps3lib/ps3lib_ctrl.h \
+        ps3lib/ps3lib_dg.h \
+        ps3lib/ps3lib_encl.h \
+        ps3lib/ps3lib_event.h \
+        ps3lib/ps3lib_expander.h \
+        ps3lib/ps3lib_passthru.h \
+        ps3lib/ps3lib_pcieswitch.h \
+        ps3lib/ps3lib_pcieswitch_host.h \
+        ps3lib/ps3lib_pd.h \
+        ps3lib/ps3lib_phy.h \
+        ps3lib/ps3lib_rdebug.h \
+        ps3lib/ps3lib_smp.h \
+        ps3lib/ps3lib_system.h \
+        ps3lib/ps3lib_type.h \
+        ps3lib/ps3lib_update.h \
+        ps3lib/ps3lib_vd.h
+
 EXTRA_DIST = \
         .editorconfig \
         autogen.sh \
@@ -433,7 +482,8 @@ EXTRA_DIST = \
         os_win32/wtssendmsg.c \
         $(docs_DATA) \
         $(examples_DATA) \
-        $(examples_SCRIPTS)
+        $(examples_SCRIPTS) \
+        $(ps3lib_sources)
 
 CLEANFILES = \
         smartd.8 \
