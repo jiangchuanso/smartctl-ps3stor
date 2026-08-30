@@ -443,6 +443,10 @@ bool ps3stornvme_device::nvme_pass_through(const nvme_cmd_in & in, nvme_cmd_out 
   nvme_cmd.cdw15 = in.cdw15;
 
   req.targetId = m_did;
+  // NVMe opcode bits 1:0 encode the data direction (0=none, 1=host-to-ctrl,
+  // 2=ctrl-to-host, 3=bidir) which coincidentally matches Ps3LibDir_e
+  // (NONE=0, WRITE=1, READ=2, BOTH=3).  Keep this mapping in mind if either
+  // side ever changes its enum values.
   req.dir = in.direction();
 
   //set encapsulatedCmdLength encapsulatedNVMeCmd submissionQueueType 

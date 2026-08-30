@@ -1776,8 +1776,12 @@ bool linux_ps3stor_device::scsi_cmd(scsi_cmnd_io *iop)
   }
 
   // use ps3lib for scsi cmd
+  // ps3lib's dataSize field is 32-bit: reject larger transfers up front so the
+  // size_t -> U32 conversion below cannot silently truncate.
+  if (iop->dxfer_len > 0xffffffffU)
+    return set_err(ENOSYS, "ps3stor cannot support data buffers larger than 4GiB");
   ps3stor_scsi_passthru_t *scsi_passthru = NULL;
-  unsigned data_size = sizeof(*scsi_passthru) + iop->dxfer_len;
+  size_t data_size = sizeof(*scsi_passthru) + iop->dxfer_len;
   scsi_passthru = (ps3stor_scsi_passthru_t*)malloc(data_size);
   if(scsi_passthru == NULL) {
     return set_err(EIO, "linux_ps3stor_device::scsi_cmd: malloc failed.");
@@ -1797,7 +1801,7 @@ bool linux_ps3stor_device::scsi_cmd(scsi_cmnd_io *iop)
 
   scsi_passthru->cdbLength = iop->cmnd_len;
   memcpy(scsi_passthru->cdb, iop->cmnd, scsi_passthru->cdbLength);
-  scsi_passthru->dataSize = iop->dxfer_len;
+  scsi_passthru->dataSize = (U32)iop->dxfer_len; // checked for 32-bit range above
   // Send the caller's data to the device
   if (iop->dxfer_dir == DXFER_TO_DEVICE && iop->dxferp && iop->dxfer_len > 0)
     memcpy(scsi_passthru->data, iop->dxferp, iop->dxfer_len);
@@ -1824,7 +1828,7 @@ bool linux_ps3stor_device::scsi_cmd(scsi_cmnd_io *iop)
   // Copy the sense data (if any), the common SCSI/SAT layers evaluate it
   // together with 'iop->scsi_status'.
   if (iop->sensep && iop->max_sense_len > 0) {
-    unsigned len = PS3STOR_MIN(iop->max_sense_len, (unsigned)sizeof(scsi_passthru->pRequestSenseData));
+    unsigned len = PS3STOR_MIN((unsigned)iop->max_sense_len, (unsigned)sizeof(scsi_passthru->pRequestSenseData));
     memcpy(iop->sensep, scsi_passthru->pRequestSenseData, len);
     iop->resp_sense_len = len;
   }
@@ -1875,7 +1879,7 @@ bool linux_ps3stor_device::find_ctrlid_by_hostid()
   // try to find cid by hostid
   for(U16 i = 0; i < ctrl_list.count; i++)
   {
-    ps3stor_system_pcieinfo_t  pcieinfo;
+    ps3stor_system_pcieinfo_t  pcieinfo = {};
     ps3stor_errno err = ps3libSystemPciInfoGet(ctrl_list.ctrlId[i], &pcieinfo);
     if(err != PS3STOR_ERRNO_SUCCESS) {
       //todo print err msg
@@ -3761,7 +3765,7 @@ int linux_smart_interface::ps3stor_pd_add_list(unsigned int ctrlid, smart_device
   for(U16 i = 0; i < pd_devid_list.pdCount; i++)
   {
     char line[128];
-    snprintf(line, sizeof(line) - 1, "/dev/ctrl/%u", ctrlid);
+    snprintf(line, sizeof(line), "/dev/ctrl/%u", ctrlid);
     smart_device * dev = new linux_ps3stor_device(this, line, pd_devid_list.pdDevId[i], ctrlid);
     devlist.push_back(dev);
   }
@@ -3801,7 +3805,7 @@ bool linux_smart_interface::ps3stor_find_ctrlid(unsigned hostid, ctrl_id_t &cid)
   // try to find cid by hostid
   for(U16 i = 0; i < m_ctrl_list.count; i++)
   {
-    ps3stor_system_pcieinfo_t  pcieinfo;
+    ps3stor_system_pcieinfo_t  pcieinfo = {};
     ps3stor_errno err = ps3libSystemPciInfoGet(m_ctrl_list.ctrlId[i], &pcieinfo);
     if(err != PS3STOR_ERRNO_SUCCESS) {
       //TODO : PRINT ERR
@@ -4107,19 +4111,23 @@ smart_device * linux_smart_interface::get_custom_smart_device(const char * name,
 
   // ps3stor ?
   unsigned ctrlId = PS3LIB_INVALID_CODE_U32;
-  if (sscanf(type, "ps3stor,%d", &disknum) == 1) {
-    //todo : check for disknum innvalid or not exist
+  unsigned pdid = 0;
+  if (sscanf(type, "ps3stor,%u", &pdid) == 1) {
+    // The PD identifier is passed to ps3lib as a U16 (ps3libPdBaseInfoGetByDevId),
+    // so reject values that would silently be truncated.
+    if (pdid > 0xffffU)
+      return set_err_np(EINVAL, "Option -d ps3stor,N (N=%u) must have 0 <= N <= 65535", pdid);
     if(ps3stor_init_lib()) {
       if(sscanf(name, "/dev/ctrl/%u", &ctrlId) == 1) {
         if(ps3stor_check_ctrlid_exist(ctrlId) ) {
-          return new linux_ps3stor_device(this, name, disknum, ctrlId);
+          return new linux_ps3stor_device(this, name, pdid, ctrlId);
         } else {
-          pout("get_custom_smart_device: invalid ctrl with /dev/ctrl/%d.\n", ctrlId);
-          set_err_np(EINVAL, "get_custom_smart_device: invalid ctrl with /dev/ctrl/%d.\n", ctrlId);
+          pout("get_custom_smart_device: invalid ctrl with /dev/ctrl/%u.\n", ctrlId);
+          set_err_np(EINVAL, "get_custom_smart_device: invalid ctrl with /dev/ctrl/%u.\n", ctrlId);
         }
       } else {
 #ifdef PS3STOR_SUPPORT_DEV_SDX
-        return new linux_ps3stor_device(this, name, disknum);
+        return new linux_ps3stor_device(this, name, pdid);
 #else
         pout("get_custom_smart_device: input /dev/ctrl/X after ps3stor,N.\n");
         set_err_np(EINVAL, "get_custom_smart_device: input /dev/ctrl/X after ps3stor,N.\n");

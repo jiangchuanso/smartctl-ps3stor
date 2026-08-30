@@ -1,9 +1,9 @@
 # Package name and version follow the upstream smartmontools release so the
 # RPM is named smartmontools-7.4-<Release>.el8.<arch>.rpm. The Release number
-# (currently 3) is the only part controlled by this project's packaging.
+# (currently 4) is the only part controlled by this project's packaging.
 Name:           smartmontools
 Version:        7.4
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        smartctl extended with PS3STOR device support (based on smartmontools 7.4)
 
 License:        GPLv2+
@@ -266,6 +266,14 @@ fi
 /usr/bin/systemctl daemon-reload >/dev/null 2>&1 || :
 
 %changelog
+* Sun Aug 30 2026 smartctl-ps3stor maintainer <maintainer@example.com> - 7.4-4
+- ps3stor bug fixes: validate the '-d ps3stor,N' physical drive identifier
+  (reject values above 65535 and negative input instead of silently
+  truncating to the U16 used by ps3libPdBaseInfoGetByDevId); fix a size_t/U32
+  overflow in the SCSI passthrough buffer allocation; initialize the PCIe info
+  struct used by the host id lookup; correct the snprintf buffer size and the
+  format strings printing the controller id.
+
 * Fri Aug 28 2026 smartctl-ps3stor maintainer <maintainer@example.com> - 7.4-3
 - Upgrade bundled vendor ps3lib from 2.2.0.14 to 2.9.0.12 (new static libs
   libps3.a / libps3_aarch64.a and updated headers under ps3lib/, including the
