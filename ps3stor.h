@@ -12,10 +12,13 @@
 #include "ps3lib_type.h"
 #include "ps3lib_ctrl.h" //todo : create ps3stor.h
 #include "ps3lib_passthru.h"
+#include "ps3lib_pd.h"   // Ps3LibPdBaseInfo_t/Ps3LibPdDevIdList_s/Ps3LibPdInterface_e (ps3lib_ctrl.h no longer pulls ps3lib_pd.h since 2.9.0.12)
 
 #define PS3STOR_ERRNO_SUCCESS           (0)
-#define PS3STOR_MIN(x,y)                ((x) < (y) ? (x) : (y))
-#define PS3STOR_SCSI_STATUS_UNDERRUN    (140)
+#define PS3STOR_MIN(x,y)                (((x) < (y)) ? (x) : (y))
+#define PS3STOR_SCSI_STATUS_UNDERRUN    (140)  ///< vendor specific: data underrun
+#define PS3STOR_SCSI_STATUS_NO_DEVICE   (12)   ///< vendor specific: PD not present
+#define PS3STOR_SCSI_STATUS_MAX         (0x7e) ///< highest status code defined by SAM
 
 //#define PS3STOR_SUPPORT_DEV_SDX   //todo : ps3libSystemPciInfoGet return with hostid 
 

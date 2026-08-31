@@ -90,9 +90,15 @@ const char * packet_types[] = {
 // lines: 1: version only, 2: version+copyright, >=3: full information
 std::string format_version_info(const char * prog_name, int lines /* = 2 */)
 {
-    ps3libVersion_s ps3libVer;
+    Ps3LibVersion_s ps3libVer;
     memset(&ps3libVer, 0 , sizeof(ps3libVer));
     ps3libVersionGet(&ps3libVer);
+    // The version string is not necessarily NUL terminated (see ps3lib_ctrl.h)
+    char ps3libVerStr[PS3LIB_VERSION_LEN + 1];
+    memcpy(ps3libVerStr, ps3libVer.libVersion, PS3LIB_VERSION_LEN);
+    ps3libVerStr[PS3LIB_VERSION_LEN] = '\0';
+    std::string ps3libver = strprintf("ps3libver %s b:%s c:%s \n",
+      ps3libVerStr, PS3_SMART_BRANCH, PS3_SMART_COMMIT_ID);
 
   std::string info = strprintf(
     "%s "
@@ -112,7 +118,7 @@ std::string format_version_info(const char * prog_name, int lines /* = 2 */)
     return info;
 
   info += "Copyright (C) 2002-23, Bruce Allen, Christian Franke, www.smartmontools.org ";
-  info += strprintf("ps3libver %s b:%s c:%s \n", ps3libVer.libVersion, PS3_SMART_BRANCH, PS3_SMART_COMMIT_ID);
+  info += ps3libver;
   if (lines == 2)
     return info;
 
@@ -177,10 +183,6 @@ std::string format_version_info(const char * prog_name, int lines /* = 2 */)
            SMARTMONTOOLS_CONFIGURE_ARGS : " [no arguments given]");
 #endif
   info += '\n';
-
-{
-      info += strprintf("ps3libver %s b:%s c:%s \n", ps3libVer.libVersion, PS3_SMART_BRANCH, PS3_SMART_COMMIT_ID);
-}
 
   return info;
 }

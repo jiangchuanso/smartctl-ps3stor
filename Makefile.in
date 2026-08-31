@@ -18,12 +18,22 @@
 # $Id: Makefile.am 5502 2023-07-16 15:03:24Z chrfranke $
 #
 
-ifeq ($(shell uname -m), x86_64)
-    PS3LIB := ps3
-else ifeq ($(shell uname -m), aarch64)
-    PS3LIB := ps3_aarch64
+# ps3lib: vendor library implementing the '-d ps3stor' device type.
+# Only static libs for x86_64 and aarch64 are shipped in ps3lib/.
+PS3LIB_ARCH = $(shell uname -m)
+ifeq ($(PS3LIB_ARCH),x86_64)
+  PS3LIB = ps3
+else ifeq ($(PS3LIB_ARCH),aarch64)
+  PS3LIB = ps3_aarch64
 else
-    ARCH := unknown
+  PS3LIB =
+  $(warning ps3lib: no prebuilt library for architecture '$(PS3LIB_ARCH)', linking smartctl/smartd will fail)
+endif
+
+ifeq ($(PS3LIB),)
+  PS3LIB_LDADD =
+else
+  PS3LIB_LDADD = -L$(srcdir)/ps3lib -l$(PS3LIB) -lpthread -ldl
 endif
 
 
@@ -605,7 +615,8 @@ AM_CPPFLAGS = -DBUILD_INFO='$(BUILD_INFO)' \
 	-DSMARTMONTOOLS_SYSCONFDIR='"$(sysconfdir)"' \
 	-DSMARTMONTOOLS_SMARTDSCRIPTDIR='"$(smartdscriptdir)"' \
 	$(am__append_1) $(am__append_2) $(am__append_3) \
-	$(am__append_4) $(am__append_5) $(am__append_6)
+	$(am__append_4) $(am__append_5) $(am__append_6) \
+	-I$(srcdir)/ps3lib
 @ENABLE_UPDATE_SMART_DRIVEDB_TRUE@@OS_WIN32_MINGW_FALSE@sbin_SCRIPTS = update-smart-drivedb
 smartctl_SOURCES = smartctl.cpp smartctl.h atacmdnames.cpp \
 	atacmdnames.h atacmds.cpp atacmds.h ataidentify.cpp \
@@ -618,8 +629,8 @@ smartctl_SOURCES = smartctl.cpp smartctl.h atacmdnames.cpp \
 	scsinvme.cpp scsiprint.cpp scsiprint.h static_assert.h \
 	utility.cpp utility.h sg_unaligned.h $(am__append_7) \
 	$(am__append_14) $(am__append_16) $(am__append_20)
-smartctl_LDADD = $(os_deps) $(os_libs) $(am__append_8) \
-	$(am__append_22)
+smartctl_LDADD = $(os_deps) $(os_libs) $(PS3LIB_LDADD) \
+	$(am__append_8) $(am__append_22)
 smartctl_DEPENDENCIES = $(os_deps) $(am__append_9)
 EXTRA_smartctl_SOURCES = os_darwin.cpp os_darwin.h os_linux.cpp \
 	os_linux.h os_freebsd.cpp os_freebsd.h os_netbsd.cpp \
@@ -637,7 +648,7 @@ smartd_SOURCES = smartd.cpp atacmdnames.cpp atacmdnames.h atacmds.cpp \
 	sg_unaligned.h $(am__append_10) $(am__append_11) \
 	$(am__append_15) $(am__append_17) $(am__append_21)
 smartd_LDADD = $(os_deps) $(os_libs) $(CAPNG_LDADD) $(SYSTEMD_LDADD) \
-	$(am__append_12) $(am__append_23)
+	$(PS3LIB_LDADD) $(am__append_12) $(am__append_23)
 smartd_DEPENDENCIES = $(os_deps) $(am__append_13)
 EXTRA_smartd_SOURCES = os_darwin.cpp os_darwin.h os_linux.cpp \
 	os_linux.h os_freebsd.cpp os_freebsd.h os_netbsd.cpp \
@@ -686,6 +697,19 @@ examples_SCRIPTS = \
 
 sysconf_DATA = smartd.conf
 smartdscript_SCRIPTS = smartd_warning.sh
+
+# Sources of the '-d ps3stor' device type (see ps3lib/ above)
+ps3lib_sources = ps3stor.h inner.h ps3lib/README ps3lib/libps3.a \
+        ps3lib/libps3_aarch64.a ps3lib/ps3_ses.h ps3lib/ps3lib_aen.h \
+        ps3lib/ps3lib_bbu.h ps3lib/ps3lib_cfg.h ps3lib/ps3lib_config.h \
+        ps3lib/ps3lib_ctrl.h ps3lib/ps3lib_dg.h ps3lib/ps3lib_encl.h \
+        ps3lib/ps3lib_event.h ps3lib/ps3lib_expander.h \
+        ps3lib/ps3lib_passthru.h ps3lib/ps3lib_pcieswitch.h \
+        ps3lib/ps3lib_pcieswitch_host.h ps3lib/ps3lib_pd.h \
+        ps3lib/ps3lib_phy.h ps3lib/ps3lib_rdebug.h ps3lib/ps3lib_smp.h \
+        ps3lib/ps3lib_system.h ps3lib/ps3lib_type.h \
+        ps3lib/ps3lib_update.h ps3lib/ps3lib_vd.h
+
 EXTRA_DIST = \
         .editorconfig \
         autogen.sh \
@@ -720,7 +744,8 @@ EXTRA_DIST = \
         os_win32/wtssendmsg.c \
         $(docs_DATA) \
         $(examples_DATA) \
-        $(examples_SCRIPTS)
+        $(examples_SCRIPTS) \
+        $(ps3lib_sources)
 
 CLEANFILES = smartd.8 smartd.1m smartd.8.html smartd.8.html.tmp \
 	smartd.8.pdf smartd.8.txt smartctl.8 smartctl.1m \
@@ -1047,12 +1072,12 @@ clean-sbinPROGRAMS:
 
 smartctl$(EXEEXT): $(smartctl_OBJECTS) $(smartctl_DEPENDENCIES) $(EXTRA_smartctl_DEPENDENCIES) 
 	@rm -f smartctl$(EXEEXT)
-	$(AM_V_CXXLD)$(CXXLINK) $(smartctl_OBJECTS) $(smartctl_LDADD) $(LIBS)  -L ./ps3lib -l$(PS3LIB) -lpthread
+	$(AM_V_CXXLD)$(CXXLINK) $(smartctl_OBJECTS) $(smartctl_LDADD) $(LIBS)
 	@cp smartctl$(EXEEXT) smartctl_ps3stor_$(shell uname -m)$(EXEEXT)
 
 smartd$(EXEEXT): $(smartd_OBJECTS) $(smartd_DEPENDENCIES) $(EXTRA_smartd_DEPENDENCIES) 
 	@rm -f smartd$(EXEEXT)
-	$(AM_V_CXXLD)$(CXXLINK) $(smartd_OBJECTS) $(smartd_LDADD) $(LIBS)  -L ./ps3lib -l$(PS3LIB) -lpthread
+	$(AM_V_CXXLD)$(CXXLINK) $(smartd_OBJECTS) $(smartd_LDADD) $(LIBS)
 install-examplesSCRIPTS: $(examples_SCRIPTS)
 	@$(NORMAL_INSTALL)
 	@list='$(examples_SCRIPTS)'; test -n "$(examplesdir)" || list=; \

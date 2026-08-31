@@ -1650,7 +1650,11 @@ smart_device * linux_ps3stor_device::autodetect_open()
     // NVMe
     if(get_device_interface_type() && m_dev_interface == PS3STOR_PD_INTERFACE_TYPE_NVME) {
       nvme_device * newdev = smi()->get_ps3stor_nvme_device(this, m_nsd, m_cid, m_did);
-      return newdev;
+      if (newdev) // NOTE: 'this' is now owned by '*newdev'
+        return newdev;
+      close();
+      set_err(EIO, "can't create NVMe device %u of ps3stor controller %u", m_did, m_cid);
+      return this;
     }
   }
 
@@ -1666,7 +1670,7 @@ bool linux_ps3stor_device::open()
 {
   if(!m_open_flag) {
   
-    if (sscanf(get_dev_name(), "/dev/ctrl/%hu", &m_cid) == 0) {
+    if (sscanf(get_dev_name(), "/dev/ctrl/%u", &m_cid) != 1) {
       if (!linux_smart_device::open())
         return false;
       /* Get device HBA */
@@ -1688,7 +1692,8 @@ bool linux_ps3stor_device::open()
         return set_err(EINVAL, "can't find device %s managed by ps3stor", get_dev_name());
       }
 #else
-      return false;
+      return set_err(EINVAL, "'-d ps3stor,%u' requires a '/dev/ctrl/N' device name, got '%s'",
+                     m_did, get_dev_name());
 #endif
     }
 
@@ -1767,13 +1772,16 @@ bool linux_ps3stor_device::scsi_cmd(scsi_cmnd_io *iop)
   encl_id_t eid = PS3LIB_INVALID_CODE_U8;
   slot_id_t sid = PS3LIB_INVALID_CODE_U16;
   if(!get_pd_position(eid, sid)) {
-    pout("linux_ps3stor_device::scsi_cmd: get_pd_position of device %u failed.\n", m_did);
     return set_err(EIO, "linux_ps3stor_device::scsi_cmd: get_pd_position of device %u failed.", m_did);
   }
 
   // use ps3lib for scsi cmd
+  // ps3lib's dataSize field is 32-bit: reject larger transfers up front so the
+  // size_t -> U32 conversion below cannot silently truncate.
+  if (iop->dxfer_len > 0xffffffffU)
+    return set_err(ENOSYS, "ps3stor cannot support data buffers larger than 4GiB");
   ps3stor_scsi_passthru_t *scsi_passthru = NULL;
-  unsigned data_size = sizeof(*scsi_passthru) + iop->dxfer_len;
+  size_t data_size = sizeof(*scsi_passthru) + iop->dxfer_len;
   scsi_passthru = (ps3stor_scsi_passthru_t*)malloc(data_size);
   if(scsi_passthru == NULL) {
     return set_err(EIO, "linux_ps3stor_device::scsi_cmd: malloc failed.");
@@ -1782,33 +1790,60 @@ bool linux_ps3stor_device::scsi_cmd(scsi_cmnd_io *iop)
   scsi_passthru->target.enclId = eid;
   scsi_passthru->target.slotId = sid;
   scsi_passthru->cmdType = PS3LIB_CMD_OP_PD_SCSI;
-  scsi_passthru->cmdDir = iop->dxfer_dir;
+  // Note: the DXFER_* values of smartmontools and the Ps3LibDir_e values of
+  // ps3lib differ for the read/write directions, a plain assignment would
+  // swap them.
+  switch (iop->dxfer_dir) {
+    case DXFER_FROM_DEVICE: scsi_passthru->cmdDir = (U8)PS3LIB_DIR_READ;  break;
+    case DXFER_TO_DEVICE:   scsi_passthru->cmdDir = (U8)PS3LIB_DIR_WRITE; break;
+    default:                scsi_passthru->cmdDir = (U8)PS3LIB_DIR_NONE;  break;
+  }
 
   scsi_passthru->cdbLength = iop->cmnd_len;
   memcpy(scsi_passthru->cdb, iop->cmnd, scsi_passthru->cdbLength);
-  scsi_passthru->dataSize = iop->dxfer_len;
+  scsi_passthru->dataSize = (U32)iop->dxfer_len; // checked for 32-bit range above
+  // Send the caller's data to the device
+  if (iop->dxfer_dir == DXFER_TO_DEVICE && iop->dxferp && iop->dxfer_len > 0)
+    memcpy(scsi_passthru->data, iop->dxferp, iop->dxfer_len);
 
   ps3stor_errno err = ps3libSCSIPassthru(m_cid, scsi_passthru);
-  if(err != PS3STOR_ERRNO_SUCCESS || scsi_passthru->scsiStatus) {
-    if(scsi_passthru->scsiStatus == 12) {
-      free(scsi_passthru);
-      return set_err(EIO, "linux_ps3stor_device::scsi_cmd: Device %u does not exist\n", m_did);
-    } else {
-      uint8_t scsi_status = scsi_passthru->scsiStatus;
-      //ignore underrun
-      if(scsi_status != PS3STOR_SCSI_STATUS_UNDERRUN) {
-        free(scsi_passthru);
-        return set_err((errno ? errno : EIO), "linux_ps3stor_device::scsi_cmd result: %u.%u = %d/%hhu",
-                    m_host, m_did, errno, scsi_status
-              );
-      }
-    }
+  if (err != PS3STOR_ERRNO_SUCCESS) {
+    uint8_t scsi_status = scsi_passthru->scsiStatus;
+    free(scsi_passthru);
+    return set_err(EIO, "linux_ps3stor_device::scsi_cmd: ps3libSCSIPassthru for device %u failed,"
+                        " ret=%d, scsiStatus=%hhu", m_did, (int)err, scsi_status);
   }
+
   iop->scsi_status = scsi_passthru->scsiStatus;
-  memcpy(iop->dxferp, scsi_passthru->data, scsi_passthru->dataSize);
-  memcpy(iop->sensep, scsi_passthru->pRequestSenseData, PS3STOR_MIN(iop->max_sense_len, sizeof(scsi_passthru->pRequestSenseData)));
+  iop->resid = 0;
+  iop->resp_sense_len = 0;
+
+  // Copy the data returned by the device
+  if (iop->dxfer_dir == DXFER_FROM_DEVICE && iop->dxferp && iop->dxfer_len > 0) {
+    unsigned len = PS3STOR_MIN(iop->dxfer_len, (unsigned)scsi_passthru->dataSize);
+    memcpy(iop->dxferp, scsi_passthru->data, len);
+    iop->resid = (int)(iop->dxfer_len - len);
+  }
+
+  // Copy the sense data (if any), the common SCSI/SAT layers evaluate it
+  // together with 'iop->scsi_status'.
+  if (iop->sensep && iop->max_sense_len > 0) {
+    unsigned len = PS3STOR_MIN((unsigned)iop->max_sense_len, (unsigned)sizeof(scsi_passthru->pRequestSenseData));
+    memcpy(iop->sensep, scsi_passthru->pRequestSenseData, len);
+    iop->resp_sense_len = len;
+  }
 
   free(scsi_passthru);
+
+  if (iop->scsi_status == PS3STOR_SCSI_STATUS_NO_DEVICE)
+    return set_err(EIO, "linux_ps3stor_device::scsi_cmd: Device %u does not exist", m_did);
+
+  // Reject unknown status codes, but ignore the vendor specific underrun code
+  if (   iop->scsi_status != PS3STOR_SCSI_STATUS_UNDERRUN
+      && iop->scsi_status >  PS3STOR_SCSI_STATUS_MAX)
+    return set_err(EIO, "linux_ps3stor_device::scsi_cmd: Device %u returned invalid status %hhu",
+                   m_did, iop->scsi_status);
+
   return true;
 }
 
@@ -1844,7 +1879,7 @@ bool linux_ps3stor_device::find_ctrlid_by_hostid()
   // try to find cid by hostid
   for(U16 i = 0; i < ctrl_list.count; i++)
   {
-    ps3stor_system_pcieinfo_t  pcieinfo;
+    ps3stor_system_pcieinfo_t  pcieinfo = {};
     ps3stor_errno err = ps3libSystemPciInfoGet(ctrl_list.ctrlId[i], &pcieinfo);
     if(err != PS3STOR_ERRNO_SUCCESS) {
       //todo print err msg
@@ -1870,7 +1905,9 @@ bool linux_ps3stor_device::get_device_interface_type()
   }
   //2.copy
   m_dev_interface = (ps3stor_pd_interface_e)baseinfo.interfaceType;
-  m_nsd = baseinfo.WWN;
+  // ps3lib does not report the NVMe namespace id, use the broadcast
+  // namespace (0xffffffff) like the other tunnelled NVMe device types do.
+  m_nsd = 0xffffffffU;
 
   return true;
 }
@@ -3725,10 +3762,14 @@ int linux_smart_interface::ps3stor_pd_add_list(unsigned int ctrlid, smart_device
     return 0;
   }
   //2. create linux_ps3stor_device for each pd and add it to devlist
-  for(U16 i = 0; i < pd_devid_list.pdCount; i++)
+  // 'pdCount' is reported by the firmware, clamp it to the size of the
+  // 'pdDevId' array to avoid an OOB read on malformed responses.
+  unsigned pdCount = PS3STOR_MIN((unsigned)pd_devid_list.pdCount,
+    (unsigned)PS3LIB_MAX_PD_NUM);
+  for(unsigned i = 0; i < pdCount; i++)
   {
     char line[128];
-    snprintf(line, sizeof(line) - 1, "/dev/ctrl/%u", ctrlid);
+    snprintf(line, sizeof(line), "/dev/ctrl/%u", ctrlid);
     smart_device * dev = new linux_ps3stor_device(this, line, pd_devid_list.pdDevId[i], ctrlid);
     devlist.push_back(dev);
   }
@@ -3739,6 +3780,9 @@ bool linux_smart_interface::ps3stor_init_lib()
 {
   //init ps3lib and get controller list , return false on err or not found
   if(!s_ps3stor_init) {
+    // m_ctrl_list is a POD member without a constructor, clear it before
+    // passing it to ps3libInit
+    memset(&m_ctrl_list, 0, sizeof(m_ctrl_list));
     m_ctrl_list.flags = PS3LIB_RUNNING_IOCTL_MODE;
     ps3stor_errno err = ps3libInit(&m_ctrl_list);
     if(err != PS3STOR_ERRNO_SUCCESS) {
@@ -3768,7 +3812,7 @@ bool linux_smart_interface::ps3stor_find_ctrlid(unsigned hostid, ctrl_id_t &cid)
   // try to find cid by hostid
   for(U16 i = 0; i < m_ctrl_list.count; i++)
   {
-    ps3stor_system_pcieinfo_t  pcieinfo;
+    ps3stor_system_pcieinfo_t  pcieinfo = {};
     ps3stor_errno err = ps3libSystemPciInfoGet(m_ctrl_list.ctrlId[i], &pcieinfo);
     if(err != PS3STOR_ERRNO_SUCCESS) {
       //TODO : PRINT ERR
@@ -4074,19 +4118,23 @@ smart_device * linux_smart_interface::get_custom_smart_device(const char * name,
 
   // ps3stor ?
   unsigned ctrlId = PS3LIB_INVALID_CODE_U32;
-  if (sscanf(type, "ps3stor,%d", &disknum) == 1) {
-    //todo : check for disknum innvalid or not exist
+  unsigned pdid = 0;
+  if (sscanf(type, "ps3stor,%u", &pdid) == 1) {
+    // The PD identifier is passed to ps3lib as a U16 (ps3libPdBaseInfoGetByDevId),
+    // so reject values that would silently be truncated.
+    if (pdid > 0xffffU)
+      return set_err_np(EINVAL, "Option -d ps3stor,N (N=%u) must have 0 <= N <= 65535", pdid);
     if(ps3stor_init_lib()) {
       if(sscanf(name, "/dev/ctrl/%u", &ctrlId) == 1) {
         if(ps3stor_check_ctrlid_exist(ctrlId) ) {
-          return new linux_ps3stor_device(this, name, disknum, ctrlId);
+          return new linux_ps3stor_device(this, name, pdid, ctrlId);
         } else {
-          pout("get_custom_smart_device: invalid ctrl with /dev/ctrl/%d.\n", ctrlId);
-          set_err_np(EINVAL, "get_custom_smart_device: invalid ctrl with /dev/ctrl/%d.\n", ctrlId);
+          pout("get_custom_smart_device: invalid ctrl with /dev/ctrl/%u.\n", ctrlId);
+          set_err_np(EINVAL, "get_custom_smart_device: invalid ctrl with /dev/ctrl/%u.\n", ctrlId);
         }
       } else {
 #ifdef PS3STOR_SUPPORT_DEV_SDX
-        return new linux_ps3stor_device(this, name, disknum);
+        return new linux_ps3stor_device(this, name, pdid);
 #else
         pout("get_custom_smart_device: input /dev/ctrl/X after ps3stor,N.\n");
         set_err_np(EINVAL, "get_custom_smart_device: input /dev/ctrl/X after ps3stor,N.\n");

@@ -443,6 +443,10 @@ bool ps3stornvme_device::nvme_pass_through(const nvme_cmd_in & in, nvme_cmd_out 
   nvme_cmd.cdw15 = in.cdw15;
 
   req.targetId = m_did;
+  // NVMe opcode bits 1:0 encode the data direction (0=none, 1=host-to-ctrl,
+  // 2=ctrl-to-host, 3=bidir) which coincidentally matches Ps3LibDir_e
+  // (NONE=0, WRITE=1, READ=2, BOTH=3).  Keep this mapping in mind if either
+  // side ever changes its enum values.
   req.dir = in.direction();
 
   //set encapsulatedCmdLength encapsulatedNVMeCmd submissionQueueType 
@@ -456,7 +460,11 @@ bool ps3stornvme_device::nvme_pass_through(const nvme_cmd_in & in, nvme_cmd_out 
     return set_err(EIO, "ps3stornvme_device::nvme_pass_through failed.");
   } else if(rsp.errorResponseCount > 0) {
     // check encapsulatedMPTErrorResponse
-    for(uint16_t i = 0; i < rsp.errorResponseCount; i++) {
+    // 'errorResponseCount' is filled by the firmware and may exceed the fixed
+    // size of 'encapsulatedMPTErrorResponse', clamp it to avoid an OOB read.
+    unsigned mptErrCount = PS3STOR_MIN((unsigned)rsp.errorResponseCount,
+      (unsigned)sizeof(rsp.encapsulatedMPTErrorResponse));
+    for(unsigned i = 0; i < mptErrCount; i++) {
       if(rsp.encapsulatedMPTErrorResponse[i] != 0) {
         return set_nvme_err(out, rsp.encapsulatedMPTErrorResponse[i]);
       }
@@ -520,8 +528,10 @@ nvme_device * smart_interface::get_snt_device(const char * type, scsi_device * s
 
 nvme_device *smart_interface::get_ps3stor_nvme_device(scsi_device *scsidev, unsigned nsid, unsigned cid, unsigned did)
 {
-  if (!scsidev->is_open())
+  if (!scsidev->is_open()) {
+    set_err(EINVAL, "smart_interface: get_ps3stor_nvme_device() called with closed device");
     return 0;
+  }
   
   nvme_device_auto_ptr nvmedev( new ps3stornvme_device(this, scsidev, "", nsid, cid, did) , scsidev);
   return nvmedev.release();
