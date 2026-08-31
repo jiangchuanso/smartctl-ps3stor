@@ -3762,7 +3762,11 @@ int linux_smart_interface::ps3stor_pd_add_list(unsigned int ctrlid, smart_device
     return 0;
   }
   //2. create linux_ps3stor_device for each pd and add it to devlist
-  for(U16 i = 0; i < pd_devid_list.pdCount; i++)
+  // 'pdCount' is reported by the firmware, clamp it to the size of the
+  // 'pdDevId' array to avoid an OOB read on malformed responses.
+  unsigned pdCount = PS3STOR_MIN((unsigned)pd_devid_list.pdCount,
+    (unsigned)PS3LIB_MAX_PD_NUM);
+  for(unsigned i = 0; i < pdCount; i++)
   {
     char line[128];
     snprintf(line, sizeof(line), "/dev/ctrl/%u", ctrlid);
@@ -3776,6 +3780,9 @@ bool linux_smart_interface::ps3stor_init_lib()
 {
   //init ps3lib and get controller list , return false on err or not found
   if(!s_ps3stor_init) {
+    // m_ctrl_list is a POD member without a constructor, clear it before
+    // passing it to ps3libInit
+    memset(&m_ctrl_list, 0, sizeof(m_ctrl_list));
     m_ctrl_list.flags = PS3LIB_RUNNING_IOCTL_MODE;
     ps3stor_errno err = ps3libInit(&m_ctrl_list);
     if(err != PS3STOR_ERRNO_SUCCESS) {

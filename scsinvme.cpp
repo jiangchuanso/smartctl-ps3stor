@@ -460,7 +460,11 @@ bool ps3stornvme_device::nvme_pass_through(const nvme_cmd_in & in, nvme_cmd_out 
     return set_err(EIO, "ps3stornvme_device::nvme_pass_through failed.");
   } else if(rsp.errorResponseCount > 0) {
     // check encapsulatedMPTErrorResponse
-    for(uint16_t i = 0; i < rsp.errorResponseCount; i++) {
+    // 'errorResponseCount' is filled by the firmware and may exceed the fixed
+    // size of 'encapsulatedMPTErrorResponse', clamp it to avoid an OOB read.
+    unsigned mptErrCount = PS3STOR_MIN((unsigned)rsp.errorResponseCount,
+      (unsigned)sizeof(rsp.encapsulatedMPTErrorResponse));
+    for(unsigned i = 0; i < mptErrCount; i++) {
       if(rsp.encapsulatedMPTErrorResponse[i] != 0) {
         return set_nvme_err(out, rsp.encapsulatedMPTErrorResponse[i]);
       }
