@@ -22,6 +22,16 @@ out/
 bin/
 *.tsbuildinfo
 
+# ===== autotools 本地构建产物（由 ./configure / make 生成，不应提交） =====
+Makefile
+config.h
+config.status
+stamp-h1
+libtool
+autom4te.cache/
+*.o
+*.lo
+
 # ===== Python =====
 __pycache__/
 *.py[cod]
